@@ -66,4 +66,44 @@ describe('session mutations', () => {
     await request('/auth/login', { method: 'POST', body: {} })
     expect(fetch.mock.calls[3]?.[1]).toMatchObject({ headers: { 'X-CSRF-TOKEN': 'csrf-new' } })
   })
+
+  it('keeps an intentional bootstrap cancellation distinct from a network failure', async () => {
+    const controller = new AbortController()
+    const fetch = vi.fn().mockRejectedValue(new DOMException('Aborted', 'AbortError'))
+    vi.stubGlobal('fetch', fetch)
+    const pending = request('/auth/me', { signal: controller.signal })
+    controller.abort()
+    await expect(pending).rejects.toMatchObject({ name: 'AbortError' })
+    expect(fetch.mock.calls[0]?.[1]).toMatchObject({ signal: controller.signal })
+  })
+
+  it('does not invalidate a new session from a cancelled bootstrap’s late 401 body', async () => {
+    const controller = new AbortController()
+    const dispatchEvent = vi.fn()
+    vi.stubGlobal('window', { dispatchEvent })
+    let releaseBody!: (value: unknown) => void
+    let started!: () => void
+    const bodyStarted = new Promise<void>((resolve) => {
+      started = resolve
+    })
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: false,
+        status: 401,
+        json: () => {
+          started()
+          return new Promise((resolve) => {
+            releaseBody = resolve
+          })
+        },
+      }),
+    )
+    const pending = request('/auth/me', { signal: controller.signal })
+    await bodyStarted
+    controller.abort()
+    releaseBody({ code: 'AUTHENTICATION_REQUIRED', message: 'Old anonymous response' })
+    await expect(pending).rejects.toMatchObject({ name: 'AbortError' })
+    expect(dispatchEvent).not.toHaveBeenCalled()
+  })
 })

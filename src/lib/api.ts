@@ -22,13 +22,13 @@ export function resetCsrf() {
 
 export async function request<T>(
   path: string,
-  options: { method?: string; body?: unknown; idempotencyKey?: string } = {},
+  options: { method?: string; body?: unknown; idempotencyKey?: string; signal?: AbortSignal } = {},
 ): Promise<T> {
   const method = options.method ?? 'GET'
   const headers: Record<string, string> = { Accept: 'application/json' }
   if (options.body !== undefined) headers['Content-Type'] = 'application/json'
   if (method !== 'GET') {
-    if (!csrf) csrf = await request<CsrfToken>('/auth/csrf')
+    if (!csrf) csrf = await request<CsrfToken>('/auth/csrf', { signal: options.signal })
     headers[csrf.headerName] = csrf.token
   }
   if (options.idempotencyKey) headers['Idempotency-Key'] = options.idempotencyKey
@@ -38,20 +38,24 @@ export async function request<T>(
       method,
       credentials: 'same-origin',
       headers,
+      ...(options.signal ? { signal: options.signal } : {}),
       ...(options.body === undefined ? {} : { body: JSON.stringify(options.body) }),
     })
-  } catch {
+  } catch (cause) {
+    if (options.signal?.aborted) throw cause
     throw new ApiError(
       'NETWORK_ERROR',
       '서버에 연결하지 못했습니다. 연결을 확인하고 다시 시도해 주세요. 신청을 다시 보내면 동일한 요청 키를 사용합니다.',
     )
   }
+  options.signal?.throwIfAborted()
   if (!response.ok) {
     const error = (await response.json().catch(() => ({}))) as {
       code?: string
       message?: string
       traceId?: string
     }
+    options.signal?.throwIfAborted()
     if (response.status === 403) resetCsrf()
     if (response.status === 401) window.dispatchEvent(new Event('omb:unauthorized'))
     throw new ApiError(
