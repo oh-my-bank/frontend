@@ -1,6 +1,6 @@
 # Oh My Bank · Frontend
 
-Vue 3 · TypeScript · Vite 기반 금융거래 시뮬레이션 고객 화면입니다. 실제 금융상품 판매, 대출 심사, 자금 이동을 제공하지 않습니다.
+React 19 · TypeScript · React Router 7 · Vite 8 기반 금융거래 시뮬레이션 고객 화면입니다. 실제 금융상품 판매, 대출 심사, 자금 이동을 제공하지 않습니다.
 
 ## 개발 실행
 
@@ -28,6 +28,8 @@ npm run dev
 
 동일 출처의 HttpOnly 세션 쿠키와 CSRF 토큰을 사용합니다. 변경 요청 전에 `/auth/csrf`를 조회하며 로그인·로그아웃 후 토큰 캐시를 비웁니다. 비밀번호와 인증 토큰을 브라우저 저장소에 저장하지 않습니다.
 
+`AuthProvider`가 세션 복원과 로그인 상태를 공유하며 React Router에서 고객·직원 경로를 구분합니다. 서버는 역할과 고객 소유권을 최종 검증합니다.
+
 대출 신청 폼은 동일한 요청 본문을 재시도할 때 같은 `Idempotency-Key`를 유지합니다. 조건을 바꾸거나 접수가 완료되면 새 키를 사용합니다. 화면을 떠나거나 새로고침하면 키가 초기화되므로 결과가 불분명한 경우 먼저 대시보드의 신청 내역을 확인합니다. 백엔드가 요청 키의 재사용과 충돌을 최종 검증합니다.
 
 백엔드 `local` 프로필의 가상 고객은 `customer@omb.local` / `OmbDemo123!`입니다. 직원은 `reviewer@omb.local`, `admin@omb.local`이며 같은 개발용 비밀번호를 사용합니다. 실제 개인정보를 입력하지 마세요. 다른 프로필에서는 개발 계정이 생성되지 않습니다.
@@ -35,14 +37,22 @@ npm run dev
 ## 검증
 
 ```sh
+npm run format:check
+npm run typecheck
 npm test
 npm run build
 ```
 
-Vitest는 신청 재시도 키 유지·변경·완료 후 초기화, CSRF 검증 선행, 실패한 CSRF 조회 시 변경 요청 차단, 네트워크 오류 시 자동 재전송 방지와 세션 변경 후 토큰 갱신을 확인합니다. 빌드에 Vue·TypeScript 타입 검사가 포함됩니다.
+Vitest는 신청 재시도 키 유지·변경·완료 후 초기화, CSRF 검증 선행, 실패한 CSRF 조회 시 변경 요청 차단, 네트워크 오류 시 자동 재전송 방지와 세션 변경 후 토큰 갱신을 확인합니다. 빌드에 TypeScript 타입 검사(`tsc --noEmit`)가 포함됩니다. 인증·상품 선택·신청·결과 조회·로그아웃은 실제 API와 연결해 데스크톱과 모바일에서 확인합니다.
+
+## 기존 화면 유지
+
+기존 녹색 버전의 색상·레이아웃·문구를 유지하면서 React로 옮겼습니다. 로그인, 상품 조회·신청, 신청 내역, 직원 안내와 모바일 화면도 기존 흐름을 기준으로 확인합니다.
+
+통합 저장소의 `docs/decisions/0001-react-and-ui.md`에 Vue에서 React로 전환한 범위·비용, FinMATE 실제 기술 스택, 기존 화면 복원 결정을 기록합니다.
 
 ## 컨테이너
 
 통합 저장소의 `infra/compose.yaml`로 실행합니다. 프런트엔드 이미지는 Node.js 24에서 빌드한 정적 파일을 Nginx로 제공합니다. `/api/`는 `backend:8080`으로 전달하며, `/health`는 컨테이너 상태 확인용입니다.
 
-개발 도구의 기준은 [Vue 공식 빠른 시작](https://vuejs.org/guide/quick-start.html)과 [Vite 공식 가이드](https://vite.dev/guide/)를 확인했습니다. 설치 버전은 `package-lock.json`으로 고정합니다.
+개발 도구의 기준은 [React 공식 문서](https://react.dev/learn), [React Router 공식 문서](https://reactrouter.com/), [Vite 공식 가이드](https://vite.dev/guide/)입니다. 설치 버전은 `package-lock.json`으로 고정합니다.
