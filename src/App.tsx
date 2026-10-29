@@ -1,16 +1,18 @@
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link, NavLink, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from './stores/auth'
 import BrandLogo from './components/BrandLogo'
 import AppIcon from './components/AppIcon'
 import ErrorNotice from './components/ErrorNotice'
+import HomePage from './views/HomePage'
+import GuidePage from './views/GuidePage'
 import AuthPage from './views/AuthPage'
 import DashboardPage from './views/DashboardPage'
 import ProductsPage from './views/ProductsPage'
 import ProductPage from './views/ProductPage'
 import ApplicationPage from './views/ApplicationPage'
 import StaffPage from './views/StaffPage'
-
+import { anchorId, destinationAfterAuthentication } from './lib/navigation'
 function Protected({ children, staff = false }: { children: ReactNode; staff?: boolean }) {
   const { user } = useAuth()
   const location = useLocation()
@@ -21,7 +23,7 @@ function Protected({ children, staff = false }: { children: ReactNode; staff?: b
         replace
       />
     )
-  if (staff && user.role === 'CUSTOMER') return <Navigate to="/" replace />
+  if (staff && user.role === 'CUSTOMER') return <Navigate to="/my" replace />
   if (!staff && user.role !== 'CUSTOMER') return <Navigate to="/staff" replace />
   return children
 }
@@ -31,25 +33,56 @@ export default function App() {
   const navigate = useNavigate()
   const [loggingOut, setLoggingOut] = useState(false)
   const [logoutError, setLogoutError] = useState<unknown>(null)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const menuButton = useRef<HTMLButtonElement>(null)
+  const dialogRef = useRef<HTMLDialogElement>(null)
+  const staff = !!user && user.role !== 'CUSTOMER'
   const role = user
     ? { CUSTOMER: '고객', REVIEWER: '심사 담당자', ADMIN: '운영 관리자' }[user.role]
     : ''
-  const pageTitle =
+  const title =
     location.pathname === '/'
-      ? '내 대시보드'
-      : location.pathname.startsWith('/products/')
-        ? '상품 상세 · 대출 신청'
+      ? '홈'
+      : location.pathname === '/my'
+        ? '나의 대출'
         : location.pathname === '/products'
-          ? '금융상품'
-          : location.pathname.startsWith('/applications/')
-            ? '신청 상세'
-            : location.pathname === '/staff'
-              ? '직원 업무'
-              : '로그인'
+          ? '대출상품'
+          : location.pathname.startsWith('/products/')
+            ? '대출 신청'
+            : location.pathname.startsWith('/applications/')
+              ? '신청 내역'
+              : location.pathname === '/guide'
+                ? '이용안내'
+                : location.pathname === '/staff'
+                  ? '직원업무'
+                  : new URLSearchParams(location.search).get('mode') === 'register'
+                    ? '회원가입'
+                    : '로그인'
   useEffect(() => {
-    document.title = `${pageTitle} · Oh My Bank`
-    window.scrollTo(0, 0)
-  }, [location.pathname, pageTitle])
+    document.title = `${title} | Oh My Bank`
+    setMenuOpen(false)
+    if (!ready) return
+    if (!location.hash) window.scrollTo(0, 0)
+    else {
+      const id = anchorId(location.hash)
+      const target = id ? document.getElementById(id) : null
+      target?.scrollIntoView()
+    }
+  }, [location.pathname, location.hash, location.key, title, ready])
+  useEffect(() => {
+    const dialog = dialogRef.current
+    if (!dialog) return
+    if (menuOpen) {
+      dialog.showModal()
+      const oldOverflow = document.body.style.overflow
+      document.body.style.overflow = 'hidden'
+      return () => {
+        dialog.close()
+        document.body.style.overflow = oldOverflow
+      }
+    }
+    dialog.close()
+  }, [menuOpen])
   async function signOut() {
     setLoggingOut(true)
     setLogoutError(null)
@@ -62,145 +95,189 @@ export default function App() {
       setLoggingOut(false)
     }
   }
-  const routeContent =
-    !ready || loggingOut ? (
-      <div className="empty-state" role="status">
-        {loggingOut ? '로그아웃 중…' : '이용 정보를 확인하고 있습니다.'}
-      </div>
-    ) : (
-      <Routes>
-        <Route
-          path="/login"
-          element={
-            user ? (
-              <Navigate to={user.role === 'CUSTOMER' ? '/' : '/staff'} replace />
-            ) : (
-              <AuthPage />
-            )
-          }
-        />
-        <Route
-          path="/"
-          element={
-            <Protected>
-              <DashboardPage />
-            </Protected>
-          }
-        />
-        <Route path="/products" element={<ProductsPage />} />
-        <Route path="/products/:id" element={<ProductPage key={location.pathname} />} />
-        <Route
-          path="/applications/:id"
-          element={
-            <Protected>
-              <ApplicationPage key={location.pathname} />
-            </Protected>
-          }
-        />
-        <Route
-          path="/staff"
-          element={
-            <Protected staff>
-              <StaffPage />
-            </Protected>
-          }
-        />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    )
+  function closeMenu() {
+    setMenuOpen(false)
+    menuButton.current?.focus()
+  }
   return (
-    <>
+    <div className="bank-site">
       <a className="skip-link" href="#main">
-        본문으로 건너뛰기
+        본문 바로가기
       </a>
-      {location.pathname === '/login' ? (
-        <div className="auth-root">{routeContent}</div>
-      ) : (
-        <div className="app-layout">
-          <aside className="sidebar">
-            <BrandLogo />
-            <div className="workspace-label">MY FINANCIAL WORKSPACE</div>
-            <nav className="main-nav" aria-label="주 메뉴">
-              {(!user || user.role === 'CUSTOMER') && (
-                <NavLink to="/" end>
-                  <AppIcon name="grid" />내 대시보드
-                </NavLink>
-              )}
-              <NavLink to="/products">
-                <AppIcon name="layers" />
-                금융상품
-                <span className="nav-dot" />
-              </NavLink>
-              {user && user.role !== 'CUSTOMER' && (
-                <NavLink to="/staff">
-                  <AppIcon name="shield" />
-                  직원 업무
-                </NavLink>
-              )}
-            </nav>
-            <div className="sidebar-note">
-              <span className="tiny-label">LEARN BY DOING</span>
-              <h3>
-                작은 경험이
-                <br />
-                금융의 이해로.
-              </h3>
-              <p>
-                모든 거래는 가상 데이터로
-                <br />
-                안전하게 진행됩니다.
-              </p>
-              <div className="note-orbit">
-                <span>OMB</span>
-              </div>
-            </div>
-            <div className="sidebar-bottom">
-              <span className="live-dot" />
-              금융 시뮬레이션<span className="version">v0.1</span>
-            </div>
-          </aside>
-          <div className="main-shell">
-            <header className="topbar">
-              <div className="breadcrumb">
-                Workspace
-                <AppIcon name="chevron" size={14} />
-                <strong>{pageTitle}</strong>
-              </div>
-              {user ? (
-                <div className="user-menu">
-                  <span className="avatar">{user.name.slice(0, 1)}</span>
-                  <div>
-                    <strong>{user.name}</strong>
-                    <small>{role} 계정</small>
-                  </div>
-                  <button
-                    className="icon-button"
-                    disabled={loggingOut}
-                    onClick={signOut}
-                    aria-label="로그아웃"
-                    title="로그아웃"
-                  >
-                    <AppIcon name="logout" size={18} />
-                  </button>
-                </div>
-              ) : (
-                <Link className="button button-dark small" to="/login">
-                  로그인
-                  <AppIcon name="arrow" size={16} />
-                </Link>
-              )}
-            </header>
-            <main id="main" className="main-content">
-              <ErrorNotice error={logoutError} />
-              {routeContent}
-            </main>
-            <footer className="page-footer">
-              <span>© {new Date().getFullYear()} Oh My Bank</span>
-              <span>학습용 가상 금융거래 시뮬레이션 · 실제 대출 및 자금 이동 없음</span>
-            </footer>
+      <header className="bank-header">
+        <div className="bank-utility content-width">
+          <span className="bank-simulation">금융거래 시뮬레이션</span>
+          <div>
+            {user ? (
+              <>
+                <span className="utility-user">
+                  <strong>{user.name}</strong>님<span className="utility-role">{role}</span>
+                </span>
+                <button disabled={loggingOut} onClick={signOut}>
+                  {loggingOut ? '로그아웃 중' : '로그아웃'}
+                </button>
+              </>
+            ) : (
+              <>
+                <Link to="/login">로그인</Link>
+                <Link to="/login?mode=register">회원가입</Link>
+              </>
+            )}
+            <Link to="/guide" className="utility-guide">
+              이용안내
+            </Link>
           </div>
         </div>
-      )}
-    </>
+        <div className="bank-gnb content-width">
+          <BrandLogo />
+          <nav aria-label="주 메뉴" className="bank-main-nav">
+            <NavLink to="/products">금융상품</NavLink>
+            <NavLink to={staff ? '/staff' : '/my'}>{staff ? '직원업무' : '신청조회'}</NavLink>
+            <NavLink to="/guide">이용안내</NavLink>
+          </nav>
+          <button
+            className="all-menu-button"
+            ref={menuButton}
+            aria-label="전체메뉴"
+            aria-expanded={menuOpen}
+            aria-controls="all-menu"
+            onClick={() => setMenuOpen(true)}
+          >
+            <AppIcon name="menu" size={25} />
+            <span>전체메뉴</span>
+          </button>
+        </div>
+      </header>
+      <dialog
+        id="all-menu"
+        ref={dialogRef}
+        className="all-menu-dialog"
+        aria-labelledby="all-menu-title"
+        onCancel={() => setMenuOpen(false)}
+        onClose={() => setMenuOpen(false)}
+      >
+        <div className="all-menu-heading">
+          <h2 id="all-menu-title">전체메뉴</h2>
+          <button onClick={closeMenu} aria-label="전체메뉴 닫기">
+            <AppIcon name="close" size={25} />
+          </button>
+        </div>
+        <div
+          className="all-menu-grid"
+          onClick={(event) => {
+            if ((event.target as Element).closest('a')) closeMenu()
+          }}
+        >
+          <section>
+            <h3>금융상품</h3>
+            <Link to="/products">대출상품 조회</Link>
+            <Link to="/products">대출 신청</Link>
+          </section>
+          <section>
+            <h3>{staff ? '직원 업무' : '나의 대출'}</h3>
+            <Link to={staff ? '/staff' : '/my'}>{staff ? '업무 범위 확인' : '신청 내역 조회'}</Link>
+            <Link to="/guide#application">신청 절차 안내</Link>
+          </section>
+          <section>
+            <h3>이용안내</h3>
+            <Link to="/guide#notice">시뮬레이션 안내</Link>
+            <Link to="/guide#scope">서비스 제공 범위</Link>
+            {!user && <Link to="/login?mode=register">회원가입</Link>}
+          </section>
+        </div>
+      </dialog>
+      <main
+        id="main"
+        className={`bank-main content-width ${location.pathname === '/' ? 'home-main' : ''}`}
+        tabIndex={-1}
+      >
+        {location.pathname !== '/' && (
+          <div className="bank-breadcrumb" aria-label="현재 위치">
+            <Link to="/" aria-label="홈">
+              <AppIcon name="home" size={14} />
+            </Link>
+            <AppIcon name="chevron" size={12} />
+            <span>{title}</span>
+          </div>
+        )}
+        <ErrorNotice error={logoutError} />
+        {!ready || loggingOut ? (
+          <div className="empty-state" role="status">
+            {loggingOut ? '로그아웃 중입니다.' : '이용 정보를 확인하고 있습니다.'}
+          </div>
+        ) : (
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/guide" element={<GuidePage />} />
+            <Route
+              path="/login"
+              element={
+                user ? (
+                  <Navigate
+                    to={destinationAfterAuthentication(
+                      new URLSearchParams(location.search).get('redirect'),
+                      user.role,
+                      new URLSearchParams(location.search).get('mode') === 'register',
+                    )}
+                    replace
+                  />
+                ) : (
+                  <AuthPage />
+                )
+              }
+            />
+            <Route
+              path="/my"
+              element={
+                <Protected>
+                  <DashboardPage />
+                </Protected>
+              }
+            />
+            <Route path="/products" element={<ProductsPage />} />
+            <Route path="/products/:id" element={<ProductPage key={location.pathname} />} />
+            <Route
+              path="/applications/:id"
+              element={
+                <Protected>
+                  <ApplicationPage key={location.pathname} />
+                </Protected>
+              }
+            />
+            <Route
+              path="/staff"
+              element={
+                <Protected staff>
+                  <StaffPage />
+                </Protected>
+              }
+            />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        )}
+      </main>
+      <footer className="bank-footer">
+        <div className="content-width">
+          <nav className="footer-links" aria-label="하단 메뉴">
+            <Link to="/guide#notice">시뮬레이션 안내</Link>
+            <Link to="/guide#application">이용 방법</Link>
+            <Link to="/products">상품안내</Link>
+            <Link to={staff ? '/staff' : '/my'}>{staff ? '직원업무' : '신청조회'}</Link>
+          </nav>
+          <div className="footer-bottom">
+            <div>
+              <strong>Oh My Bank</strong>
+              <p>금융업무 학습을 위한 가상 금융거래 서비스</p>
+              <small>© {new Date().getFullYear()} Oh My Bank. All rights reserved.</small>
+            </div>
+            <p className="footer-disclaimer">
+              실제 금융상품 판매·대출 중개·자금 이동을 제공하지 않습니다.
+              <br />
+              실제 개인정보와 금융정보는 입력하지 마세요.
+            </p>
+          </div>
+        </div>
+      </footer>
+    </div>
   )
 }

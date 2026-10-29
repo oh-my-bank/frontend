@@ -1,0 +1,531 @@
+.bank-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.bank-title-actions {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+}
+.bank-title-actions > .button {
+  flex-shrink: 0;
+}
+.bank-overview {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fff;
+  overflow: hidden;
+}
+.bank-overview-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 22px 28px;
+  background: var(--surface-soft);
+  border-bottom: 1px solid var(--border);
+}
+.bank-overview-heading h2 {
+  font-size: 18px;
+  font-weight: 650;
+  color: var(--brand-dark);
+}
+.bank-overview-heading > span {
+  font-size: 13px;
+  color: var(--muted);
+}
+.bank-overview-counts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  padding: 27px 0;
+}
+.bank-overview-counts > div {
+  padding: 0 30px;
+}
+.bank-overview-counts > div + div {
+  border-left: 1px solid var(--border);
+}
+.bank-overview-counts > div > span {
+  display: block;
+  font-size: 14px;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+.bank-overview-counts strong {
+  font-size: 36px;
+  line-height: 1.15;
+  color: var(--brand-dark);
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+.bank-overview-counts small {
+  font-size: 16px;
+  font-weight: 400;
+  margin-left: 8px;
+}
+.bank-record-section {
+  margin-top: 42px;
+}
+.bank-application-table-wrap {
+  border-top: 2px solid var(--brand-dark);
+}
+.bank-application-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+.bank-application-table th {
+  padding: 17px 16px;
+  background: var(--surface-soft);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  white-space: nowrap;
+}
+.bank-application-table td {
+  padding: 20px 16px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+  line-height: 1.6;
+}
+.bank-application-table .bank-amount-cell {
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.bank-product-cell {
+  min-width: 170px;
+  font-weight: 600;
+}
+.bank-product-cell a:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  color: var(--brand);
+}
+.bank-date-cell {
+  font-size: 13px;
+  color: var(--muted);
+}
+.bank-detail-cell {
+  width: 94px;
+}
+.bank-detail-cell a {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 44px;
+  font-size: 13px;
+  white-space: nowrap;
+  color: var(--brand-dark);
+}
+.bank-detail-cell a:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.bank-section-help {
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--muted);
+  margin-top: 14px;
+}
+.bank-empty-records > svg {
+  color: var(--brand);
+  margin-bottom: 14px;
+}
+.bank-empty-records .button {
+  margin-top: 20px;
+}
+.bank-products-section {
+  padding-top: 36px;
+  border-top: 1px solid var(--border);
+}
+.bank-record-retry {
+  margin: 18px 0;
+}
+.bank-statement {
+  margin-top: 30px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  overflow: hidden;
+}
+.bank-statement-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 28px 32px;
+}
+.bank-statement-heading > div > span {
+  font-size: 13px;
+  color: var(--muted);
+  display: block;
+  margin-bottom: 8px;
+}
+.bank-statement-heading h2 {
+  font-size: 23px;
+  line-height: 1.4;
+  font-weight: 650;
+}
+.bank-statement-summary {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr 1fr;
+  margin: 0;
+  padding: 30px 32px;
+  background: var(--surface-soft);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.bank-statement-summary > div + div {
+  border-left: 1px solid var(--border);
+  padding-left: 30px;
+}
+.bank-statement-summary dt {
+  font-size: 14px;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+.bank-statement-summary dd {
+  margin: 0;
+  font-size: 29px;
+  font-weight: 600;
+  color: var(--brand-dark);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+.bank-statement-summary .bank-statement-principal {
+  font-size: 34px;
+}
+.bank-statement-summary small {
+  font-size: 17px;
+  font-weight: 400;
+  margin-left: 4px;
+}
+.bank-statement-body {
+  padding: 30px 32px;
+}
+.bank-statement-body h3 {
+  font-size: 18px;
+  margin-bottom: 12px;
+}
+.bank-statement-body .details-list {
+  margin: 0;
+  padding: 0;
+}
+.bank-statement-body .monospace {
+  overflow-wrap: anywhere;
+  font-size: 13px;
+}
+.bank-record-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 24px 26px;
+  margin-top: 28px;
+  background: var(--surface-soft);
+  border-radius: 6px;
+  color: var(--brand-dark);
+}
+.bank-record-notice > svg {
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+.bank-record-notice h2 {
+  font-size: 15px;
+  margin-bottom: 7px;
+}
+.bank-record-notice p {
+  font-size: 13px;
+  line-height: 1.9;
+  color: var(--muted);
+}
+.bank-bottom-action {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 32px;
+}
+.bank-bottom-action .button {
+  min-width: 150px;
+}
+.bank-staff-role {
+  display: inline-block;
+  padding: 9px 14px;
+  border: 1px solid #bfddd5;
+  border-radius: 4px;
+  background: var(--surface-soft);
+  color: var(--brand-dark);
+  font-size: 13px;
+  white-space: nowrap;
+}
+.bank-staff-account {
+  padding: 28px 30px;
+}
+.bank-staff-account-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--brand-dark);
+  margin-bottom: 17px;
+}
+.bank-staff-account-title h2 {
+  font-size: 19px;
+}
+.bank-staff-account .details-list {
+  padding: 0;
+  margin: 0;
+}
+.bank-staff-account dd {
+  overflow-wrap: anywhere;
+}
+.bank-staff-scope-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+.bank-staff-scope {
+  padding: 28px 30px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+}
+.bank-scope-state {
+  display: inline-block;
+  padding: 5px 9px;
+  font-size: 12px;
+  border-radius: 3px;
+  background: var(--surface-soft);
+  color: var(--brand);
+  margin-bottom: 14px;
+}
+.bank-staff-scope h3 {
+  font-size: 21px;
+  margin-bottom: 12px;
+}
+.bank-staff-scope p,
+.bank-staff-scope ul {
+  font-size: 15px;
+  line-height: 1.9;
+  color: var(--muted);
+}
+.bank-staff-scope ul {
+  margin: 0;
+  padding-left: 20px;
+}
+.bank-staff-scope .text-button {
+  margin-top: 21px;
+}
+.bank-staff-pending .bank-scope-state {
+  color: var(--muted);
+  background: #f4f5f4;
+}
+.bank-staff-scope .bank-section-help {
+  font-size: 13px;
+}
+.bank-staff-notice {
+  margin-top: 28px;
+}
+@media (max-width: 1050px) {
+  .bank-application-table th,
+  .bank-application-table td {
+    padding-left: 11px;
+    padding-right: 11px;
+  }
+  .bank-overview-counts > div {
+    padding: 0 23px;
+  }
+  .bank-statement-summary {
+    padding: 27px;
+  }
+  .bank-statement-summary > div + div {
+    padding-left: 22px;
+  }
+  .bank-statement-summary .bank-statement-principal {
+    font-size: 30px;
+  }
+  .bank-statement-summary dd {
+    font-size: 26px;
+  }
+}
+@media (max-width: 799px) {
+  .bank-title-actions {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 18px;
+  }
+  .bank-overview-heading {
+    padding: 20px;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .bank-overview-counts {
+    padding: 23px 0;
+  }
+  .bank-overview-counts > div {
+    padding: 0 17px;
+  }
+  .bank-overview-counts > div > span {
+    font-size: 13px;
+    line-height: 1.6;
+    min-height: 21px;
+  }
+  .bank-overview-counts strong {
+    font-size: 30px;
+  }
+  .bank-overview-counts small {
+    font-size: 14px;
+    margin-left: 5px;
+  }
+  .bank-record-section {
+    margin-top: 32px;
+  }
+  .bank-application-table,
+  .bank-application-table tbody {
+    display: block;
+  }
+  .bank-application-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+  }
+  .bank-application-table tr {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 17px 20px;
+    padding: 22px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .bank-application-table td {
+    display: block;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    font-size: 15px;
+  }
+  .bank-application-table td::before {
+    content: attr(data-label);
+    display: block;
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--muted);
+    margin-bottom: 7px;
+  }
+  .bank-application-table .bank-product-cell {
+    grid-column: 1/-1;
+    font-size: 17px;
+    min-width: 0;
+  }
+  .bank-product-cell::before {
+    display: none !important;
+  }
+  .bank-application-table .bank-amount-cell {
+    text-align: left;
+  }
+  .bank-date-cell {
+    font-size: 13px !important;
+  }
+  .bank-detail-cell {
+    grid-column: 1/-1;
+    width: auto;
+  }
+  .bank-detail-cell::before {
+    display: none !important;
+  }
+  .bank-detail-cell a {
+    min-height: 44px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .bank-products-section {
+    padding-top: 27px;
+  }
+  .bank-statement-heading {
+    padding: 24px 22px;
+    align-items: flex-start;
+  }
+  .bank-statement-heading h2 {
+    font-size: 21px;
+  }
+  .bank-statement-summary {
+    grid-template-columns: 1fr 1fr;
+    gap: 25px 20px;
+    padding: 26px 22px;
+  }
+  .bank-statement-summary > div:first-child {
+    grid-column: 1/-1;
+  }
+  .bank-statement-summary > div + div {
+    border-left: 0;
+    padding-left: 0;
+  }
+  .bank-statement-summary > div:last-child {
+    padding-left: 20px;
+    border-left: 1px solid var(--border);
+  }
+  .bank-statement-summary dd {
+    font-size: 26px;
+  }
+  .bank-statement-summary .bank-statement-principal {
+    font-size: 32px;
+  }
+  .bank-statement-body {
+    padding: 27px 22px;
+  }
+  .bank-record-notice {
+    padding: 21px 20px;
+  }
+  .bank-bottom-action .button {
+    min-width: 0;
+    flex: 1;
+  }
+  .bank-staff-account {
+    padding: 25px 22px;
+  }
+  .bank-staff-scope-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+  .bank-staff-scope {
+    padding: 25px 22px;
+  }
+}
+@media (max-width: 380px) {
+  .bank-overview-counts > div {
+    padding: 0 12px;
+  }
+  .bank-overview-counts > div > span {
+    font-size: 12px;
+    min-height: 38px;
+  }
+  .bank-overview-counts strong {
+    font-size: 27px;
+  }
+  .bank-statement-summary dd {
+    font-size: 23px;
+  }
+  .bank-statement-summary small {
+    font-size: 15px;
+  }
+  .bank-statement-summary .bank-statement-principal {
+    font-size: 29px;
+  }
+  .bank-statement-heading {
+    gap: 12px;
+  }
+  .bank-statement-heading h2 {
+    font-size: 19px;
+  }
+}
