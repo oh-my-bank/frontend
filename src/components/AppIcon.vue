@@ -15,4 +15,18 @@ const paths: Record<string, string> = {
   chevron: 'm9 5 7 7-7 7',
 }
 </script>
-<template><svg :width="size ?? 20" :height="size ?? 20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path :d="paths[name] ?? paths.document" /></svg></template>
+<template>
+  <svg
+    :width="size ?? 20"
+    :height="size ?? 20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="1.7"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+  >
+    <path :d="paths[name] ?? paths.document" />
+  </svg>
+</template>

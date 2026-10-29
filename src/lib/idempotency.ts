@@ -5,9 +5,15 @@ export function createApplicationRequest(newKey: () => string = () => crypto.ran
   return {
     keyFor(payload: unknown) {
       const serialized = JSON.stringify(payload)
-      if (serialized !== previousPayload || !key) { previousPayload = serialized; key = newKey() }
+      if (serialized !== previousPayload || !key) {
+        previousPayload = serialized
+        key = newKey()
+      }
       return key
     },
-    clear() { previousPayload = ''; key = '' },
+    clear() {
+      previousPayload = ''
+      key = ''
+    },
   }
 }
