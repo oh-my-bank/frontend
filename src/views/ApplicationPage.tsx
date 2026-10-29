@@ -5,6 +5,8 @@ import { dateTime, rate, statusLabel, won } from '../lib/format'
 import type { LoanApplication } from '../types'
 import AppIcon from '../components/AppIcon'
 import ErrorNotice from '../components/ErrorNotice'
+import ProgressSteps from '../components/ProgressSteps'
+import '../styles/banking-records.css'
 
 export default function ApplicationPage() {
   const { id } = useParams()
@@ -12,7 +14,6 @@ export default function ApplicationPage() {
   const [pending, setPending] = useState(true)
   const [error, setError] = useState<unknown>(null)
   const [reload, setReload] = useState(0)
-
   useEffect(() => {
     let active = true
     const controller = new AbortController()
@@ -39,80 +40,106 @@ export default function ApplicationPage() {
 
   return (
     <>
-      <Link to="/" className="back-link">
-        ← 내 대시보드
-      </Link>
+      <section className="page-title bank-title-actions">
+        <div>
+          <h1>대출 신청 내역</h1>
+          <p>접수한 신청의 조건과 현재 진행 상태를 확인하세요.</p>
+        </div>
+        <Link to="/my" className="button button-outline">
+          나의 대출
+          <AppIcon name="chevron" size={15} />
+        </Link>
+      </section>
+      {application && !pending && <ProgressSteps current={3} />}
       <ErrorNotice error={error} />
-      {error ? (
-        <button className="text-button" onClick={() => setReload((value) => value + 1)}>
-          다시 불러오기
-        </button>
-      ) : null}
+      {error && (
+        <div className="bank-record-retry">
+          <button className="button button-outline" onClick={() => setReload((value) => value + 1)}>
+            다시 불러오기
+          </button>
+        </div>
+      )}
       {pending && (
         <div className="empty-state" role="status">
-          신청 정보를 불러오고 있어요…
+          신청 정보를 불러오고 있습니다.
         </div>
       )}
       {application && !pending && (
         <>
-          <section className="confirmation-heading">
-            <span className="success-mark">
-              <AppIcon name="check" size={30} />
-            </span>
-            <span className="eyebrow">YOUR FINANCIAL JOURNEY</span>
-            <h1>
-              신청 내역을 확인하세요<span className="heading-dot">.</span>
-            </h1>
-            <p>신청 조건과 현재 진행 상태를 한곳에서 확인할 수 있어요.</p>
-          </section>
-          <section className="application-detail-card">
-            <div className="section-heading">
+          <section className="bank-statement" aria-labelledby="bank-statement-title">
+            <div className="bank-statement-heading">
               <div>
-                <span className="eyebrow">APPLICATION DETAILS</span>
-                <h2>{application.productName}</h2>
+                <span>신청 상품</span>
+                <h2 id="bank-statement-title">{application.productName}</h2>
               </div>
               <span className={`status-badge ${application.status.toLowerCase()}`}>
                 {statusLabel(application.status)}
               </span>
             </div>
-            <div className="application-principal">
-              <small>신청 금액</small>
-              <strong>{won(application.requestedAmount)}</strong>
-            </div>
-            <dl className="details-list">
+            <dl className="bank-statement-summary">
               <div>
-                <dt>신청 번호</dt>
-                <dd className="monospace">{application.id}</dd>
-              </div>
-              <div>
-                <dt>신청 시각</dt>
-                <dd>{dateTime(application.createdAt)}</dd>
-              </div>
-              <div>
-                <dt>신청 기간</dt>
-                <dd>{application.termMonths}개월</dd>
+                <dt>신청금액</dt>
+                <dd className="bank-statement-principal">{won(application.requestedAmount)}</dd>
               </div>
               <div>
                 <dt>신청 당시 금리</dt>
-                <dd>연 {rate(application.annualInterestRate)}%</dd>
+                <dd>
+                  연 {rate(application.annualInterestRate)}
+                  <small>%</small>
+                </dd>
               </div>
               <div>
-                <dt>상품 정책</dt>
-                <dd>v{application.policyVersion} · 신청 당시 조건 보존</dd>
-              </div>
-              <div>
-                <dt>상환 방식</dt>
-                <dd>원리금균등분할상환</dd>
+                <dt>신청기간</dt>
+                <dd>
+                  {application.termMonths}
+                  <small>개월</small>
+                </dd>
               </div>
             </dl>
-            <div className="info-banner">
-              현재 단계에서는 신청 접수와 내역 조회를 제공합니다. 모의 심사, 약정, 대출 실행·상환은
-              다음 단계에서 순차적으로 연결합니다.
+            <div className="bank-statement-body">
+              <h3>신청 정보</h3>
+              <dl className="details-list">
+                <div>
+                  <dt>신청번호</dt>
+                  <dd className="monospace">{application.id}</dd>
+                </div>
+                <div>
+                  <dt>접수일시</dt>
+                  <dd>{dateTime(application.createdAt)}</dd>
+                </div>
+                <div>
+                  <dt>상환방식</dt>
+                  <dd>원리금균등분할상환</dd>
+                </div>
+                <div>
+                  <dt>적용 상품 조건</dt>
+                  <dd>버전 {application.policyVersion}</dd>
+                </div>
+              </dl>
+              <p className="bank-section-help">
+                표시된 금리와 상품 조건은 신청 시점에 보관한 내용입니다. 약정 조건은 심사 이후
+                별도로 확정됩니다.
+              </p>
             </div>
-            <Link to="/" className="button button-dark">
-              대시보드로 돌아가기 <AppIcon name="arrow" size={18} />
-            </Link>
           </section>
+          <section className="bank-record-notice" aria-labelledby="bank-application-notice-title">
+            <AppIcon name="info" size={21} />
+            <div>
+              <h2 id="bank-application-notice-title">확인해 주세요</h2>
+              <p>
+                현재 신청 접수와 내역 조회를 이용할 수 있습니다. 모의 심사·약정·실행·상환은 준비
+                중이며 실제 자금 이동은 발생하지 않습니다.
+              </p>
+            </div>
+          </section>
+          <div className="bank-bottom-action">
+            <Link to="/my" className="button button-primary">
+              신청 내역 목록
+            </Link>
+            <Link to="/products" className="button button-outline">
+              다른 상품 보기
+            </Link>
+          </div>
         </>
       )}
     </>
