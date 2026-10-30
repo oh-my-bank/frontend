@@ -1,23 +1,32 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
 import { ApiError, request, resetCsrf } from '../lib/api'
 import type { User } from '../types'
 interface AuthState {
   user: User | null
   ready: boolean
   error: string
+  sessionExpired: boolean
   login: (input: { email: string; password: string }) => Promise<User>
   register: (input: { email: string; password: string; name: string }) => Promise<User>
   logout: () => Promise<void>
+  refresh: () => Promise<User | null>
 }
 const AuthContext = createContext<AuthState | null>(null)
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [ready, setReady] = useState(false)
   const [error, setError] = useState('')
+  const [sessionExpired, setSessionExpired] = useState(false)
+  const signedIn = useRef(false)
+  useEffect(() => {
+    signedIn.current = !!user
+  }, [user])
   useEffect(() => {
     let active = true
     const controller = new AbortController()
     const unauthorized = () => {
+      // Only a session that was signed in can expire; an anonymous 401 is not news.
+      if (signedIn.current) setSessionExpired(true)
       setUser(null)
       resetCsrf()
     }
@@ -48,6 +57,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     resetCsrf()
     setUser(result)
     setError('')
+    setSessionExpired(false)
     return result
   }
   async function register(input: { email: string; password: string; name: string }) {
@@ -55,15 +65,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     resetCsrf()
     setUser(result)
     setError('')
+    setSessionExpired(false)
     return result
   }
   async function logout() {
     await request<void>('/auth/logout', { method: 'POST' })
     resetCsrf()
     setUser(null)
+    setSessionExpired(false)
+  }
+  /** Rechecks the server session, e.g. after a 403 that may be an expired session or a stale CSRF token. */
+  async function refresh() {
+    try {
+      const result = await request<User>('/auth/me')
+      setUser(result)
+      return result
+    } catch (cause) {
+      // The 401 has already signed the user out through the unauthorized event.
+      if (cause instanceof ApiError && cause.status === 401) return null
+      throw cause
+    }
   }
   return (
-    <AuthContext.Provider value={{ user, ready, error, login, register, logout }}>
+    <AuthContext.Provider
+      value={{ user, ready, error, sessionExpired, login, register, logout, refresh }}
+    >
       {children}
     </AuthContext.Provider>
   )
