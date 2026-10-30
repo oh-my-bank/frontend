@@ -6,7 +6,7 @@ import ErrorNotice from '../components/ErrorNotice'
 import { destinationAfterAuthentication } from '../lib/navigation'
 
 export default function AuthPage() {
-  const { login, register, error: connectionError } = useAuth()
+  const { login, register, error: connectionError, sessionExpired } = useAuth()
   const navigate = useNavigate()
   const [params, setParams] = useSearchParams()
   const registering = params.get('mode') === 'register'
@@ -100,6 +100,12 @@ export default function AuthPage() {
               : '가입 시 등록한 이메일과 비밀번호를 입력해 주세요.'}
           </p>
           {connectionError && <div className="notice">{connectionError}</div>}
+          {sessionExpired && !registering && (
+            <div className="notice" role="status">
+              로그인 시간이 만료되었습니다. 다시 로그인하면 이용하던 화면으로 돌아갑니다. 완료
+              안내를 받지 못한 변경은 다시 확인해 주세요.
+            </div>
+          )}
           <ErrorNotice error={error} />
           <form className="stack-form" onSubmit={submit}>
             <fieldset className="form-fieldset" disabled={pending}>

@@ -29,6 +29,23 @@ describe('authentication destinations', () => {
   it('routes staff to their workspace and new customers away from another account’s old record', () => {
     expect(destinationAfterAuthentication('/applications/old-record', 'REVIEWER')).toBe('/staff')
     expect(destinationAfterAuthentication('/products', 'ADMIN')).toBe('/staff')
+    expect(destinationAfterAuthentication(null, 'ADMIN')).toBe('/staff')
     expect(destinationAfterAuthentication('/applications/old-record', 'CUSTOMER', true)).toBe('/my')
+  })
+  it('returns an administrator to product management after the session expired there', () => {
+    expect(destinationAfterAuthentication('/admin/products/product-one', 'ADMIN')).toBe(
+      '/admin/products/product-one',
+    )
+    expect(destinationAfterAuthentication('/admin/products', 'ADMIN')).toBe('/admin/products')
+    // A reviewer keeps the staff guide: product management is not part of the role.
+    expect(destinationAfterAuthentication('/admin/products', 'REVIEWER')).toBe('/staff')
+    for (const redirect of [
+      '/administrator',
+      '//admin/products',
+      '/admin\\products',
+      '/admin/\n',
+    ]) {
+      expect(destinationAfterAuthentication(redirect, 'ADMIN')).toBe('/staff')
+    }
   })
 })

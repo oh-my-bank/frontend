@@ -34,3 +34,30 @@ export interface ApplicationInput {
   termMonths: number
   annualIncome: number
 }
+export interface PolicyTerms {
+  annualInterestRate: string
+  minAmount: number
+  maxAmount: number
+  minTermMonths: number
+  maxTermMonths: number
+  repaymentMethod: 'EQUAL_PRINCIPAL_AND_INTEREST'
+  explanationVersion: string
+}
+export interface PolicyVersion extends PolicyTerms {
+  version: number
+  createdAt: string
+}
+export interface AdminProduct {
+  id: string
+  name: string
+  description: string
+  active: boolean
+  createdAt: string
+  deactivatedAt: string | null
+  currentPolicy: PolicyVersion
+}
+export interface ProductInput {
+  name: string
+  description: string
+  policy: PolicyTerms
+}

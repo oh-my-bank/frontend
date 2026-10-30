@@ -1,12 +1,12 @@
 import { ApiError, errorMessage } from '../lib/api'
 import '../styles/banking-products.css'
 
-export default function ErrorNotice({ error }: { error: unknown }) {
+export default function ErrorNotice({ error, message }: { error: unknown; message?: string }) {
   if (!error) return null
   return (
     <div className="error-notice" role="alert">
       <strong>확인이 필요합니다.</strong>
-      <p>{errorMessage(error)}</p>
+      <p>{message ?? errorMessage(error)}</p>
       {error instanceof ApiError && error.traceId && (
         <details className="error-notice-details">
           <summary>오류 상세 정보</summary>

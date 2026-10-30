@@ -10,6 +10,7 @@ export class ApiError extends Error {
     message: string,
     public status = 0,
     public traceId?: string,
+    public fieldErrors: Record<string, string> = {},
   ) {
     super(message)
     this.name = 'ApiError'
@@ -54,6 +55,7 @@ export async function request<T>(
       code?: string
       message?: string
       traceId?: string
+      fieldErrors?: unknown
     }
     options.signal?.throwIfAborted()
     if (response.status === 403) resetCsrf()
@@ -66,10 +68,21 @@ export async function request<T>(
           : '요청을 처리하지 못했습니다. 잠시 후 다시 시도해 주세요.'),
       response.status,
       error.traceId,
+      fieldMessages(error.fieldErrors),
     )
   }
   if (response.status === 204) return undefined as T
   return response.json() as Promise<T>
+}
+
+/** Keeps only string messages keyed by field path, such as `policy.maxAmount`. */
+function fieldMessages(value: unknown): Record<string, string> {
+  if (!value || typeof value !== 'object') return {}
+  return Object.fromEntries(
+    Object.entries(value).filter(
+      (entry): entry is [string, string] => typeof entry[1] === 'string',
+    ),
+  )
 }
 
 export function errorMessage(error: unknown): string {

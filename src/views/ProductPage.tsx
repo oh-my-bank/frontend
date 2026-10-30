@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '../stores/auth'
 import { request } from '../lib/api'
-import { createApplicationRequest } from '../lib/idempotency'
+import { createRequestIdentity } from '../lib/idempotency'
 import { compactWon, rate } from '../lib/format'
 import type { ApplicationInput, LoanApplication, Product } from '../types'
 import AppIcon from '../components/AppIcon'
@@ -34,7 +34,7 @@ export default function ProductPage() {
   const [income, setIncome] = useState('')
   const [acknowledged, setAcknowledged] = useState(false)
   const [touched, setTouched] = useState<Record<Field, boolean>>(untouched)
-  const identity = useRef(createApplicationRequest())
+  const identity = useRef(createRequestIdentity())
   const applicationPanel = useRef<HTMLElement>(null)
   useEffect(() => {
     setAmount('')
