@@ -1,0 +1,1016 @@
+/* 나의 전략·모의 운용 화면. 0002의 청록(#008577)·짙은 녹색(#1f5149) 체계를 따른다. */
+.sim-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.sim-lead-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 26px;
+}
+.sim-lead-notice svg {
+  flex: none;
+  margin-top: 5px;
+  color: var(--brand);
+}
+.sim-panel {
+  min-width: 0;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 26px;
+}
+.sim-panel-heading {
+  margin-bottom: 20px;
+}
+.sim-panel-heading h2 {
+  font-size: 20px;
+  line-height: 1.4;
+}
+.sim-panel-heading p {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.7;
+}
+.sim-section-title {
+  margin: 0 0 14px;
+  font-size: 20px;
+  line-height: 1.4;
+}
+.sim-account-info {
+  margin-bottom: 36px;
+}
+.sim-section-title small {
+  margin-left: 8px;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--muted);
+}
+.sim-subheading {
+  margin: 28px 0 14px;
+  font-size: 17px;
+  line-height: 1.4;
+}
+.sim-help {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.75;
+}
+.sim-help a {
+  color: var(--brand);
+  text-decoration: underline;
+}
+.sim-error {
+  margin: 7px 0 0;
+  color: #aa463a;
+  font-size: 13px;
+  line-height: 1.7;
+}
+.sim-reading {
+  margin: 7px 0 0;
+  color: var(--brand-dark);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.sim-empty-note {
+  padding: 18px;
+  border: 1px dashed var(--border);
+  border-radius: 6px;
+  color: var(--muted);
+  font-size: 14px;
+  text-align: center;
+  background: #fbfcfb;
+}
+.sim-flash {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0 0 18px;
+  padding: 13px 16px;
+  border: 1px solid #cfe6dc;
+  border-radius: 5px;
+  background: #eef8f3;
+  color: #1f5149;
+  font-size: 14px;
+  line-height: 1.7;
+}
+.sim-flash svg {
+  flex: none;
+  margin-top: 4px;
+  color: var(--brand);
+}
+.sim-load-error {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+/* 입력 */
+.sim-fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.sim-fieldset > legend {
+  padding: 0;
+  margin-bottom: 18px;
+  font-size: 19px;
+  font-weight: 650;
+  outline: none;
+}
+.sim-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px 24px;
+  align-items: start;
+}
+.sim-form-grid.three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.sim-field {
+  min-width: 0;
+}
+.sim-field > label {
+  display: block;
+  margin-bottom: 9px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.sim-required {
+  margin-left: 3px;
+  color: #b04a3c;
+  font-style: normal;
+}
+.sim-field input[aria-invalid='true'] {
+  border-color: #c4685a;
+}
+.sim-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.6;
+  cursor: pointer;
+}
+.sim-check input {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin: 3px 0 0;
+  accent-color: var(--brand);
+}
+.sim-check small {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 400;
+}
+.sim-confirm-check {
+  margin-top: 18px;
+}
+.sim-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
+.sim-error-summary ul {
+  margin: 8px 0 0;
+  padding-left: 18px;
+}
+.sim-link-button {
+  padding: 0;
+  background: none;
+  color: #8a4b37;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+/* 단계 */
+.sim-steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0 0 24px;
+  padding: 0;
+  list-style: none;
+}
+.sim-steps button {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  min-height: 48px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: #fff;
+  color: var(--muted);
+  font-size: 14px;
+  text-align: left;
+}
+.sim-steps .done button {
+  color: var(--brand-dark);
+  background: var(--surface-soft);
+}
+.sim-steps .current button {
+  border-color: var(--brand);
+  color: var(--brand-dark);
+  font-weight: 650;
+  box-shadow: inset 0 -3px 0 var(--brand);
+}
+.sim-step-number {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #e5eeea;
+  font-size: 13px;
+  font-weight: 700;
+}
+.sim-steps .current .sim-step-number {
+  background: var(--brand);
+  color: #fff;
+}
+.sim-repeat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+}
+.sim-repeat > .sim-help {
+  margin: 0;
+}
+.sim-repeat-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 0.8fr);
+  gap: 16px;
+  align-items: start;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #fbfdfc;
+}
+.sim-repeat-item > legend {
+  padding: 0 6px;
+  font-size: 14px;
+  font-weight: 650;
+  color: var(--brand-dark);
+}
+.sim-remove {
+  grid-column: 1 / -1;
+  justify-self: end;
+}
+
+/* 결과 */
+.sim-result {
+  margin-top: 42px;
+}
+.sim-result .section-heading h2 {
+  outline: none;
+}
+.sim-stale {
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  border-left: 4px solid var(--accent);
+  background: #fffaeb;
+  font-size: 14px;
+  line-height: 1.7;
+}
+.sim-warnings {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0 0 20px;
+  padding: 0;
+  list-style: none;
+}
+.sim-warnings li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  padding: 14px 16px;
+  border: 1px solid #efd4cb;
+  border-left: 4px solid #b04a3c;
+  border-radius: 5px;
+  background: #fff7f4;
+  color: #7d3f33;
+  font-size: 14px;
+  line-height: 1.7;
+}
+.sim-warnings strong {
+  color: #9b3f31;
+}
+.sim-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  margin: 0;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: #fff;
+  overflow: hidden;
+}
+.sim-summary.compact {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 16px;
+}
+.sim-summary > div {
+  min-width: 0;
+  padding: 18px 20px;
+  background: #fff;
+  /* Separators are drawn by each cell, so a short last row leaves no grey gap. */
+  box-shadow:
+    1px 0 0 var(--border),
+    0 1px 0 var(--border);
+}
+.sim-summary > div.emphasis {
+  background: var(--surface-soft);
+}
+.sim-summary dt {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.sim-summary dd {
+  margin: 6px 0 0;
+  font-size: 19px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.sim-summary .emphasis dd {
+  color: var(--brand-dark);
+}
+.sim-action-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.sim-action {
+  min-width: 0;
+  padding: 20px 22px;
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--brand);
+  border-radius: 6px;
+  background: #fff;
+}
+.sim-action.tone-partial {
+  border-left-color: #c98a1b;
+}
+.sim-action.tone-info {
+  border-left-color: #8fa39a;
+}
+.sim-action-head {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: start;
+}
+.sim-action-order {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--brand-dark);
+  color: #fff;
+  font-weight: 700;
+}
+.sim-action-type {
+  display: block;
+  color: var(--brand);
+  font-size: 13px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.sim-action h4 {
+  margin: 3px 0 0;
+  font-size: 17px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.sim-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px 18px;
+  margin: 16px 0 0;
+  padding: 14px 16px;
+  border-radius: 5px;
+  background: #f7faf8;
+}
+.sim-facts dt {
+  color: var(--muted);
+  font-size: 12px;
+}
+.sim-facts dd {
+  margin: 3px 0 0;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.sim-action-reason {
+  margin-top: 14px;
+  font-size: 14px;
+  line-height: 1.8;
+  color: #3f4a46;
+}
+.sim-action .text-button {
+  margin-top: 6px;
+  color: var(--brand);
+  font-weight: 600;
+}
+.sim-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 9px;
+  border: 1px solid #d7e9de;
+  border-radius: 4px;
+  background: #edf6f1;
+  color: #2b7263;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.sim-badge.tone-partial {
+  border-color: #f0dcae;
+  background: #fff6e2;
+  color: #8a5a07;
+}
+.sim-badge.tone-info {
+  border-color: #dde4e1;
+  background: #f4f6f5;
+  color: #55635d;
+}
+.sim-badge.tone-warn {
+  border-color: #efd4cb;
+  background: #fff3ef;
+  color: #9b3f31;
+}
+.sim-badge.tone-done {
+  border-color: #cddff0;
+  background: #eef5fb;
+  color: #2d5a80;
+}
+
+/* 막대그래프 */
+.sim-chart {
+  min-width: 0;
+}
+.sim-chart-bar {
+  display: block;
+  width: 100%;
+  height: 40px;
+  border-radius: 5px;
+  overflow: hidden;
+  background: #f1f4f2;
+}
+.sim-chart-caption {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.sim-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin: 14px 0 16px;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+}
+.sim-legend li {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.sim-legend-swatch {
+  flex: none;
+  width: 14px;
+  height: 14px;
+}
+.sim-legend strong {
+  font-variant-numeric: tabular-nums;
+}
+.sim-rates {
+  margin: 24px 0 16px;
+  padding: 14px 18px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+.sim-rates summary {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  min-height: 28px;
+}
+.sim-rates .sim-table-wrap {
+  margin-top: 12px;
+}
+.sim-next {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 22px;
+  padding: 22px 24px;
+  border-radius: 7px;
+  background: var(--surface-soft);
+  border: 1px solid #d5e9e0;
+}
+.sim-next > div {
+  flex: 1 1 360px;
+  min-width: 0;
+}
+.sim-next h3 {
+  font-size: 17px;
+}
+.sim-next p {
+  margin-top: 6px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: #4d5e57;
+}
+
+/* 표 */
+.sim-table-wrap {
+  min-width: 0;
+  border-top: 2px solid var(--brand-dark);
+}
+.sim-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.sim-table th,
+.sim-table td {
+  padding: 13px 12px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: middle;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.sim-table thead th {
+  background: var(--surface-soft);
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.sim-table tbody th {
+  font-weight: 600;
+}
+.sim-table .sim-number {
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.sim-table tr.is-warning {
+  background: #fff7f4;
+}
+.sim-in {
+  color: #1f6b5b;
+}
+.sim-out {
+  color: #9b3f31;
+}
+.sim-missed {
+  color: #9b3f31;
+  font-weight: 650;
+}
+.sim-kind {
+  display: block;
+  color: var(--brand);
+  font-size: 12px;
+  font-weight: 600;
+}
+.page-title .sim-kind {
+  font-size: 14px;
+}
+.sim-account-name small,
+.sim-cell-note {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 400;
+}
+.sim-table .text-button {
+  min-height: 36px;
+  color: var(--brand);
+  white-space: nowrap;
+}
+
+/* 대시보드 */
+.sim-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 34px;
+}
+.sim-dashboard > section {
+  min-width: 0;
+}
+.sim-clock {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 18px 40px;
+  padding: 22px 26px;
+  border-radius: 8px;
+  background: var(--brand-dark);
+  color: #fff;
+}
+.sim-clock-date span {
+  display: block;
+  font-size: 13px;
+  color: #cfe6dd;
+}
+.sim-clock-date strong {
+  display: block;
+  margin-top: 2px;
+  font-size: 30px;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.sim-clock-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 30px;
+  margin: 0;
+}
+.sim-clock-facts dt {
+  font-size: 12px;
+  color: #cfe6dd;
+}
+.sim-clock-facts dd {
+  margin: 3px 0 0;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.sim-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  align-items: start;
+}
+.sim-advance {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+}
+.sim-advance .button {
+  padding-left: 6px;
+  padding-right: 6px;
+}
+.sim-advance .button[aria-disabled='true'] {
+  cursor: progress;
+  opacity: 0.55;
+}
+.sim-processed {
+  margin-top: 16px;
+  padding: 16px 18px;
+  border: 1px solid #cfe6dc;
+  border-radius: 6px;
+  background: #f3faf6;
+  font-size: 14px;
+}
+.sim-processed-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+.sim-processed ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 6px 16px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.sim-processed li {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+.sim-processed li.is-warning {
+  color: #9b3f31;
+  font-weight: 650;
+}
+.sim-processed .sim-missed {
+  margin-top: 10px;
+  font-size: 13px;
+}
+.sim-icon-button {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 4px;
+  background: none;
+  color: var(--muted);
+}
+.sim-icon-button:hover {
+  background: #e3efe9;
+  color: var(--brand-dark);
+}
+.sim-upcoming,
+.sim-events {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.sim-upcoming li,
+.sim-events li {
+  display: grid;
+  grid-template-columns: 92px auto minmax(0, 1fr);
+  gap: 6px 12px;
+  align-items: center;
+  padding: 11px 4px;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+  line-height: 1.6;
+}
+.sim-upcoming time,
+.sim-events time {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.sim-upcoming a {
+  color: var(--brand-dark);
+  text-decoration: underline;
+}
+.sim-events li.is-warning {
+  padding-left: 10px;
+  border-left: 4px solid #b04a3c;
+  background: #fff7f4;
+  color: #7d3f33;
+}
+.sim-products {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  min-width: 0;
+  margin: 0 0 18px;
+  padding: 0;
+  border: 0;
+}
+.sim-products > legend {
+  margin-bottom: 10px;
+  padding: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+.sim-product {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 2px 9px;
+  align-items: center;
+  min-width: 0;
+  padding: 11px 12px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 13px;
+}
+.sim-product.selected {
+  border-color: var(--brand);
+  background: var(--surface-soft);
+}
+.sim-product:focus-within {
+  outline: 2px solid var(--brand);
+  outline-offset: 1px;
+}
+/* Outranks the global `input:not([type='checkbox'])` text-field rule, which loads later. */
+.sim-product input[type='radio'] {
+  grid-row: span 3;
+  width: 17px;
+  height: 17px;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  accent-color: var(--brand);
+}
+.sim-product-name {
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+.sim-product-rate {
+  color: var(--brand);
+  font-weight: 650;
+}
+.sim-product-range {
+  color: var(--muted);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.sim-danger-zone {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 24px;
+  padding: 22px 24px;
+  border: 1px solid #efd4cb;
+  border-radius: 7px;
+  background: #fffaf8;
+}
+.sim-danger-zone > div {
+  flex: 1 1 360px;
+  min-width: 0;
+}
+.sim-danger-zone h2 {
+  font-size: 18px;
+}
+.sim-danger-zone p {
+  margin-top: 6px;
+  color: #6e5a53;
+  font-size: 14px;
+  line-height: 1.7;
+}
+.sim-create-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.sim-closed p {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+/* 계좌 상세 */
+.sim-compare {
+  min-width: 0;
+}
+.sim-compare-table tbody th {
+  width: 26%;
+  color: var(--muted);
+  font-weight: 500;
+}
+.sim-compare-table tr.sim-compare-total th,
+.sim-compare-table tr.sim-compare-total td {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+}
+.sim-gap {
+  margin-top: 14px;
+  padding: 13px 16px;
+  border-radius: 5px;
+  background: var(--surface-soft);
+  font-weight: 650;
+  line-height: 1.7;
+}
+.sim-gap.is-warning {
+  border-left: 4px solid #b04a3c;
+  background: #fff5f1;
+  color: #8a3b2e;
+}
+
+@media (max-width: 1100px) {
+  .sim-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .sim-columns {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 760px) {
+  .sim-panel {
+    padding: 20px 16px;
+  }
+  .sim-form-grid,
+  .sim-form-grid.three,
+  .sim-repeat-item,
+  .sim-products {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .sim-steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .sim-remove {
+    justify-self: stretch;
+  }
+  .sim-form-actions > .button {
+    flex: 1 1 auto;
+  }
+  .sim-advance {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .sim-clock {
+    padding: 20px;
+  }
+  .sim-clock-date strong {
+    font-size: 26px;
+  }
+  .sim-action {
+    padding: 16px;
+  }
+  .sim-action-head {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .sim-action-head > .sim-badge {
+    grid-column: 2;
+    justify-self: start;
+  }
+  .sim-upcoming li,
+  .sim-events li {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .sim-upcoming li > span:last-child,
+  .sim-events li > span:last-child {
+    grid-column: 1 / -1;
+  }
+
+  /* 표는 행마다 카드로 바꾸고 칸 이름을 앞에 붙인다. */
+  .sim-table,
+  .sim-table tbody,
+  .sim-table tr {
+    display: block;
+  }
+  .sim-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+  }
+  .sim-table tr {
+    padding: 12px 4px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sim-table th,
+  .sim-table td {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 4px 6px;
+    border: 0;
+    text-align: right;
+  }
+  .sim-table tbody th {
+    display: block;
+    text-align: left;
+    font-size: 15px;
+    padding-bottom: 6px;
+  }
+  .sim-table td[data-label]::before {
+    content: attr(data-label);
+    flex: none;
+    color: var(--muted);
+    font-size: 13px;
+    text-align: left;
+  }
+  .sim-table .sim-number {
+    white-space: normal;
+  }
+  .sim-compare-table tbody th {
+    width: auto;
+  }
+}
+
+@media (max-width: 360px) {
+  .sim-summary,
+  .sim-summary.compact,
+  .sim-steps {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .sim-advance {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .sim-summary dd {
+    font-size: 17px;
+  }
+}

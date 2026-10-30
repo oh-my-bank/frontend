@@ -218,6 +218,7 @@ summary:focus-visible {
   letter-spacing: -0.045em;
   font-weight: 600;
   padding-inline: 4px;
+  white-space: nowrap;
 }
 .bank-main-nav a.active {
   color: var(--brand);
@@ -1126,6 +1127,9 @@ input[type='checkbox'] {
   .bank-main-nav {
     gap: 35px;
   }
+  .bank-main-nav a {
+    font-size: 18px;
+  }
   .bank-home-top {
     grid-template-columns: minmax(0, 1fr) 290px;
     gap: 20px;
@@ -1172,6 +1176,18 @@ input[type='checkbox'] {
 @media (max-width: 960px) {
   .content-width {
     width: calc(100% - 48px);
+  }
+  .bank-gnb {
+    gap: 24px;
+  }
+  .bank-main-nav {
+    gap: 22px;
+  }
+  .bank-main-nav a {
+    font-size: 16px;
+  }
+  .all-menu-button span {
+    display: none;
   }
   .bank-home-top {
     grid-template-columns: 1fr;
@@ -1253,12 +1269,10 @@ input[type='checkbox'] {
 }
 @media (max-width: 760px) {
   .bank-main-nav {
-    gap: 28px;
-  }
-  .bank-main-nav a {
-    font-size: 17px;
+    display: none;
   }
   .bank-gnb {
+    justify-content: space-between;
     gap: 28px;
     min-height: 75px;
   }
