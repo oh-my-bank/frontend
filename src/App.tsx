@@ -16,8 +16,17 @@ import AdminProductsPage from './views/AdminProductsPage'
 import AdminProductNewPage from './views/AdminProductNewPage'
 import AdminProductPage from './views/AdminProductPage'
 import AdminPolicyPublishPage from './views/AdminPolicyPublishPage'
+import LearnPage from './views/LearnPage'
+import ConceptPage from './views/ConceptPage'
+import GlossaryPage from './views/GlossaryPage'
+import ToolsPage from './views/ToolsPage'
+import CalculatorPage from './views/tools/CalculatorPage'
+import StrategyPage from './views/StrategyPage'
+import SimulationPage from './views/SimulationPage'
+import SimulationAccountPage from './views/SimulationAccountPage'
 import AdminAccessDenied from './components/AdminAccessDenied'
 import { anchorId, destinationAfterAuthentication, isAdminPath } from './lib/navigation'
+import { calculatorInfo, calculatorKinds, isCalculatorKind } from './lib/learning'
 function Protected({
   children,
   staff = false,
@@ -44,6 +53,17 @@ function Protected({
 }
 function pageTitle(pathname: string, search: string) {
   if (pathname === '/') return '홈'
+  if (pathname === '/learn') return '은행업 학습'
+  if (pathname.startsWith('/learn/')) return '개념 학습'
+  if (pathname === '/glossary') return '용어 사전'
+  if (pathname === '/tools') return '계산기'
+  if (pathname.startsWith('/tools/')) {
+    const kind = pathname.slice('/tools/'.length)
+    return isCalculatorKind(kind) ? calculatorInfo[kind].title : '계산기'
+  }
+  if (pathname === '/strategy') return '나의 전략'
+  if (pathname === '/simulation') return '모의 운용'
+  if (pathname.startsWith('/simulation/accounts/')) return '모의 계좌 상세'
   if (pathname === '/my') return '나의 대출'
   if (pathname === '/products') return '대출상품'
   if (pathname.startsWith('/products/')) return '대출 신청'
@@ -76,17 +96,19 @@ export default function App() {
     user && !admin && isAdminPath(location.pathname)
       ? '상품관리'
       : pageTitle(location.pathname, location.search)
+  // Search filters that rewrite the query string in place keep the reader's scroll position.
+  const keepScroll = !!(location.state as { keepScroll?: boolean } | null)?.keepScroll
   useEffect(() => {
     document.title = `${title} | Oh My Bank`
     setMenuOpen(false)
-    if (!ready) return
+    if (!ready || keepScroll) return
     if (!location.hash) window.scrollTo(0, 0)
     else {
       const id = anchorId(location.hash)
       const target = id ? document.getElementById(id) : null
       target?.scrollIntoView()
     }
-  }, [location.pathname, location.hash, location.key, title, ready])
+  }, [location.pathname, location.hash, location.key, title, ready, keepScroll])
   useEffect(() => {
     const dialog = dialogRef.current
     if (!dialog) return
@@ -124,7 +146,7 @@ export default function App() {
       </a>
       <header className="bank-header">
         <div className="bank-utility content-width">
-          <span className="bank-simulation">금융거래 시뮬레이션</span>
+          <span className="bank-simulation">은행업 학습·모의 서비스</span>
           <div>
             {user ? (
               <>
@@ -141,6 +163,16 @@ export default function App() {
                 <Link to="/login?mode=register">회원가입</Link>
               </>
             )}
+            {user && (
+              <Link to={staff ? '/staff' : '/my'} className="utility-guide">
+                {staff ? '직원업무' : '신청조회'}
+              </Link>
+            )}
+            {admin && (
+              <Link to="/admin/products" className="utility-guide">
+                상품관리
+              </Link>
+            )}
             <Link to="/guide" className="utility-guide">
               이용안내
             </Link>
@@ -149,10 +181,11 @@ export default function App() {
         <div className="bank-gnb content-width">
           <BrandLogo />
           <nav aria-label="주 메뉴" className="bank-main-nav">
-            <NavLink to="/products">금융상품</NavLink>
-            <NavLink to={staff ? '/staff' : '/my'}>{staff ? '직원업무' : '신청조회'}</NavLink>
-            {admin && <NavLink to="/admin/products">상품관리</NavLink>}
-            <NavLink to="/guide">이용안내</NavLink>
+            <NavLink to="/learn">은행업 학습</NavLink>
+            <NavLink to="/tools">계산기</NavLink>
+            <NavLink to="/strategy">나의 전략</NavLink>
+            <NavLink to="/simulation">모의 운용</NavLink>
+            <NavLink to="/products">업무 체험</NavLink>
           </nav>
           <button
             className="all-menu-button"
@@ -188,23 +221,39 @@ export default function App() {
           }}
         >
           <section>
-            <h3>금융상품</h3>
-            <Link to="/products">대출상품 조회</Link>
-            <Link to="/products">대출 신청</Link>
+            <h3>배우기</h3>
+            <Link to="/learn">은행업 개념 학습</Link>
+            <Link to="/glossary">은행 용어 사전</Link>
           </section>
           <section>
-            <h3>{staff ? '직원 업무' : '나의 대출'}</h3>
-            <Link to={staff ? '/staff' : '/my'}>{staff ? '업무 범위 확인' : '신청 내역 조회'}</Link>
+            <h3>계산기</h3>
+            <Link to="/tools">계산기 안내·금리표</Link>
+            {calculatorKinds.map((kind) => (
+              <Link key={kind} to={`/tools/${kind}`}>
+                {calculatorInfo[kind].title}
+              </Link>
+            ))}
+          </section>
+          <section>
+            <h3>전략·운용</h3>
+            <Link to="/strategy">나의 전략 세우기</Link>
+            <Link to="/simulation">예·적금 모의 운용 (고객 로그인)</Link>
+          </section>
+          <section>
+            <h3>은행 업무 체험</h3>
+            <Link to="/products">대출상품 조회·신청</Link>
+            <Link to={staff ? '/staff' : '/my'}>{staff ? '직원 업무 범위' : '나의 신청 조회'}</Link>
             {admin && (
               <>
                 <Link to="/admin/products">상품 관리</Link>
                 <Link to="/admin/products/new">상품 등록</Link>
               </>
             )}
-            <Link to="/guide#application">신청 절차 안내</Link>
+            <Link to="/guide#application">대출 신청 절차</Link>
           </section>
           <section>
             <h3>이용안내</h3>
+            <Link to="/guide#service">서비스 구성</Link>
             <Link to="/guide#notice">시뮬레이션 안내</Link>
             <Link to="/guide#scope">서비스 제공 범위</Link>
             {!user && <Link to="/login?mode=register">회원가입</Link>}
@@ -234,6 +283,28 @@ export default function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/guide" element={<GuidePage />} />
+            <Route path="/learn" element={<LearnPage />} />
+            <Route path="/learn/:slug" element={<ConceptPage key={location.pathname} />} />
+            <Route path="/glossary" element={<GlossaryPage />} />
+            <Route path="/tools" element={<ToolsPage />} />
+            <Route path="/tools/:kind" element={<CalculatorPage key={location.pathname} />} />
+            <Route path="/strategy" element={<StrategyPage />} />
+            <Route
+              path="/simulation"
+              element={
+                <Protected>
+                  <SimulationPage />
+                </Protected>
+              }
+            />
+            <Route
+              path="/simulation/accounts/:id"
+              element={
+                <Protected>
+                  <SimulationAccountPage key={location.pathname} />
+                </Protected>
+              }
+            />
             <Route
               path="/login"
               element={
@@ -296,18 +367,24 @@ export default function App() {
         <div className="content-width">
           <nav className="footer-links" aria-label="하단 메뉴">
             <Link to="/guide#notice">시뮬레이션 안내</Link>
-            <Link to="/guide#application">이용 방법</Link>
-            <Link to="/products">상품안내</Link>
+            <Link to="/learn">은행업 학습</Link>
+            <Link to="/glossary">용어 사전</Link>
+            <Link to="/tools">계산기</Link>
+            <Link to="/strategy">나의 전략</Link>
+            <Link to="/simulation">모의 운용</Link>
+            <Link to="/products">대출 업무 체험</Link>
             <Link to={staff ? '/staff' : '/my'}>{staff ? '직원업무' : '신청조회'}</Link>
           </nav>
           <div className="footer-bottom">
             <div>
               <strong>Oh My Bank</strong>
-              <p>금융업무 학습을 위한 가상 금융거래 서비스</p>
+              <p>은행업을 배우고 계산하고 가상 시간으로 예·적금을 운용해 보는 교육용 모의 서비스</p>
               <small>© {new Date().getFullYear()} Oh My Bank. All rights reserved.</small>
             </div>
             <p className="footer-disclaimer">
-              실제 금융상품 판매·대출 중개·자금 이동을 제공하지 않습니다.
+              실제 금융상품 판매·추천·대출 중개·자금 이동을 제공하지 않습니다.
+              <br />
+              계산·전략 결과는 공개된 교육용 규칙의 결과이며 금융 자문이 아닙니다.
               <br />
               실제 개인정보와 금융정보는 입력하지 마세요.
             </p>
