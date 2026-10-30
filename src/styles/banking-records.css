@@ -293,6 +293,9 @@
   grid-template-columns: 1fr 1fr;
   gap: 24px;
 }
+.bank-staff-scope-grid-wide {
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
 .bank-staff-scope {
   padding: 28px 30px;
   border: 1px solid var(--border);

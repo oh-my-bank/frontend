@@ -12,8 +12,21 @@ import ProductsPage from './views/ProductsPage'
 import ProductPage from './views/ProductPage'
 import ApplicationPage from './views/ApplicationPage'
 import StaffPage from './views/StaffPage'
-import { anchorId, destinationAfterAuthentication } from './lib/navigation'
-function Protected({ children, staff = false }: { children: ReactNode; staff?: boolean }) {
+import AdminProductsPage from './views/AdminProductsPage'
+import AdminProductNewPage from './views/AdminProductNewPage'
+import AdminProductPage from './views/AdminProductPage'
+import AdminPolicyPublishPage from './views/AdminPolicyPublishPage'
+import AdminAccessDenied from './components/AdminAccessDenied'
+import { anchorId, destinationAfterAuthentication, isAdminPath } from './lib/navigation'
+function Protected({
+  children,
+  staff = false,
+  admin = false,
+}: {
+  children: ReactNode
+  staff?: boolean
+  admin?: boolean
+}) {
   const { user } = useAuth()
   const location = useLocation()
   if (!user)
@@ -23,10 +36,27 @@ function Protected({ children, staff = false }: { children: ReactNode; staff?: b
         replace
       />
     )
+  // Other roles see why instead of an empty redirect; the admin API is not called for them.
+  if (admin) return user.role === 'ADMIN' ? children : <AdminAccessDenied role={user.role} />
   if (staff && user.role === 'CUSTOMER') return <Navigate to="/my" replace />
   if (!staff && user.role !== 'CUSTOMER') return <Navigate to="/staff" replace />
   return children
 }
+function pageTitle(pathname: string, search: string) {
+  if (pathname === '/') return '홈'
+  if (pathname === '/my') return '나의 대출'
+  if (pathname === '/products') return '대출상품'
+  if (pathname.startsWith('/products/')) return '대출 신청'
+  if (pathname.startsWith('/applications/')) return '신청 내역'
+  if (pathname === '/guide') return '이용안내'
+  if (pathname === '/staff') return '직원업무'
+  if (pathname === '/admin/products/new') return '상품 등록'
+  if (pathname.startsWith('/admin/products/'))
+    return pathname.endsWith('/policies/new') ? '새 정책 발행' : '상품 상세'
+  if (isAdminPath(pathname)) return '상품관리'
+  return new URLSearchParams(search).get('mode') === 'register' ? '회원가입' : '로그인'
+}
+const adminRoute = (page: ReactNode) => <Protected admin>{page}</Protected>
 export default function App() {
   const { user, ready, logout } = useAuth()
   const location = useLocation()
@@ -37,27 +67,15 @@ export default function App() {
   const menuButton = useRef<HTMLButtonElement>(null)
   const dialogRef = useRef<HTMLDialogElement>(null)
   const staff = !!user && user.role !== 'CUSTOMER'
+  const admin = user?.role === 'ADMIN'
   const role = user
     ? { CUSTOMER: '고객', REVIEWER: '심사 담당자', ADMIN: '운영 관리자' }[user.role]
     : ''
+  // Other roles only see the access notice on an administrator path, so the title stays generic.
   const title =
-    location.pathname === '/'
-      ? '홈'
-      : location.pathname === '/my'
-        ? '나의 대출'
-        : location.pathname === '/products'
-          ? '대출상품'
-          : location.pathname.startsWith('/products/')
-            ? '대출 신청'
-            : location.pathname.startsWith('/applications/')
-              ? '신청 내역'
-              : location.pathname === '/guide'
-                ? '이용안내'
-                : location.pathname === '/staff'
-                  ? '직원업무'
-                  : new URLSearchParams(location.search).get('mode') === 'register'
-                    ? '회원가입'
-                    : '로그인'
+    user && !admin && isAdminPath(location.pathname)
+      ? '상품관리'
+      : pageTitle(location.pathname, location.search)
   useEffect(() => {
     document.title = `${title} | Oh My Bank`
     setMenuOpen(false)
@@ -133,6 +151,7 @@ export default function App() {
           <nav aria-label="주 메뉴" className="bank-main-nav">
             <NavLink to="/products">금융상품</NavLink>
             <NavLink to={staff ? '/staff' : '/my'}>{staff ? '직원업무' : '신청조회'}</NavLink>
+            {admin && <NavLink to="/admin/products">상품관리</NavLink>}
             <NavLink to="/guide">이용안내</NavLink>
           </nav>
           <button
@@ -176,6 +195,12 @@ export default function App() {
           <section>
             <h3>{staff ? '직원 업무' : '나의 대출'}</h3>
             <Link to={staff ? '/staff' : '/my'}>{staff ? '업무 범위 확인' : '신청 내역 조회'}</Link>
+            {admin && (
+              <>
+                <Link to="/admin/products">상품 관리</Link>
+                <Link to="/admin/products/new">상품 등록</Link>
+              </>
+            )}
             <Link to="/guide#application">신청 절차 안내</Link>
           </section>
           <section>
@@ -251,6 +276,17 @@ export default function App() {
                   <StaffPage />
                 </Protected>
               }
+            />
+            <Route path="/admin" element={<Navigate to="/admin/products" replace />} />
+            <Route path="/admin/products" element={adminRoute(<AdminProductsPage />)} />
+            <Route path="/admin/products/new" element={adminRoute(<AdminProductNewPage />)} />
+            <Route
+              path="/admin/products/:id"
+              element={adminRoute(<AdminProductPage key={location.pathname} />)}
+            />
+            <Route
+              path="/admin/products/:id/policies/new"
+              element={adminRoute(<AdminPolicyPublishPage key={location.pathname} />)}
             />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
