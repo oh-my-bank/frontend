@@ -73,7 +73,8 @@ export default function AdminProductNewPage() {
       setFocusField(orderedErrors(current.errors)[0]?.[0] ?? null)
       return
     }
-    command.setError(null)
+    // An uncertain result stays explained until it is checked or sent again.
+    if (!unresolved) command.setError(null)
     setCheckResult(null)
     setReview(current.input)
   }
@@ -276,13 +277,7 @@ export default function AdminProductNewPage() {
       >
         {review && (
           <>
-            {!!command.error && !Object.keys(commandFieldErrors).length && (
-              <ErrorNotice
-                error={command.error}
-                message={commandMessage(command.error, 'create')}
-              />
-            )}
-            {unresolved && !retrying && !command.error && (
+            {unresolved && !retrying ? (
               <div className="error-notice" role="alert">
                 <strong>직전 등록 요청의 결과를 확인하지 못했습니다.</strong>
                 <p>
@@ -290,6 +285,14 @@ export default function AdminProductNewPage() {
                   등록됩니다.
                 </p>
               </div>
+            ) : (
+              !!command.error &&
+              !Object.keys(commandFieldErrors).length && (
+                <ErrorNotice
+                  error={command.error}
+                  message={commandMessage(command.error, 'create')}
+                />
+              )
             )}
             {checkResult &&
               (checkResult.failed ? (

@@ -118,7 +118,8 @@ export default function AdminPolicyPublishPage() {
       )
       return
     }
-    command.setError(null)
+    // An uncertain result stays explained until it is checked or sent again.
+    if (!unresolved) command.setError(null)
     setCheckResult(null)
     setReview({ expectedCurrentVersion: base.version, policy: current.terms })
   }
@@ -361,17 +362,19 @@ export default function AdminPolicyPublishPage() {
       >
         {review && product && (
           <>
-            {!!command.error && !Object.keys(commandFieldErrors).length && (
-              <ErrorNotice
-                error={command.error}
-                message={commandMessage(command.error, 'publish')}
-              />
-            )}
-            {unresolved && !retrying && !command.error && (
+            {unresolved && !retrying ? (
               <div className="error-notice" role="alert">
                 <strong>직전 발행 요청의 결과를 확인하지 못했습니다.</strong>
                 <p>반영 여부를 먼저 확인해 주세요. 내용이 다른 요청은 별도 발행으로 처리됩니다.</p>
               </div>
+            ) : (
+              !!command.error &&
+              !Object.keys(commandFieldErrors).length && (
+                <ErrorNotice
+                  error={command.error}
+                  message={commandMessage(command.error, 'publish')}
+                />
+              )
             )}
             {checkResult &&
               (checkResult.failed ? (

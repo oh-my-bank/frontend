@@ -75,7 +75,8 @@ export default function AdminProductPage() {
   }, [path, reload])
 
   function openDeactivation() {
-    command.setError(null)
+    // An uncertain result stays explained until it is checked or sent again.
+    if (!unresolved) command.setError(null)
     setCheckResult(null)
     setAcknowledged(unresolved)
     setConfirming(true)
