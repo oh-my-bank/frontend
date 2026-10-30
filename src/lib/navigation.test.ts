@@ -32,6 +32,14 @@ describe('authentication destinations', () => {
     expect(destinationAfterAuthentication(null, 'ADMIN')).toBe('/staff')
     expect(destinationAfterAuthentication('/applications/old-record', 'CUSTOMER', true)).toBe('/my')
   })
+  it('lets a new customer continue only to the simulation start screen with its plan prefill', () => {
+    expect(
+      destinationAfterAuthentication('/simulation?initialCash=15000000', 'CUSTOMER', true),
+    ).toBe('/simulation?initialCash=15000000')
+    expect(destinationAfterAuthentication('/simulation', 'CUSTOMER', true)).toBe('/simulation')
+    expect(destinationAfterAuthentication('/simulation/accounts/old', 'CUSTOMER', true)).toBe('/my')
+    expect(destinationAfterAuthentication('/simulationx', 'CUSTOMER', true)).toBe('/my')
+  })
   it('returns an administrator to product management after the session expired there', () => {
     expect(destinationAfterAuthentication('/admin/products/product-one', 'ADMIN')).toBe(
       '/admin/products/product-one',

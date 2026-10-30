@@ -1,7 +1,8 @@
 import type { Role } from '../types'
 
 /**
- * Only return an internal destination; a new customer has no preexisting private records.
+ * Only return an internal destination; a new customer has no preexisting private records, so
+ * registration continues only to the simulation start screen (with any plan prefill) or `/my`.
  * An administrator returns to the product management screen they were sent away from.
  */
 export function destinationAfterAuthentication(
@@ -12,7 +13,9 @@ export function destinationAfterAuthentication(
   const internal = isInternalPath(redirect) ? redirect : null
   if (role === 'ADMIN') return internal && isAdminPath(internal) ? internal : '/staff'
   if (role !== 'CUSTOMER') return '/staff'
-  if (registering || !internal || internal === '/') return '/my'
+  if (registering)
+    return internal === '/simulation' || internal?.startsWith('/simulation?') ? internal : '/my'
+  if (!internal || internal === '/') return '/my'
   return internal
 }
 
