@@ -53,6 +53,34 @@ describe('session mutations', () => {
     expect(fetch).toHaveBeenCalledTimes(2)
   })
 
+  it('keeps field errors keyed by the nested path so a form can mark the input', async () => {
+    const fetch = vi
+      .fn()
+      .mockResolvedValueOnce(Response.json({ token: 'csrf-one', headerName: 'X-CSRF-TOKEN' }))
+      .mockResolvedValueOnce(
+        Response.json(
+          {
+            code: 'VALIDATION_ERROR',
+            message: '입력값을 확인해 주세요.',
+            traceId: 'trace-one',
+            fieldErrors: { 'policy.maxAmount': '최대 금액은 최소 금액 이상이어야 합니다.', bad: 1 },
+          },
+          { status: 400 },
+        ),
+      )
+    vi.stubGlobal('fetch', fetch)
+    const error = await request('/admin/loan-products', {
+      method: 'POST',
+      body: {},
+      idempotencyKey: 'key-one',
+    }).catch((cause: unknown) => cause)
+    expect(error).toBeInstanceOf(ApiError)
+    expect(error).toMatchObject({ status: 400, code: 'VALIDATION_ERROR' })
+    expect((error as ApiError).fieldErrors).toEqual({
+      'policy.maxAmount': '최대 금액은 최소 금액 이상이어야 합니다.',
+    })
+  })
+
   it('obtains a new token after the session changes', async () => {
     const fetch = vi
       .fn()
