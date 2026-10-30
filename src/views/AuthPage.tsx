@@ -178,19 +178,19 @@ export default function AuthPage() {
             <AppIcon name="shield" size={38} />
           </span>
           <h2>
-            안전하게 경험하는
+            가상 자금으로 배우는
             <br />
-            나의 금융생활
+            은행 이용
           </h2>
           <p>
             실제 자금 이동 없이
             <br />
-            대출 신청과 조회를 경험해 보세요.
+            예·적금 운용과 대출 업무를 경험해 보세요.
           </p>
           <ul>
             <li>가상 정보로 회원가입</li>
-            <li>상품 조건 확인 후 신청</li>
-            <li>나의 대출에서 접수 내역 조회</li>
+            <li>모의 운용에서 예·적금 가입과 시간 진행</li>
+            <li>대출 상품 신청과 접수 내역 조회</li>
           </ul>
           <Link to="/guide" className="button button-outline small">
             이용안내

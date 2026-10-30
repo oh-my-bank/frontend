@@ -8,6 +8,8 @@ export const compactWon = (value: number) =>
   value >= 100000000
     ? `${new Intl.NumberFormat('ko-KR', { maximumFractionDigits: 1 }).format(value / 100000000)}억원`
     : `${new Intl.NumberFormat('ko-KR').format(value / 10000)}만원`
+/** Whole-won amount for statements and result tables, e.g. 10,253,800원. */
+export const wonText = (value: number) => `${new Intl.NumberFormat('ko-KR').format(value)}원`
 /** Exact Korean reading of a whole-won amount, e.g. 123만 4,567원. */
 export const koreanWon = (value: number) => {
   const group = new Intl.NumberFormat('ko-KR')
