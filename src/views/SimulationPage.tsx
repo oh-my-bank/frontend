@@ -96,6 +96,9 @@ export default function SimulationPage() {
             봅니다.
           </p>
         </div>
+        <Link className="button button-outline" to="/simulation/history">
+          지난 모의 운용 기록
+        </Link>
       </section>
       <p className="notice sim-lead-notice">
         <AppIcon name="shield" size={16} /> 실제 계좌·이체가 아닌 학습용 가상 자금입니다. 금리와
@@ -210,7 +213,10 @@ function CreateSandbox({
           <h2 id="sim-closed-title">모의 운용을 종료했습니다</h2>
           <p>
             {simDate(closed.startDate)} ~ {simDate(closed.currentDate)} ({closed.elapsedDays}일)
-            동안의 기록은 지워지지 않고 보관됩니다.
+            동안의 기록은 지워지지 않고 보관됩니다.{' '}
+            <Link to={`/simulation/history/${encodeURIComponent(closed.id)}`}>
+              이 운용의 성과 리포트 보기
+            </Link>
           </p>
           <dl className="sim-summary compact">
             <div>
@@ -434,7 +440,10 @@ function Dashboard({
           </div>
         </dl>
         <p className="sim-help">
-          파킹통장 이자는 날마다 쌓이고 월말에 원 단위로 결산되어 세금을 뺀 뒤 입금됩니다.
+          파킹통장 이자는 날마다 쌓이고 월말에 원 단위로 결산되어 세금을 뺀 뒤 입금됩니다.{' '}
+          <Link to={`/simulation/history/${encodeURIComponent(sandbox.id)}`}>
+            상품별 기여·중도해지 손실·만기후이율 비교 리포트 보기
+          </Link>
         </p>
       </section>
 
