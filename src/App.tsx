@@ -19,6 +19,7 @@ import AdminProductsPage from './views/AdminProductsPage'
 import AdminProductNewPage from './views/AdminProductNewPage'
 import AdminProductPage from './views/AdminProductPage'
 import AdminPolicyPublishPage from './views/AdminPolicyPublishPage'
+import AdminAuditLogsPage from './views/AdminAuditLogsPage'
 import LearnPage from './views/LearnPage'
 import ConceptPage from './views/ConceptPage'
 import GlossaryPage from './views/GlossaryPage'
@@ -79,6 +80,7 @@ function pageTitle(pathname: string, search: string) {
   if (pathname.startsWith('/applications/')) return '신청 내역'
   if (pathname === '/guide') return '이용안내'
   if (pathname === '/staff') return '직원업무'
+  if (pathname === '/admin/audit') return '감사 로그'
   if (pathname === '/staff/dashboard') return '운영 현황'
   if (pathname === '/staff/reviews') return '대출 심사'
   if (pathname.startsWith('/staff/reviews/')) return '심사 상세'
@@ -260,6 +262,7 @@ export default function App() {
               <>
                 <Link to="/admin/products">상품 관리</Link>
                 <Link to="/admin/products/new">상품 등록</Link>
+                <Link to="/admin/audit">감사 로그 조회</Link>
               </>
             )}
             <Link to="/guide#application">대출 신청 절차</Link>
@@ -411,6 +414,7 @@ export default function App() {
             />
             <Route path="/admin" element={<Navigate to="/admin/products" replace />} />
             <Route path="/admin/products" element={adminRoute(<AdminProductsPage />)} />
+            <Route path="/admin/audit" element={adminRoute(<AdminAuditLogsPage />)} />
             <Route path="/admin/products/new" element={adminRoute(<AdminProductNewPage />)} />
             <Route
               path="/admin/products/:id"
