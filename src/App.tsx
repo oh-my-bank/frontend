@@ -12,6 +12,8 @@ import ProductsPage from './views/ProductsPage'
 import ProductPage from './views/ProductPage'
 import ApplicationPage from './views/ApplicationPage'
 import StaffPage from './views/StaffPage'
+import StaffReviewsPage from './views/StaffReviewsPage'
+import StaffReviewPage from './views/StaffReviewPage'
 import AdminProductsPage from './views/AdminProductsPage'
 import AdminProductNewPage from './views/AdminProductNewPage'
 import AdminProductPage from './views/AdminProductPage'
@@ -70,6 +72,8 @@ function pageTitle(pathname: string, search: string) {
   if (pathname.startsWith('/applications/')) return '신청 내역'
   if (pathname === '/guide') return '이용안내'
   if (pathname === '/staff') return '직원업무'
+  if (pathname === '/staff/reviews') return '대출 심사'
+  if (pathname.startsWith('/staff/reviews/')) return '심사 상세'
   if (pathname === '/admin/products/new') return '상품 등록'
   if (pathname.startsWith('/admin/products/'))
     return pathname.endsWith('/policies/new') ? '새 정책 발행' : '상품 상세'
@@ -243,6 +247,7 @@ export default function App() {
             <h3>은행 업무 체험</h3>
             <Link to="/products">대출상품 조회·신청</Link>
             <Link to={staff ? '/staff' : '/my'}>{staff ? '직원 업무 범위' : '나의 신청 조회'}</Link>
+            {staff && <Link to="/staff/reviews">대출 심사</Link>}
             {admin && (
               <>
                 <Link to="/admin/products">상품 관리</Link>
@@ -345,6 +350,22 @@ export default function App() {
               element={
                 <Protected staff>
                   <StaffPage />
+                </Protected>
+              }
+            />
+            <Route
+              path="/staff/reviews"
+              element={
+                <Protected staff>
+                  <StaffReviewsPage />
+                </Protected>
+              }
+            />
+            <Route
+              path="/staff/reviews/:id"
+              element={
+                <Protected staff>
+                  <StaffReviewPage key={location.pathname} />
                 </Protected>
               }
             />
