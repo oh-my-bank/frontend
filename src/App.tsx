@@ -25,6 +25,9 @@ import GlossaryPage from './views/GlossaryPage'
 import ToolsPage from './views/ToolsPage'
 import CalculatorPage from './views/tools/CalculatorPage'
 import StrategyPage from './views/StrategyPage'
+import StrategySavesPage from './views/StrategySavesPage'
+import StrategySavePage from './views/StrategySavePage'
+import StrategyComparePage from './views/StrategyComparePage'
 import SimulationPage from './views/SimulationPage'
 import SimulationAccountPage from './views/SimulationAccountPage'
 import AdminAccessDenied from './components/AdminAccessDenied'
@@ -65,6 +68,9 @@ function pageTitle(pathname: string, search: string) {
     return isCalculatorKind(kind) ? calculatorInfo[kind].title : '계산기'
   }
   if (pathname === '/strategy') return '나의 전략'
+  if (pathname === '/strategy/saves') return '내 전략'
+  if (pathname === '/strategy/saves/compare') return '전략 비교'
+  if (pathname.startsWith('/strategy/saves/')) return '저장한 전략'
   if (pathname === '/simulation') return '모의 운용'
   if (pathname.startsWith('/simulation/accounts/')) return '모의 계좌 상세'
   if (pathname === '/my') return '나의 대출'
@@ -296,6 +302,30 @@ export default function App() {
             <Route path="/tools" element={<ToolsPage />} />
             <Route path="/tools/:kind" element={<CalculatorPage key={location.pathname} />} />
             <Route path="/strategy" element={<StrategyPage />} />
+            <Route
+              path="/strategy/saves"
+              element={
+                <Protected>
+                  <StrategySavesPage />
+                </Protected>
+              }
+            />
+            <Route
+              path="/strategy/saves/compare"
+              element={
+                <Protected>
+                  <StrategyComparePage />
+                </Protected>
+              }
+            />
+            <Route
+              path="/strategy/saves/:id"
+              element={
+                <Protected>
+                  <StrategySavePage key={location.pathname} />
+                </Protected>
+              }
+            />
             <Route
               path="/simulation"
               element={
