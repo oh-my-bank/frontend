@@ -54,6 +54,8 @@ export interface AdminProduct {
   active: boolean
   createdAt: string
   deactivatedAt: string | null
+  /** Current name and description version; edits append a new version. */
+  detailVersion: number
   currentPolicy: PolicyVersion
 }
 export interface ProductInput {

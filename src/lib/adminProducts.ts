@@ -22,7 +22,15 @@ export type PolicyField =
 export type PolicyForm = Record<PolicyField, string>
 /** Messages keyed by the API field path, such as `name` or `policy.maxAmount`. */
 export type FieldErrors = Record<string, string>
-export type AdminCommand = 'create' | 'publish' | 'deactivate'
+export type AdminCommand = 'create' | 'publish' | 'deactivate' | 'reactivate' | 'details'
+
+/** One stored version of a product's name and description, newest first in the history API. */
+export interface ProductDetailVersion {
+  version: number
+  name: string
+  description: string
+  createdAt: string
+}
 
 const rules = {
   rate: '0~100 사이의 숫자를 소수점 셋째 자리까지 입력해 주세요.',
@@ -133,11 +141,8 @@ export function readPolicy(form: PolicyForm): { terms?: PolicyTerms; errors: Fie
   }
 }
 
-export function readProduct(
-  name: string,
-  description: string,
-  policy: PolicyForm,
-): { input?: ProductInput; errors: FieldErrors } {
+/** Name and description rules shared by registration and the details edit (decision 0003). */
+function readDetailFields(name: string, description: string) {
   const errors: FieldErrors = {}
   const trimmedName = name.trim()
   const trimmedDescription = description.trim()
@@ -147,6 +152,65 @@ export function readProduct(
   if (!trimmedDescription) errors.description = '상품 설명을 입력해 주세요.'
   else if (trimmedDescription.length > MAX_DESCRIPTION_LENGTH)
     errors.description = '상품 설명은 1,000자 이내로 입력해 주세요.'
+  return { name: trimmedName, description: trimmedDescription, errors }
+}
+
+/** A details edit; unchanged values are reported before sending, like the server's PRODUCT_DETAILS_UNCHANGED. */
+export function readDetails(
+  name: string,
+  description: string,
+  current: { name: string; description: string },
+): { input?: { name: string; description: string }; errors: FieldErrors; unchanged?: boolean } {
+  const read = readDetailFields(name, description)
+  if (Object.keys(read.errors).length) return { errors: read.errors }
+  if (read.name === current.name && read.description === current.description)
+    return { errors: {}, unchanged: true }
+  return { errors: {}, input: { name: read.name, description: read.description } }
+}
+
+/** Whether an uncertain details edit from `baseVersion` was applied, judged from the details history. */
+export function detailsOutcome(
+  history: ProductDetailVersion[],
+  baseVersion: number,
+  input: { name: string; description: string },
+): { state: 'applied'; version: number } | { state: 'not-applied' | 'superseded' } {
+  const newer = history.filter((item) => item.version > baseVersion)
+  if (!newer.length) return { state: 'not-applied' }
+  const mine = newer.find(
+    (item) => item.name === input.name && item.description === input.description,
+  )
+  return mine ? { state: 'applied', version: mine.version } : { state: 'superseded' }
+}
+
+export type StatusFilter = 'all' | 'active' | 'inactive'
+const statusFilters: StatusFilter[] = ['all', 'active', 'inactive']
+export const MAX_SEARCH_LENGTH = 100
+
+/** List view state kept in the URL, so a search survives reloads and the back button. */
+export function listState(params: URLSearchParams): { status: StatusFilter; q: string } {
+  const status = params.get('status') as StatusFilter | null
+  return {
+    status: status && statusFilters.includes(status) ? status : 'all',
+    q: (params.get('q') ?? '').trim().slice(0, MAX_SEARCH_LENGTH),
+  }
+}
+
+/** Admin list request; the server matches the name literally and ignores case. */
+export function listPath(q: string) {
+  const query = q.trim()
+  return query ? `/admin/loan-products?q=${encodeURIComponent(query)}` : '/admin/loan-products'
+}
+
+export function readProduct(
+  name: string,
+  description: string,
+  policy: PolicyForm,
+): { input?: ProductInput; errors: FieldErrors } {
+  const {
+    name: trimmedName,
+    description: trimmedDescription,
+    errors,
+  } = readDetailFields(name, description)
   const { terms, errors: policyErrors } = readPolicy(policy)
   Object.assign(errors, policyErrors)
   if (!terms || Object.keys(errors).length) return { errors }
@@ -230,6 +294,8 @@ const fallbackFieldMessages: FieldErrors = {
   'policy.repaymentMethod': '지원하는 상환 방식은 원리금균등분할상환입니다.',
   'policy.explanationVersion': rules.explanation,
   expectedCurrentVersion: '기준 정책 버전을 확인할 수 없습니다. 최신 정책을 다시 불러와 주세요.',
+  expectedDetailVersion:
+    '기준 상품 정보 버전을 확인할 수 없습니다. 최신 정보를 다시 불러와 주세요.',
 }
 const duplicateName = '판매 중인 상품 중 같은 이름이 있습니다. 다른 상품명을 입력해 주세요.'
 
@@ -259,6 +325,10 @@ const uncertainMessages: Record<AdminCommand, string> = {
     '발행 결과를 확인하지 못했습니다. 먼저 반영 여부를 확인해 주세요. 같은 내용으로 다시 보내면 같은 요청 키를 사용하므로 정책이 중복 발행되지 않습니다.',
   deactivate:
     '판매 중지 결과를 확인하지 못했습니다. 먼저 반영 여부를 확인해 주세요. 다시 보내도 같은 요청 키를 사용하므로 중복 처리되지 않습니다.',
+  reactivate:
+    '판매 재개 결과를 확인하지 못했습니다. 먼저 반영 여부를 확인해 주세요. 다시 보내도 같은 요청 키를 사용하므로 중복 처리되지 않습니다.',
+  details:
+    '상품 정보 수정 결과를 확인하지 못했습니다. 먼저 반영 여부를 확인해 주세요. 같은 내용으로 다시 보내면 같은 요청 키를 사용하므로 중복 수정되지 않습니다.',
 }
 const codeMessages: Record<string, string> = {
   POLICY_VERSION_CONFLICT:
@@ -268,6 +338,10 @@ const codeMessages: Record<string, string> = {
   PRODUCT_NAME_DUPLICATE: duplicateName,
   PRODUCT_INACTIVE: '이미 판매 중지된 상품이라 변경할 수 없습니다. 최신 상태를 다시 불러왔습니다.',
   PRODUCT_NOT_FOUND: '상품을 찾을 수 없습니다. 상품 목록에서 다시 선택해 주세요.',
+  PRODUCT_ACTIVE: '이미 판매 중인 상품입니다. 최신 상태를 다시 불러왔습니다.',
+  PRODUCT_DETAILS_VERSION_CONFLICT:
+    '다른 관리자가 먼저 상품 정보를 수정했습니다. 최신 정보를 다시 불러왔으니 확인한 뒤 다시 수정해 주세요.',
+  PRODUCT_DETAILS_UNCHANGED: '현재 상품 정보와 같습니다. 바꿀 상품명이나 설명을 입력해 주세요.',
   IDEMPOTENCY_CONFLICT:
     '같은 요청 키가 다른 내용으로 이미 사용되었습니다. 상품 목록에서 처리 여부를 확인한 뒤 다시 시도해 주세요.',
   VALIDATION_ERROR: '입력 내용을 확인해 주세요. 표시된 항목을 고친 뒤 다시 확인해 주세요.',
@@ -277,6 +351,12 @@ const codeMessages: Record<string, string> = {
 export function commandMessage(error: unknown, command: AdminCommand) {
   if (!error) return undefined
   if (isUncertain(error)) return uncertainMessages[command]
+  if (
+    command === 'reactivate' &&
+    error instanceof ApiError &&
+    error.code === 'PRODUCT_NAME_DUPLICATE'
+  )
+    return '판매 중인 다른 상품과 이름이 같아 다시 판매할 수 없습니다. 상품 정보 수정에서 이름을 먼저 바꿔 주세요.'
   return error instanceof ApiError ? codeMessages[error.code] : undefined
 }
 
