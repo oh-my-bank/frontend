@@ -7,6 +7,7 @@ import type { LoanApplication, Product } from '../types'
 import AppIcon from '../components/AppIcon'
 import ErrorNotice from '../components/ErrorNotice'
 import ProductCard from '../components/ProductCard'
+import MyLearningSection from '../components/MyLearningSection'
 import '../styles/banking-records.css'
 
 export default function DashboardPage() {
@@ -214,6 +215,8 @@ export default function DashboardPage() {
           <div className="empty-state">현재 조회할 수 있는 상품이 없습니다.</div>
         )}
       </section>
+
+      <MyLearningSection />
     </>
   )
 }

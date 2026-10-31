@@ -59,6 +59,8 @@ export interface QuizResult {
   slug: string
   total: number
   correct: number
+  /** True only when a logged-in customer's attempt was saved to the learning record. */
+  recorded: boolean
   results: {
     questionId: string
     selectedIndex: number | null
