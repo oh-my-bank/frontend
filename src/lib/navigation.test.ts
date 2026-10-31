@@ -36,6 +36,16 @@ describe('authentication destinations', () => {
     expect(destinationAfterAuthentication(null, 'ADMIN')).toBe('/staff')
     expect(destinationAfterAuthentication('/applications/old-record', 'CUSTOMER', true)).toBe('/my')
   })
+  it('returns staff to the review screen they were sent away from', () => {
+    expect(destinationAfterAuthentication('/staff/reviews/app-1', 'REVIEWER')).toBe(
+      '/staff/reviews/app-1',
+    )
+    expect(destinationAfterAuthentication('/staff/reviews?status=APPLIED', 'ADMIN')).toBe(
+      '/staff/reviews?status=APPLIED',
+    )
+    expect(destinationAfterAuthentication('/staffroom', 'REVIEWER')).toBe('/staff')
+    expect(destinationAfterAuthentication('//staff/reviews', 'REVIEWER')).toBe('/staff')
+  })
   it('lets a new customer continue only to the simulation start screen with its plan prefill', () => {
     expect(
       destinationAfterAuthentication('/simulation?initialCash=15000000', 'CUSTOMER', true),

@@ -44,10 +44,13 @@ export function StackedBars({
   title,
   rows,
   note,
+  format = wonText,
 }: {
   title: string
   rows: BarRow[]
   note?: string
+  /** Reads each value in the accessible label; amounts by default, counts on the staff dashboard. */
+  format?: (value: number) => string
 }) {
   const base = useId()
   const legend = new Map<string, Tone>()
@@ -64,8 +67,8 @@ export function StackedBars({
           [0],
         )
         const description = row.segments
-          .map((segment) => `${segment.label} ${wonText(segment.value)}`)
-          .concat(row.marker ? [`${row.marker.label} ${wonText(row.marker.value)}`] : [])
+          .map((segment) => `${segment.label} ${format(segment.value)}`)
+          .concat(row.marker ? [`${row.marker.label} ${format(row.marker.value)}`] : [])
           .join(', ')
         return (
           <div className="tool-chart-row" key={row.label}>
