@@ -9,6 +9,8 @@ import type { AdminProduct, PolicyVersion } from '../types'
 import AppIcon from '../components/AppIcon'
 import ConfirmDialog from '../components/ConfirmDialog'
 import ErrorNotice from '../components/ErrorNotice'
+import ProductDetailsSection from '../components/ProductDetailsSection'
+import ProductReactivation from '../components/ProductReactivation'
 import '../styles/banking-records.css'
 import '../styles/banking-admin.css'
 
@@ -81,6 +83,10 @@ export default function AdminProductPage() {
     setAcknowledged(unresolved)
     setConfirming(true)
   }
+  function changed(updated: AdminProduct, message: string) {
+    setProduct(updated)
+    setNotice(message)
+  }
   function deactivated(updated: AdminProduct, message: string) {
     setProduct(updated)
     setConfirming(false)
@@ -148,7 +154,7 @@ export default function AdminProductPage() {
       <section className="page-title bank-title-actions">
         <div>
           <h1>상품 상세</h1>
-          <p>현재 정책과 정책 버전 이력을 확인하고 판매 상태를 관리합니다.</p>
+          <p>현재 정책·상품 정보와 버전 이력을 확인하고 판매 상태를 관리합니다.</p>
         </div>
         <Link to="/admin/products" className="button button-outline">
           상품 목록
@@ -266,22 +272,22 @@ export default function AdminProductPage() {
                 </button>
               </div>
               <p className="bank-section-help">
-                조건 변경은 새 정책 버전으로 발행하며 기존 버전은 수정·삭제되지 않습니다.
-                상품명·설명 수정과 재활성화는 제공하지 않습니다.
+                조건 변경은 새 정책 버전으로 발행하며 기존 버전은 수정·삭제되지 않습니다. 판매를
+                중지한 상품은 현재 정책 그대로 판매를 재개할 수 있습니다.
               </p>
             </section>
           ) : (
-            <section className="bank-record-notice" aria-labelledby="bank-admin-inactive-title">
-              <AppIcon name="info" size={21} />
-              <div>
-                <h2 id="bank-admin-inactive-title">판매 중지된 상품입니다.</h2>
-                <p>
-                  고객 상품 목록과 신규 신청에서 제외되었으며 이미 접수된 신청 내역은 계속
-                  조회됩니다. 이번 버전에는 재활성화와 정책 발행을 제공하지 않습니다.
-                </p>
-              </div>
-            </section>
+            <ProductReactivation
+              product={product}
+              onChanged={changed}
+              onReload={() => setReload((value) => value + 1)}
+            />
           )}
+          <ProductDetailsSection
+            product={product}
+            onChanged={changed}
+            onReload={() => setReload((value) => value + 1)}
+          />
           <section className="bank-record-section" aria-labelledby="bank-admin-history-title">
             <div className="section-heading">
               <div>
@@ -401,8 +407,8 @@ export default function AdminProductPage() {
               <li>고객 상품 목록·상품 상세에서 제외되고 새 신청을 받을 수 없습니다.</li>
               <li>이미 접수된 신청 내역과 접수 당시 조건은 그대로 조회됩니다.</li>
               <li>
-                <strong>되돌릴 수 없습니다.</strong> 재활성화 기능이 없으며 이후 정책 발행도 할 수
-                없습니다. 다시 판매하려면 새 상품으로 등록해야 합니다.
+                판매 중지 동안에는 정책을 발행할 수 없습니다. 판매 재개는 현재 정책 버전 조건 그대로
+                진행됩니다.
               </li>
             </ul>
             <label className="bank-confirm-acknowledge">
@@ -412,7 +418,7 @@ export default function AdminProductPage() {
                 onChange={(event) => setAcknowledged(event.target.checked)}
                 disabled={command.pending}
               />
-              <span>판매 중지는 되돌릴 수 없다는 것을 확인했습니다.</span>
+              <span>판매 중지 동안 신규 신청을 받을 수 없다는 것을 확인했습니다.</span>
             </label>
           </ConfirmDialog>
         </>
