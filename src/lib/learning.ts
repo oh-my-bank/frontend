@@ -1,4 +1,10 @@
 import { request } from './api'
+import type {
+  RateScenarioInput,
+  RateScenarioResult,
+  VariableLoanInput,
+  VariableLoanResult,
+} from './rateScenario'
 
 /** Contract: docs/api/banking-learning.md 1장(학습)·2장(계산기). */
 export type CategoryCode =
@@ -77,7 +83,8 @@ export interface Term {
   relatedConcept: string | null
 }
 
-export type CalculatorKind = 'deposit' | 'savings' | 'loan' | 'dsr' | 'goal'
+export type CalculatorKind =
+  'deposit' | 'savings' | 'loan' | 'dsr' | 'goal' | 'variable-loan' | 'rate-scenario'
 export type InterestType = 'SIMPLE' | 'MONTHLY_COMPOUND'
 export type TaxType = 'GENERAL' | 'TAX_FREE'
 export type RepaymentMethod = 'EQUAL_PAYMENT' | 'EQUAL_PRINCIPAL' | 'BULLET'
@@ -218,6 +225,8 @@ interface Calculation {
   loan: [LoanInput, LoanResult]
   dsr: [DsrInput, DsrResult]
   goal: [GoalInput, GoalResult]
+  'variable-loan': [VariableLoanInput, VariableLoanResult]
+  'rate-scenario': [RateScenarioInput, RateScenarioResult]
 }
 export type CalculationInput<K extends CalculatorKind> = Calculation[K][0]
 export type CalculationResult<K extends CalculatorKind> = Calculation[K][1]
@@ -255,7 +264,15 @@ export const categoryLabels: Record<CategoryCode, string> = {
 export const categoryLabel = (code: string) => categoryLabels[code as CategoryCode] ?? code
 export const levelLabel = (level: Level) => (level === 'BASIC' ? '기초' : '심화')
 
-export const calculatorKinds: CalculatorKind[] = ['deposit', 'savings', 'loan', 'dsr', 'goal']
+export const calculatorKinds: CalculatorKind[] = [
+  'deposit',
+  'savings',
+  'loan',
+  'dsr',
+  'goal',
+  'variable-loan',
+  'rate-scenario',
+]
 export const isCalculatorKind = (value: string | undefined): value is CalculatorKind =>
   calculatorKinds.includes(value as CalculatorKind)
 /** Hub, menu and page titles for each calculator, with the concepts that explain it. */
@@ -301,6 +318,23 @@ export const calculatorInfo: Record<
     concepts: [
       { slug: 'saving-strategy', label: '나에게 맞는 은행 활용 전략' },
       { slug: 'installment-savings', label: '적금' },
+    ],
+  },
+  'variable-loan': {
+    title: '거치·변동금리 대출 계산기',
+    summary:
+      '거치기간과 금리 변경 경로를 넣어 회차별 납입액과 고정금리 대비 이자 차이를 계산합니다.',
+    concepts: [
+      { slug: 'fixed-vs-variable', label: '고정금리와 변동금리' },
+      { slug: 'repayment-methods', label: '대출을 갚는 세 가지 방법' },
+    ],
+  },
+  'rate-scenario': {
+    title: '금리 시나리오 계산기',
+    summary: '기준금리가 오르거나 내리는 가정 시나리오별로 대출 상환액과 예금 이자를 비교합니다.',
+    concepts: [
+      { slug: 'base-rate-and-pricing', label: '내 금리는 어떻게 정해지나' },
+      { slug: 'fixed-vs-variable', label: '고정금리와 변동금리' },
     ],
   },
 }
