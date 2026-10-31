@@ -1,0 +1,54 @@
+/* Grace-period/variable-rate loan and rate scenario calculators (R07); builds on tools.css. */
+.rate-change-line {
+  padding-top: 8px;
+  border-top: 1px dashed #dfe8e3;
+}
+.rate-change-line:first-of-type {
+  border-top: 0;
+  padding-top: 0;
+}
+.rate-change-line > .text-button {
+  margin: -4px 0 8px;
+}
+.rate-scenario-row > .button {
+  margin-top: 4px;
+}
+.rate-grace-row td,
+.rate-grace-row th {
+  background: #f6f9f7;
+}
+.rate-phase-tag {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 0 6px;
+  border-radius: 3px;
+  background: #e4ebe7;
+  color: #4b5d53;
+  font-size: 11px;
+  font-weight: 600;
+}
+.rate-assumption-note {
+  margin: 0 0 16px;
+  align-items: center;
+}
+.rate-compare th[scope='row'] {
+  min-width: 120px;
+}
+.rate-change-text {
+  display: block;
+  margin-top: 2px;
+  color: #627168;
+  font-size: 12px;
+  font-weight: 500;
+}
+.rate-lines svg[role='img'] {
+  display: block;
+  width: 100%;
+  height: 180px;
+}
+.rate-line-swatch {
+  width: 32px;
+  height: 8px;
+  margin-right: 6px;
+  vertical-align: middle;
+}
