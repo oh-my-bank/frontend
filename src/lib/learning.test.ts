@@ -6,6 +6,7 @@ import {
   parseWholeNumber,
   visibleScheduleIndexes,
 } from './learning'
+import { pathTotals } from './learningPath'
 
 describe('rate input', () => {
   it('sends the typed rate as a decimal string the API accepts', () => {
@@ -72,5 +73,13 @@ describe('content paragraphs', () => {
       '둘째 문단이다.',
       '셋째.',
     ])
+  })
+})
+
+describe('learning path totals', () => {
+  it('summarises a stage or the whole path in one line', () => {
+    expect(pathTotals({ conceptCount: 3, readMinutes: 15, questionCount: 9 })).toBe(
+      '개념 3개 · 15분 · 확인 문제 9문항',
+    )
   })
 })
