@@ -1,0 +1,178 @@
+/* Customer loan agreement, execution, ledger and repayment (R02~R04). Builds on banking-records. */
+.loan-step {
+  margin-top: 24px;
+}
+.loan-step .bank-statement-body > .notice {
+  margin-bottom: 14px;
+}
+.loan-sim-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 9px;
+  border-radius: 4px;
+  border: 1px solid #cfe6da;
+  background: #e7f5ee;
+  color: #276b57;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.loan-explanation {
+  display: grid;
+  gap: 10px;
+  margin: 0 0 18px;
+  padding-left: 22px;
+}
+.loan-explanation strong {
+  font-size: 14px;
+}
+.loan-explanation p {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+.loan-acknowledgements {
+  display: grid;
+  gap: 10px;
+  margin: 0 0 14px;
+  padding: 16px 18px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #f8faf8;
+}
+.loan-acknowledgements legend {
+  padding: 0 6px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.loan-acknowledgements label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 14px;
+  line-height: 1.6;
+  cursor: pointer;
+}
+.loan-acknowledgements input {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  flex: none;
+  accent-color: var(--brand);
+}
+.loan-step-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  margin-top: 16px;
+}
+.loan-link-list {
+  display: grid;
+  gap: 10px;
+  margin: 16px 0;
+  padding: 0;
+  list-style: none;
+}
+.loan-link-list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+.loan-link-list li > div {
+  display: grid;
+  gap: 3px;
+}
+.loan-link-list span {
+  color: var(--muted);
+  font-size: 13px;
+}
+.loan-next {
+  margin-top: 24px;
+  padding: 20px 26px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+}
+.loan-next h2 {
+  margin: 0 0 8px;
+  font-size: 18px;
+}
+.loan-next .details-list {
+  margin-bottom: 16px;
+}
+.loan-tabs {
+  display: flex;
+  margin-top: 28px;
+  border-bottom: 2px solid var(--brand);
+}
+.loan-tabs button {
+  min-height: 46px;
+  padding: 0 22px;
+  border: 1px solid var(--border);
+  border-bottom: 0;
+  border-radius: 7px 7px 0 0;
+  background: #f8faf8;
+  color: #6f7a73;
+  font-size: 15px;
+  font-weight: 500;
+}
+.loan-tabs button + button {
+  border-left: 0;
+}
+.loan-tabs button[aria-selected='true'] {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: white;
+}
+.loan-tab-panel {
+  padding: 20px 0;
+}
+.loan-reconciliation {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 18px;
+  border: 1px solid #cfe6da;
+  border-radius: 6px;
+  background: #e7f5ee;
+  color: #276b57;
+}
+.loan-reconciliation.is-unbalanced {
+  border-color: #efdcd6;
+  background: #fff5f1;
+  color: #ae594b;
+}
+.loan-reconciliation p {
+  margin: 2px 0 0;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.loan-journal tr.loan-journal-start td {
+  border-top: 1px solid var(--border);
+}
+.status-badge.repaying,
+.status-badge.agreed,
+.status-badge.executed {
+  color: #1f6f78;
+  background: #e5f3f4;
+}
+.bank-loan-table-wrap {
+  margin-top: 6px;
+}
+@media (max-width: 640px) {
+  .loan-next {
+    padding: 18px 16px;
+  }
+  .loan-tabs button {
+    flex: 1;
+    padding: 0 10px;
+    font-size: 14px;
+  }
+}

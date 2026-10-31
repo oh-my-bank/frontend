@@ -11,6 +11,7 @@ import DashboardPage from './views/DashboardPage'
 import ProductsPage from './views/ProductsPage'
 import ProductPage from './views/ProductPage'
 import ApplicationPage from './views/ApplicationPage'
+import LoanPage from './views/LoanPage'
 import StaffPage from './views/StaffPage'
 import OpsDashboardPage from './views/OpsDashboardPage'
 import StaffReviewsPage from './views/StaffReviewsPage'
@@ -88,6 +89,7 @@ function pageTitle(pathname: string, search: string) {
   if (pathname === '/products') return '대출상품'
   if (pathname.startsWith('/products/')) return '대출 신청'
   if (pathname.startsWith('/applications/')) return '신청 내역'
+  if (pathname.startsWith('/loans/')) return '대출 상세'
   if (pathname === '/guide') return '이용안내'
   if (pathname === '/staff') return '직원업무'
   if (pathname === '/account') return '내 정보'
@@ -412,6 +414,14 @@ export default function App() {
               element={
                 <Protected>
                   <ApplicationPage key={location.pathname} />
+                </Protected>
+              }
+            />
+            <Route
+              path="/loans/:id"
+              element={
+                <Protected>
+                  <LoanPage key={location.pathname} />
                 </Protected>
               }
             />
