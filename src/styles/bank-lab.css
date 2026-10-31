@@ -1,0 +1,108 @@
+/* Bank operations simulator BANK_OPS_V1 (docs/domain/banking-rules.md 7장). */
+.bank-lab-callout {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  margin-top: 18px;
+  padding: 18px 20px;
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--brand);
+  background: #f5faf8;
+}
+.bank-lab-callout > svg {
+  color: var(--brand);
+}
+.bank-lab-callout > span {
+  display: grid;
+  gap: 4px;
+}
+.bank-lab-callout strong {
+  font-size: 16px;
+  font-weight: 650;
+}
+.bank-lab-callout span span {
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--muted);
+  word-break: keep-all;
+}
+.bank-lab-callout:hover strong {
+  color: var(--brand);
+  text-decoration: underline;
+}
+.bank-lab-metrics {
+  list-style: none;
+  margin: 18px 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.bank-lab-metric {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--brand);
+  background: #fff;
+}
+.bank-lab-metric h3 {
+  font-size: 14px;
+  font-weight: 650;
+  color: var(--brand-dark);
+  word-break: keep-all;
+}
+.bank-lab-metric-value {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+.bank-lab-metric-value strong {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text);
+}
+.bank-lab-metric-shock,
+.bank-lab-metric-threshold {
+  margin: 0;
+  font-size: 13px;
+  color: var(--brand-dark);
+}
+.bank-lab-metric-text {
+  margin: 4px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--muted);
+  word-break: keep-all;
+}
+.bank-lab-compare td {
+  white-space: nowrap;
+}
+.bank-lab-notices {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+@media (max-width: 1100px) {
+  .bank-lab-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 600px) {
+  .bank-lab-metrics {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .bank-lab-callout {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .bank-lab-callout > svg:last-child {
+    display: none;
+  }
+}
