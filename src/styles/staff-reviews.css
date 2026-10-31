@@ -170,3 +170,9 @@
   margin: 0;
   line-height: 1.75;
 }
+
+.staff-review-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
