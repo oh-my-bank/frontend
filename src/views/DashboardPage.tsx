@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../stores/auth'
 import { request } from '../lib/api'
-import { dateTime, statusLabel, won } from '../lib/format'
+import { dateTime, isReviewApproved, statusLabel, won } from '../lib/format'
 import type { LoanApplication, Product } from '../types'
 import AppIcon from '../components/AppIcon'
 import ErrorNotice from '../components/ErrorNotice'
@@ -22,7 +22,7 @@ export default function DashboardPage() {
   const inReview = applications.filter((item) =>
     ['APPLIED', 'UNDER_REVIEW'].includes(item.status),
   ).length
-  const approved = applications.filter((item) => item.status === 'APPROVED').length
+  const approved = applications.filter((item) => isReviewApproved(item.status)).length
 
   useEffect(() => {
     let active = true
@@ -63,7 +63,10 @@ export default function DashboardPage() {
       <section className="bank-overview" aria-labelledby="bank-overview-title" aria-busy={pending}>
         <div className="bank-overview-heading">
           <h2 id="bank-overview-title">대출 신청 현황</h2>
-          <span>내가 신청한 내역을 기준으로 표시합니다.</span>
+          <span>
+            내가 신청한 내역을 기준으로 표시합니다. 심사 승인에는 이후 약정·상환 중·완납 신청도
+            포함합니다.
+          </span>
         </div>
         <div className="bank-overview-counts">
           <div>

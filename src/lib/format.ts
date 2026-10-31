@@ -44,5 +44,9 @@ export const statusLabel = (status: string) =>
     REPAYING: '상환 중',
     PAID_OFF: '완납',
   })[status] ?? status
+/** Statuses an application reaches only after the review approved it; agreement and repayment keep that result. */
+export const APPROVED_STATUSES = ['APPROVED', 'AGREED', 'EXECUTED', 'REPAYING', 'PAID_OFF'] as const
+export const isReviewApproved = (status: string) =>
+  (APPROVED_STATUSES as readonly string[]).includes(status)
 export const repaymentLabel = (method: string) =>
   ({ EQUAL_PRINCIPAL_AND_INTEREST: '원리금균등분할상환' })[method] ?? method
