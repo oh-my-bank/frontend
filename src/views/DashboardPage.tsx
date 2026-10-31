@@ -8,6 +8,7 @@ import AppIcon from '../components/AppIcon'
 import ErrorNotice from '../components/ErrorNotice'
 import ProductCard from '../components/ProductCard'
 import MyLearningSection from '../components/MyLearningSection'
+import MyLoansSection from '../components/MyLoansSection'
 import '../styles/banking-records.css'
 
 export default function DashboardPage() {
@@ -176,10 +177,12 @@ export default function DashboardPage() {
           </div>
         )}
         <p className="bank-section-help">
-          신청 접수·내역 조회와 모의 심사 결과(승인 시 확정 조건, 거절 시 안내)를 제공합니다.
-          약정·실행·상환 기능은 준비 중입니다.
+          신청 접수·내역 조회와 모의 심사 결과(승인 시 확정 조건, 거절 시 안내)를 제공합니다. 승인된
+          신청은 상세 화면에서 약정과 대출 실행을 진행할 수 있습니다.
         </p>
       </section>
+
+      <MyLoansSection reload={reload} />
 
       <section
         className="bank-record-section bank-products-section"

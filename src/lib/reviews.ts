@@ -197,7 +197,7 @@ export function customerReviewStage(status: string, decision?: ApplicationDecisi
       tone: 'approved',
       title: '모의 심사에서 승인되었습니다.',
       description:
-        '아래 확정 조건으로 승인되었습니다. 약정·실행 기능은 아직 제공하지 않으므로 대출금이 지급되거나 대출 잔액이 생기지 않습니다.',
+        '아래 확정 조건으로 승인되었습니다. 상품설명서를 확인하고 약정한 뒤 대출을 실행하면 가상 자금으로 지급되고 상환 일정이 만들어집니다. 약정 전에는 대출금이나 대출 잔액이 생기지 않습니다.',
     } as const
   if (decision?.result === 'REJECTED')
     return {
