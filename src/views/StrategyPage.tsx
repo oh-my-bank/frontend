@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { useAuth } from '../stores/auth'
 import { ApiError, request } from '../lib/api'
 import { rate, won } from '../lib/format'
 import { fetchRules, type Rules } from '../lib/learning'
@@ -22,7 +23,9 @@ import {
 import AppIcon from '../components/AppIcon'
 import ErrorNotice from '../components/ErrorNotice'
 import SimField from '../components/sim/SimField'
+import StrategySavePanel from '../components/StrategySavePanel'
 import AllocationChart from '../components/sim/AllocationChart'
+import { clearPendingInput, draftFromRequest, peekPendingInput } from '../lib/strategySaves'
 import '../styles/simulation.css'
 
 const initialDraft: StrategyDraft = {
@@ -35,9 +38,17 @@ const initialDraft: StrategyDraft = {
   loans: [],
 }
 
+/** A saved strategy's input (router state) or the input kept across the login detour fills the form. */
+function prefilledDraft(state: unknown): StrategyDraft {
+  const prefill = (state as { prefill?: StrategyRequest } | null)?.prefill ?? peekPendingInput()
+  return prefill ? draftFromRequest(prefill) : initialDraft
+}
+
 export default function StrategyPage() {
   const navigate = useNavigate()
-  const [draft, setDraft] = useState<StrategyDraft>(initialDraft)
+  const location = useLocation()
+  const { user } = useAuth()
+  const [draft, setDraft] = useState<StrategyDraft>(() => prefilledDraft(location.state))
   const [step, setStep] = useState(0)
   const [shown, setShown] = useState<Record<string, string>>({})
   const [submitting, setSubmitting] = useState(false)
@@ -60,6 +71,7 @@ export default function StrategyPage() {
       })
     return () => controller.abort()
   }, [])
+  useEffect(() => clearPendingInput(), [])
   useEffect(() => {
     if (!focusTarget.current) return
     document.getElementById(focusTarget.current)?.focus()
@@ -158,10 +170,16 @@ export default function StrategyPage() {
             예·적금 순서로 실행 항목을 계산합니다.
           </p>
         </div>
+        {user?.role === 'CUSTOMER' && (
+          <Link className="button button-outline" to="/strategy/saves">
+            <AppIcon name="list" size={16} /> 내 전략 목록·비교
+          </Link>
+        )}
       </section>
       <p className="notice sim-lead-notice">
         <AppIcon name="info" size={16} /> 교육용 규칙(BANK_STRATEGY_V1)의 계산 결과이며 실제
-        금융상품 추천이나 투자 자문이 아닙니다. 입력값은 저장하지 않습니다.
+        금융상품 추천이나 투자 자문이 아닙니다. 입력값은 직접 저장하기 전에는 서버에 남기지
+        않습니다.
       </p>
 
       <form className="sim-panel sim-strategy-form" onSubmit={submit} noValidate>
@@ -450,11 +468,14 @@ export default function StrategyPage() {
           }}
         />
       )}
+      {plan && (
+        <StrategySavePanel key={JSON.stringify(plan.input)} input={plan.input} stale={stale} />
+      )}
     </>
   )
 }
 
-const warningLabels: Record<string, string> = {
+export const warningLabels: Record<string, string> = {
   NEGATIVE_CASHFLOW: '여유자금 없음',
   DEPOSIT_PROTECTION_LIMIT: '예금자보호 한도',
 }
@@ -611,7 +632,7 @@ function StrategyResult({
   )
 }
 
-function ActionItem({ action }: { action: StrategyAction }) {
+export function ActionItem({ action }: { action: StrategyAction }) {
   const status = actionStatus(action.status)
   const target = action.goalName ?? action.loanName
   const facts: [string, string][] = []

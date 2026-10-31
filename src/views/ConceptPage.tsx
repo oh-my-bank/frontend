@@ -11,14 +11,34 @@ import {
   type QuizQuestion,
   type QuizResult,
 } from '../lib/learning'
+import {
+  clearConceptCompleted,
+  markConceptCompleted,
+  progressBadges,
+  type ConceptProgress,
+} from '../lib/learningProgress'
+import { useLearningProgress } from '../lib/useLearningProgress'
+import { dateTime } from '../lib/format'
 import AppIcon from '../components/AppIcon'
 import ErrorNotice from '../components/ErrorNotice'
 import SourceList from '../components/SourceList'
 import '../styles/learning.css'
+import '../styles/learning-progress.css'
 
 const optionMark = ['①', '②', '③', '④', '⑤', '⑥']
 
-function Quiz({ slug, questions }: { slug: string; questions: QuizQuestion[] }) {
+function Quiz({
+  slug,
+  questions,
+  saving,
+  onGraded,
+}: {
+  slug: string
+  questions: QuizQuestion[]
+  /** Whether the viewer is a signed-in customer, whose graded attempts the server records. */
+  saving: boolean
+  onGraded: (result: QuizResult) => void
+}) {
   const [answers, setAnswers] = useState<Record<string, number>>({})
   const [result, setResult] = useState<QuizResult | null>(null)
   const [pending, setPending] = useState(false)
@@ -33,6 +53,7 @@ function Quiz({ slug, questions }: { slug: string; questions: QuizQuestion[] }) 
         Object.entries(answers).map(([questionId, optionIndex]) => ({ questionId, optionIndex })),
       )
       setResult(graded)
+      onGraded(graded)
       requestAnimationFrame(() => document.getElementById('quiz-score')?.focus())
     } catch (cause) {
       setError(cause)
@@ -52,11 +73,15 @@ function Quiz({ slug, questions }: { slug: string; questions: QuizQuestion[] }) 
         확인 문제
       </h2>
       <p className="form-help">
-        보기를 고르고 채점을 누르면 서버가 정답과 해설을 알려 줍니다. 채점 결과는 저장하지 않습니다.
+        보기를 고르고 채점을 누르면 서버가 정답과 해설을 알려 줍니다.{' '}
+        {saving
+          ? '고객으로 로그인한 상태이므로 서버가 채점한 점수를 나의 학습 기록에 저장합니다.'
+          : '로그인하지 않았거나 직원 계정이면 채점 결과를 저장하지 않습니다.'}
       </p>
       {result && (
         <p className="learn-quiz-score" id="quiz-score" tabIndex={-1} role="status">
           {result.total}문항 중 <strong>{result.correct}문항</strong>을 맞혔습니다.
+          {result.recorded && ' 학습 기록에 저장했습니다.'}
         </p>
       )}
       <form
@@ -143,11 +168,81 @@ function Quiz({ slug, questions }: { slug: string; questions: QuizQuestion[] }) 
   )
 }
 
+/** Completion mark and the saved quiz record for one concept (R05). Shown only to customers. */
+function ConceptRecord({
+  slug,
+  item,
+  onChange,
+}: {
+  slug: string
+  item: ConceptProgress | undefined
+  onChange: () => void
+}) {
+  const [pending, setPending] = useState(false)
+  const [error, setError] = useState<unknown>(null)
+  const completed = !!item?.completed
+  async function toggle() {
+    setPending(true)
+    setError(null)
+    try {
+      await (completed ? clearConceptCompleted(slug) : markConceptCompleted(slug))
+      onChange()
+    } catch (cause) {
+      setError(cause)
+    } finally {
+      setPending(false)
+    }
+  }
+  const badges = progressBadges(item)
+  return (
+    <section className="learn-record" aria-labelledby="learn-record-title">
+      <h2 id="learn-record-title">나의 학습 기록</h2>
+      {badges.length > 0 && (
+        <p className="learn-record-badges">
+          {badges.map((badge) => (
+            <span key={badge} className="learn-progress-badge">
+              {badge}
+            </span>
+          ))}
+        </p>
+      )}
+      <dl className="learn-record-list">
+        <div>
+          <dt>학습 완료</dt>
+          <dd>{item?.completedAt ? dateTime(item.completedAt) : '표시 전'}</dd>
+        </div>
+        <div>
+          <dt>문제 풀이</dt>
+          <dd>{item?.attempts ? `${item.attempts}회` : '기록 없음'}</dd>
+        </div>
+        {item?.lastAttemptedAt && item.lastCorrect !== null && item.lastTotal !== null && (
+          <div>
+            <dt>마지막 채점</dt>
+            <dd>
+              {item.lastCorrect}/{item.lastTotal} · {dateTime(item.lastAttemptedAt)}
+            </dd>
+          </div>
+        )}
+      </dl>
+      <ErrorNotice error={error} />
+      <button
+        type="button"
+        className={`button small ${completed ? 'button-outline' : 'button-primary'}`}
+        onClick={() => void toggle()}
+        disabled={pending}
+      >
+        {pending ? '저장 중…' : completed ? '학습 완료 표시 해제' : '학습 완료로 표시'}
+      </button>
+    </section>
+  )
+}
+
 export default function ConceptPage() {
   const { slug = '' } = useParams<{ slug: string }>()
   const [concept, setConcept] = useState<ConceptDetail | null>(null)
   const [error, setError] = useState<unknown>(null)
   const [reload, setReload] = useState(0)
+  const record = useLearningProgress()
   useEffect(() => {
     const controller = new AbortController()
     setError(null)
@@ -270,9 +365,40 @@ export default function ConceptPage() {
               </ul>
             </section>
           )}
-          {concept.quiz.length > 0 && <Quiz slug={concept.slug} questions={concept.quiz} />}
+          {concept.quiz.length > 0 && (
+            <Quiz
+              slug={concept.slug}
+              questions={concept.quiz}
+              saving={record.customer}
+              onGraded={(graded) => {
+                if (graded.recorded) record.reload()
+              }}
+            />
+          )}
         </div>
         <aside className="learn-article-aside" aria-label="관련 정보">
+          {record.progress ? (
+            <ConceptRecord
+              slug={concept.slug}
+              item={record.progress.items.find((item) => item.slug === concept.slug)}
+              onChange={record.reload}
+            />
+          ) : record.error ? (
+            <section className="learn-record">
+              <h2>나의 학습 기록</h2>
+              <ErrorNotice error={record.error} message="학습 기록을 불러오지 못했습니다." />
+              <button type="button" className="text-button" onClick={record.reload}>
+                다시 불러오기
+              </button>
+            </section>
+          ) : (
+            record.customer && (
+              <section className="learn-record" role="status">
+                <h2>나의 학습 기록</h2>
+                <p className="form-help">학습 기록을 불러오고 있습니다.</p>
+              </section>
+            )
+          )}
           {concept.relatedTerms.length > 0 && (
             <section>
               <h2>관련 용어</h2>
