@@ -53,6 +53,18 @@ export default function StaffPage() {
               <AppIcon name="arrow" size={16} />
             </Link>
           </section>
+          <section className="bank-staff-scope">
+            <span className="bank-scope-state">이용 가능</span>
+            <h3>운영 현황</h3>
+            <p>
+              저장된 가상 신청·심사 기록의 상태별·상품별 건수, 승인율과 일별 추이를 확인할 수
+              있습니다.
+            </p>
+            <Link to="/staff/dashboard" className="text-button">
+              운영 현황 보기
+              <AppIcon name="arrow" size={16} />
+            </Link>
+          </section>
           {admin && (
             <section className="bank-staff-scope">
               <span className="bank-scope-state">이용 가능</span>
