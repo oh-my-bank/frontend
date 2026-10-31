@@ -2,6 +2,10 @@ import { describe, expect, it } from 'vitest'
 import { anchorId, destinationAfterAuthentication } from './navigation'
 
 describe('authentication destinations', () => {
+  it('returns every role to its own account page', () => {
+    for (const role of ['CUSTOMER', 'REVIEWER', 'ADMIN'] as const)
+      expect(destinationAfterAuthentication('/account', role)).toBe('/account')
+  })
   it('preserves an internal customer destination and defaults to the dashboard', () => {
     expect(destinationAfterAuthentication('/products/product-one', 'CUSTOMER')).toBe(
       '/products/product-one',
