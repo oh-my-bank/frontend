@@ -7,6 +7,7 @@ import type { LoanApplication, Product } from '../types'
 import AppIcon from '../components/AppIcon'
 import ErrorNotice from '../components/ErrorNotice'
 import ProductCard from '../components/ProductCard'
+import MyLearningSection from '../components/MyLearningSection'
 import '../styles/banking-records.css'
 
 export default function DashboardPage() {
@@ -175,7 +176,8 @@ export default function DashboardPage() {
           </div>
         )}
         <p className="bank-section-help">
-          현재 신청 접수와 내역 조회를 제공합니다. 심사·약정·실행·상환 기능은 준비 중입니다.
+          신청 접수·내역 조회와 모의 심사 결과(승인 시 확정 조건, 거절 시 안내)를 제공합니다.
+          약정·실행·상환 기능은 준비 중입니다.
         </p>
       </section>
 
@@ -214,6 +216,8 @@ export default function DashboardPage() {
           <div className="empty-state">현재 조회할 수 있는 상품이 없습니다.</div>
         )}
       </section>
+
+      <MyLearningSection />
     </>
   )
 }

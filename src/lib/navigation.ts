@@ -3,7 +3,8 @@ import type { Role } from '../types'
 /**
  * Only return an internal destination; a new customer has no preexisting private records, so
  * registration continues only to the simulation start screen (with any plan prefill) or `/my`.
- * An administrator returns to the product management screen they were sent away from.
+ * An administrator returns to the product management screen they were sent away from, and staff
+ * to the review screen.
  */
 export function destinationAfterAuthentication(
   redirect: string | null,
@@ -13,12 +14,18 @@ export function destinationAfterAuthentication(
   const internal = isInternalPath(redirect) ? redirect : null
   // Every role owns an account page, so returning there after a session expiry is safe.
   if (internal === '/account') return internal
-  if (role === 'ADMIN') return internal && isAdminPath(internal) ? internal : '/staff'
-  if (role !== 'CUSTOMER') return '/staff'
+  if (role === 'ADMIN')
+    return internal && (isAdminPath(internal) || isStaffPath(internal)) ? internal : '/staff'
+  // Staff return to the review screen they were sent away from; customer pages are not theirs.
+  if (role !== 'CUSTOMER') return internal && isStaffPath(internal) ? internal : '/staff'
   if (registering)
     return internal === '/simulation' || internal?.startsWith('/simulation?') ? internal : '/my'
   if (!internal || internal === '/') return '/my'
   return internal
+}
+
+export function isStaffPath(path: string) {
+  return path === '/staff' || path.startsWith('/staff/')
 }
 
 export function isAdminPath(path: string) {
