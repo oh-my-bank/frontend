@@ -1,6 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { fetchConcepts, levelLabel, type Category, type ConceptSummary } from '../lib/learning'
+import {
+  fetchConcepts,
+  levelLabel,
+  relatedToolLinks,
+  type Category,
+  type ConceptSummary,
+} from '../lib/learning'
+import { fetchLearningPath, pathTotals, type LearningPath } from '../lib/learningPath'
 import { progressBadges, type ConceptProgress } from '../lib/learningProgress'
 import { anchorId } from '../lib/navigation'
 import { useLearningProgress } from '../lib/useLearningProgress'
@@ -24,6 +31,18 @@ export default function LearnPage() {
       })
     return () => controller.abort()
   }, [reload])
+  // The path is loaded separately so a failure only hides the path, not the concept list.
+  const [path, setPath] = useState<LearningPath | null>(null)
+  const [pathError, setPathError] = useState<unknown>(null)
+  useEffect(() => {
+    const controller = new AbortController()
+    fetchLearningPath(controller.signal)
+      .then(setPath)
+      .catch((cause) => {
+        if (!controller.signal.aborted) setPathError(cause)
+      })
+    return () => controller.abort()
+  }, [])
   const record = useLearningProgress()
   const progressBySlug = new Map<string, ConceptProgress>(
     record.progress?.items.map((item) => [item.slug, item]) ?? [],
@@ -93,12 +112,20 @@ export default function LearnPage() {
             </p>
           )}
           <nav className="learn-category-index" aria-label="학습 분류">
+            {path && <a href="#learning-path">권장 학습 경로</a>}
             {data.categories.map((category) => (
               <a key={category.code} href={`#category-${category.code}`}>
                 {category.label}
               </a>
             ))}
           </nav>
+          {path ? (
+            <LearningPathSection path={path} />
+          ) : pathError ? (
+            <p className="form-help learn-path-error">
+              권장 학습 경로를 불러오지 못했습니다. 아래 분류별 목록으로 학습할 수 있습니다.
+            </p>
+          ) : null}
           {data.categories.map((category) => {
             const items = data.items.filter((item) => item.category === category.code)
             if (!items.length) return null
@@ -152,5 +179,64 @@ export default function LearnPage() {
         </>
       )}
     </>
+  )
+}
+
+function LearningPathSection({ path }: { path: LearningPath }) {
+  return (
+    <section id="learning-path" className="learn-path" aria-labelledby="learning-path-title">
+      <div className="learn-category-heading">
+        <h2 id="learning-path-title">{path.title}</h2>
+        <p>{pathTotals(path)}</p>
+      </div>
+      {path.description && <p className="learn-path-description">{path.description}</p>}
+      <ol className="learn-path-stages">
+        {path.stages.map((stage) => (
+          <li key={stage.code} className="learn-path-stage">
+            <div className="learn-path-stage-heading">
+              <span className="learn-path-step" aria-hidden="true">
+                {stage.order}
+              </span>
+              <div>
+                <h3>
+                  <span className="learn-sr-only">{stage.order}단계 </span>
+                  {stage.title}
+                </h3>
+                <p>{stage.goal}</p>
+                <span className="learn-concept-meta">
+                  {pathTotals({ ...stage, conceptCount: stage.concepts.length })}
+                </span>
+              </div>
+            </div>
+            <ol className="learn-path-concepts">
+              {stage.concepts.map((concept) => (
+                <li key={concept.slug}>
+                  <Link to={`/learn/${concept.slug}`}>
+                    <span className="learn-path-order">{concept.order}</span>
+                    <span className="learn-path-concept-title">{concept.title}</span>
+                    <span className={`learn-level ${concept.level.toLowerCase()}`}>
+                      {levelLabel(concept.level)}
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ol>
+            {stage.practice.length > 0 && (
+              <ul className="learn-path-practice" aria-label={`${stage.title} 직접 해 보기`}>
+                {stage.practice.map((tool) => (
+                  <li key={tool}>
+                    <Link to={relatedToolLinks[tool].to}>
+                      {relatedToolLinks[tool].label}
+                      {tool === 'simulation' && <small> 고객 로그인</small>}
+                      <AppIcon name="chevron" size={14} />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </li>
+        ))}
+      </ol>
+    </section>
   )
 }
