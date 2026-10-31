@@ -159,7 +159,9 @@ describe('review command results', () => {
 describe('list filter and labels', () => {
   it('sends only server statuses as a filter', () => {
     expect(statusFilter('UNDER_REVIEW')).toBe('UNDER_REVIEW')
-    expect(statusFilter('AGREED')).toBeNull()
+    expect(statusFilter('AGREED')).toBe('AGREED')
+    expect(statusFilter('PAID_OFF')).toBe('PAID_OFF')
+    expect(statusFilter('CANCELLED')).toBeNull()
     expect(statusFilter(null)).toBeNull()
     expect(ruleResultLabel(null)).toBe('평가 전')
     expect(ruleResultLabel('NOT_MET')).toBe('기준 미충족')

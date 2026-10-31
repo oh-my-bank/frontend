@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { koreanWon, rate } from './format'
+import { isReviewApproved, koreanWon, rate } from './format'
 
 describe('amount and rate display', () => {
   it('reads whole-won amounts exactly in Korean units', () => {
@@ -15,5 +15,14 @@ describe('amount and rate display', () => {
     expect(rate('5.125')).toBe('5.125')
     expect(rate('4.900')).toBe('4.9')
     expect(rate('6.000')).toBe('6.0')
+  })
+})
+
+describe('review approval', () => {
+  it('counts approved applications that moved on to agreement and repayment', () => {
+    for (const status of ['APPROVED', 'AGREED', 'EXECUTED', 'REPAYING', 'PAID_OFF'])
+      expect(isReviewApproved(status)).toBe(true)
+    for (const status of ['APPLIED', 'UNDER_REVIEW', 'REJECTED'])
+      expect(isReviewApproved(status)).toBe(false)
   })
 })
