@@ -5,6 +5,7 @@ import { dateTime, rate, statusLabel, won } from '../lib/format'
 import type { LoanApplication } from '../types'
 import AppIcon from '../components/AppIcon'
 import ErrorNotice from '../components/ErrorNotice'
+import ApplicationDecisionPanel from '../components/ApplicationDecisionPanel'
 import ProgressSteps from '../components/ProgressSteps'
 import '../styles/banking-records.css'
 
@@ -117,18 +118,19 @@ export default function ApplicationPage() {
                 </div>
               </dl>
               <p className="bank-section-help">
-                표시된 금리와 상품 조건은 신청 시점에 보관한 내용입니다. 약정 조건은 심사 이후
-                별도로 확정됩니다.
+                표시된 금리와 상품 조건은 신청 시점에 보관한 내용입니다. 모의 심사에서 승인되면 확정
+                조건이 아래에 표시됩니다.
               </p>
             </div>
           </section>
+          <ApplicationDecisionPanel application={application} />
           <section className="bank-record-notice" aria-labelledby="bank-application-notice-title">
             <AppIcon name="info" size={21} />
             <div>
               <h2 id="bank-application-notice-title">확인해 주세요</h2>
               <p>
-                현재 신청 접수와 내역 조회를 이용할 수 있습니다. 모의 심사·약정·실행·상환은 준비
-                중이며 실제 자금 이동은 발생하지 않습니다.
+                현재 신청 접수·내역 조회와 모의 심사 결과 조회를 이용할 수 있습니다.
+                약정·실행·상환은 준비 중이며 실제 자금 이동은 발생하지 않습니다.
               </p>
             </div>
           </section>

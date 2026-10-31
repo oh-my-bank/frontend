@@ -43,13 +43,37 @@ export default function StaffPage() {
             <p>현재 제공하는 기능과 준비 중인 업무를 확인하세요.</p>
           </div>
         </div>
-        <div className={`bank-staff-scope-grid${admin ? ' bank-staff-scope-grid-wide' : ''}`}>
+        <div className="bank-staff-scope-grid bank-staff-scope-grid-wide">
+          <section className="bank-staff-scope">
+            <span className="bank-scope-state">이용 가능</span>
+            <h3>대출 심사</h3>
+            <p>
+              접수된 신청의 모의 심사를 시작하고 규칙 근거를 확인해 승인·거절하며 처리 이력을
+              조회합니다.
+            </p>
+            <Link to="/staff/reviews" className="text-button">
+              심사하기
+              <AppIcon name="arrow" size={16} />
+            </Link>
+          </section>
           <section className="bank-staff-scope">
             <span className="bank-scope-state">이용 가능</span>
             <h3>대출상품 조회</h3>
             <p>등록된 상품의 금리·한도·기간과 상품 조건 버전을 확인할 수 있습니다.</p>
             <Link to="/products" className="text-button">
               상품 조회하기
+              <AppIcon name="arrow" size={16} />
+            </Link>
+          </section>
+          <section className="bank-staff-scope">
+            <span className="bank-scope-state">이용 가능</span>
+            <h3>운영 현황</h3>
+            <p>
+              저장된 가상 신청·심사 기록의 상태별·상품별 건수, 승인율과 일별 추이를 확인할 수
+              있습니다.
+            </p>
+            <Link to="/staff/dashboard" className="text-button">
+              운영 현황 보기
               <AppIcon name="arrow" size={16} />
             </Link>
           </section>
@@ -79,9 +103,8 @@ export default function StaffPage() {
           )}
           <section className="bank-staff-scope bank-staff-pending">
             <span className="bank-scope-state">준비 중</span>
-            <h3>심사 및 운영 관리</h3>
+            <h3>운영 관리</h3>
             <ul>
-              <li>신청 검토 및 승인·거절</li>
               <li>거래 모니터링</li>
             </ul>
             <p className="bank-section-help">

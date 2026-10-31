@@ -12,6 +12,9 @@ import ProductsPage from './views/ProductsPage'
 import ProductPage from './views/ProductPage'
 import ApplicationPage from './views/ApplicationPage'
 import StaffPage from './views/StaffPage'
+import OpsDashboardPage from './views/OpsDashboardPage'
+import StaffReviewsPage from './views/StaffReviewsPage'
+import StaffReviewPage from './views/StaffReviewPage'
 import AdminProductsPage from './views/AdminProductsPage'
 import AdminProductNewPage from './views/AdminProductNewPage'
 import AdminProductPage from './views/AdminProductPage'
@@ -23,6 +26,9 @@ import GlossaryPage from './views/GlossaryPage'
 import ToolsPage from './views/ToolsPage'
 import CalculatorPage from './views/tools/CalculatorPage'
 import StrategyPage from './views/StrategyPage'
+import StrategySavesPage from './views/StrategySavesPage'
+import StrategySavePage from './views/StrategySavePage'
+import StrategyComparePage from './views/StrategyComparePage'
 import SimulationPage from './views/SimulationPage'
 import SimulationAccountPage from './views/SimulationAccountPage'
 import AdminAccessDenied from './components/AdminAccessDenied'
@@ -63,6 +69,9 @@ function pageTitle(pathname: string, search: string) {
     return isCalculatorKind(kind) ? calculatorInfo[kind].title : '계산기'
   }
   if (pathname === '/strategy') return '나의 전략'
+  if (pathname === '/strategy/saves') return '내 전략'
+  if (pathname === '/strategy/saves/compare') return '전략 비교'
+  if (pathname.startsWith('/strategy/saves/')) return '저장한 전략'
   if (pathname === '/simulation') return '모의 운용'
   if (pathname.startsWith('/simulation/accounts/')) return '모의 계좌 상세'
   if (pathname === '/my') return '나의 대출'
@@ -72,6 +81,9 @@ function pageTitle(pathname: string, search: string) {
   if (pathname === '/guide') return '이용안내'
   if (pathname === '/staff') return '직원업무'
   if (pathname === '/admin/audit') return '감사 로그'
+  if (pathname === '/staff/dashboard') return '운영 현황'
+  if (pathname === '/staff/reviews') return '대출 심사'
+  if (pathname.startsWith('/staff/reviews/')) return '심사 상세'
   if (pathname === '/admin/products/new') return '상품 등록'
   if (pathname.startsWith('/admin/products/'))
     return pathname.endsWith('/policies/new') ? '새 정책 발행' : '상품 상세'
@@ -245,6 +257,7 @@ export default function App() {
             <h3>은행 업무 체험</h3>
             <Link to="/products">대출상품 조회·신청</Link>
             <Link to={staff ? '/staff' : '/my'}>{staff ? '직원 업무 범위' : '나의 신청 조회'}</Link>
+            {staff && <Link to="/staff/reviews">대출 심사</Link>}
             {admin && (
               <>
                 <Link to="/admin/products">상품 관리</Link>
@@ -292,6 +305,30 @@ export default function App() {
             <Route path="/tools" element={<ToolsPage />} />
             <Route path="/tools/:kind" element={<CalculatorPage key={location.pathname} />} />
             <Route path="/strategy" element={<StrategyPage />} />
+            <Route
+              path="/strategy/saves"
+              element={
+                <Protected>
+                  <StrategySavesPage />
+                </Protected>
+              }
+            />
+            <Route
+              path="/strategy/saves/compare"
+              element={
+                <Protected>
+                  <StrategyComparePage />
+                </Protected>
+              }
+            />
+            <Route
+              path="/strategy/saves/:id"
+              element={
+                <Protected>
+                  <StrategySavePage key={location.pathname} />
+                </Protected>
+              }
+            />
             <Route
               path="/simulation"
               element={
@@ -348,6 +385,30 @@ export default function App() {
               element={
                 <Protected staff>
                   <StaffPage />
+                </Protected>
+              }
+            />
+            <Route
+              path="/staff/dashboard"
+              element={
+                <Protected staff>
+                  <OpsDashboardPage />
+                </Protected>
+              }
+            />
+            <Route
+              path="/staff/reviews"
+              element={
+                <Protected staff>
+                  <StaffReviewsPage />
+                </Protected>
+              }
+            />
+            <Route
+              path="/staff/reviews/:id"
+              element={
+                <Protected staff>
+                  <StaffReviewPage key={location.pathname} />
                 </Protected>
               }
             />
