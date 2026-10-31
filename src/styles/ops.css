@@ -1,0 +1,50 @@
+.ops-toolbar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px 24px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.ops-toolbar .tool-field {
+  min-width: 180px;
+  margin: 0;
+}
+.ops-toolbar .bank-section-help {
+  margin: 0;
+}
+.ops-error {
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.ops-empty {
+  margin-top: 20px;
+}
+.ops-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 32px;
+}
+.ops-grid > .bank-record-section {
+  min-width: 0;
+}
+.ops-review-list {
+  margin-top: 4px;
+}
+.ops-daily-details {
+  margin-top: 16px;
+}
+.ops-daily-details summary {
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--brand-dark);
+  margin-bottom: 12px;
+}
+@media (max-width: 900px) {
+  .ops-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
