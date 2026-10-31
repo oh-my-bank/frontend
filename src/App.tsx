@@ -32,6 +32,8 @@ import StrategySavePage from './views/StrategySavePage'
 import StrategyComparePage from './views/StrategyComparePage'
 import SimulationPage from './views/SimulationPage'
 import SimulationAccountPage from './views/SimulationAccountPage'
+import SimulationHistoryPage from './views/SimulationHistoryPage'
+import SimulationReportPage from './views/SimulationReportPage'
 import AccountPage from './views/AccountPage'
 import AdminAccessDenied from './components/AdminAccessDenied'
 import { anchorId, destinationAfterAuthentication, isAdminPath } from './lib/navigation'
@@ -80,6 +82,8 @@ function pageTitle(pathname: string, search: string) {
   if (pathname.startsWith('/strategy/saves/')) return '저장한 전략'
   if (pathname === '/simulation') return '모의 운용'
   if (pathname.startsWith('/simulation/accounts/')) return '모의 계좌 상세'
+  if (pathname === '/simulation/history') return '지난 모의 운용'
+  if (pathname.startsWith('/simulation/history/')) return '모의 운용 리포트'
   if (pathname === '/my') return '나의 대출'
   if (pathname === '/products') return '대출상품'
   if (pathname.startsWith('/products/')) return '대출 신청'
@@ -357,6 +361,22 @@ export default function App() {
               element={
                 <Protected>
                   <SimulationAccountPage key={location.pathname} />
+                </Protected>
+              }
+            />
+            <Route
+              path="/simulation/history"
+              element={
+                <Protected>
+                  <SimulationHistoryPage />
+                </Protected>
+              }
+            />
+            <Route
+              path="/simulation/history/:id"
+              element={
+                <Protected>
+                  <SimulationReportPage key={location.pathname} />
                 </Protected>
               }
             />

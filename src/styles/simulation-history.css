@@ -1,0 +1,132 @@
+/* 지난 모의 운용 목록과 성과 리포트. 공통 표·요약·배지는 simulation.css를 쓴다. */
+.sim-history-list {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.sim-history-card {
+  display: grid;
+  gap: 10px;
+  padding: 20px 22px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--surface);
+  color: inherit;
+  text-decoration: none;
+}
+.sim-history-card:hover,
+.sim-history-card:focus-visible {
+  border-color: var(--brand);
+  background: var(--surface-soft);
+}
+.sim-history-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  font-size: 17px;
+}
+.sim-history-period {
+  color: var(--muted);
+  font-size: 14px;
+}
+.sim-history-facts {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px 16px;
+  margin: 0;
+}
+.sim-history-facts dt {
+  color: var(--muted);
+  font-size: 13px;
+}
+.sim-history-facts dd {
+  margin: 4px 0 0;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.sim-history-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--brand);
+  font-size: 14px;
+  font-weight: 600;
+}
+.sim-history-pager {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  margin-top: 20px;
+}
+.sim-report > section {
+  margin-bottom: 36px;
+}
+.sim-report .page-title h1 .sim-badge {
+  vertical-align: middle;
+  font-size: 13px;
+}
+.sim-report-tiers {
+  max-width: 520px;
+  margin: 14px 0 20px;
+}
+.sim-report-tiers caption {
+  padding-bottom: 8px;
+  color: var(--muted);
+  font-size: 13px;
+  text-align: left;
+}
+.sim-report-post {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.sim-report-post > li {
+  padding: 20px 22px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+}
+.sim-report-post h3 {
+  margin: 0 0 8px;
+  font-size: 17px;
+}
+.sim-report-post h3 small {
+  margin-left: 6px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 400;
+}
+.sim-report-post p {
+  margin: 0;
+  line-height: 1.7;
+}
+.sim-report-post .sim-summary.compact {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 1100px) {
+  .sim-history-facts {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 760px) {
+  .sim-history-card,
+  .sim-report-post > li {
+    padding: 16px;
+  }
+  .sim-history-facts,
+  .sim-report-post .sim-summary.compact {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 360px) {
+  .sim-history-facts,
+  .sim-report-post .sim-summary.compact {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
