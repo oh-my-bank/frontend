@@ -1,0 +1,163 @@
+/* Learning record of a signed-in customer (requirement R05). Counts come from saved records only. */
+.learn-progress-card {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 22px 24px;
+  border: 1px solid #cfe0d7;
+  border-radius: 7px;
+  background: var(--surface-soft);
+}
+.learn-progress-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 14px;
+}
+.learn-progress-head h2,
+.learn-progress-head h3 {
+  font-size: 18px;
+  font-weight: 650;
+}
+.learn-progress-head span {
+  font-size: 13px;
+  color: var(--muted);
+}
+.learn-progress-counts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+}
+.learn-progress-counts div {
+  padding: 12px 14px;
+  border-radius: 5px;
+  background: #fff;
+  border: 1px solid var(--border);
+}
+.learn-progress-counts dt {
+  font-size: 12px;
+  color: var(--muted);
+}
+.learn-progress-counts dd {
+  margin: 4px 0 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--brand-dark);
+}
+.learn-progress-counts small {
+  margin-left: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+}
+.learn-progress-next {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 2px 12px;
+  padding: 14px 16px;
+  border-radius: 5px;
+  background: var(--brand-dark);
+  color: #fff;
+}
+.learn-progress-next span {
+  grid-column: 1;
+  font-size: 12px;
+  color: #cfe7df;
+}
+.learn-progress-next strong {
+  grid-column: 1;
+  font-size: 16px;
+  word-break: keep-all;
+}
+.learn-progress-next svg {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+}
+.learn-progress-next:hover strong {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.learn-progress-done {
+  font-size: 14px;
+  color: var(--brand-dark);
+}
+.learn-progress-notice {
+  margin-bottom: 24px;
+}
+.learn-progress-error {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+.learn-category-progress {
+  margin-left: auto;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--brand);
+}
+.learn-progress-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding: 2px 8px;
+  border-radius: 3px;
+  background: #fff6dc;
+  color: #7a5a00;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.learn-record {
+  display: grid;
+  gap: 12px;
+}
+.learn-record-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.learn-record-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  font-size: 13px;
+}
+.learn-record-list div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.learn-record-list dt {
+  color: var(--muted);
+}
+.learn-record-list dd {
+  margin: 0;
+  text-align: right;
+  font-weight: 600;
+}
+.learn-record .button {
+  justify-self: start;
+}
+@media (max-width: 600px) {
+  .learn-progress-card {
+    padding: 18px 16px;
+  }
+  .learn-progress-counts {
+    grid-template-columns: 1fr;
+  }
+  .learn-progress-counts div {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .learn-progress-counts dd {
+    margin: 0;
+    font-size: 18px;
+  }
+  .learn-category-progress {
+    margin-left: 0;
+  }
+}

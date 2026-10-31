@@ -13,6 +13,7 @@ import ErrorNotice from '../components/ErrorNotice'
 import SourceList from '../components/SourceList'
 import '../styles/banking-products.css'
 import '../styles/tools.css'
+import '../styles/bank-lab.css'
 
 export default function ToolsPage() {
   const [rules, setRules] = useState<Rules | null>(null)
@@ -34,8 +35,8 @@ export default function ToolsPage() {
         <div>
           <h1>계산기</h1>
           <p>
-            예금·적금·대출·DSR·목표 저축을 숫자로 확인합니다. 모든 계산은 공개된 규칙으로 서버가
-            하고, 화면은 그 결과만 보여 줍니다.
+            예금·적금·대출·DSR·목표 저축과 거치·변동금리, 금리 시나리오를 숫자로 확인합니다. 모든
+            계산은 공개된 규칙으로 서버가 하고, 화면은 그 결과만 보여 줍니다.
           </p>
         </div>
       </header>
@@ -50,6 +51,17 @@ export default function ToolsPage() {
           </li>
         ))}
       </ul>
+      <Link to="/bank-lab" className="bank-lab-callout">
+        <AppIcon name="chart" size={26} />
+        <span>
+          <strong>은행 경영 시뮬레이터</strong>
+          <span>
+            고객이 아니라 은행의 눈으로 봅니다. 가상 은행의 NIM·BIS 자기자본비율·LCR·예대율과
+            기준금리·연체 충격을 계산합니다.
+          </span>
+        </span>
+        <AppIcon name="chevron" size={18} />
+      </Link>
       <section id="rules" className="guide-section" aria-labelledby="rules-title">
         <div className="section-heading">
           <div>
