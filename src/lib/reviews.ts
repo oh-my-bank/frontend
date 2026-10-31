@@ -2,7 +2,15 @@ import type { ApplicationDecision } from '../types'
 import { ApiError } from './api'
 
 /** Staff views of decision 0005; customers only see `ApplicationDecision` on their own application. */
-export type ReviewStatus = 'APPLIED' | 'UNDER_REVIEW' | 'APPROVED' | 'REJECTED'
+export type ReviewStatus =
+  | 'APPLIED'
+  | 'UNDER_REVIEW'
+  | 'APPROVED'
+  | 'REJECTED'
+  | 'AGREED'
+  | 'EXECUTED'
+  | 'REPAYING'
+  | 'PAID_OFF'
 export type RuleResult = 'MET' | 'NOT_MET'
 export type RejectReasonCode = 'DSR_LIMIT_EXCEEDED' | 'STAFF_DECISION'
 export type ReviewCommand = 'start' | 'approve' | 'reject'
@@ -77,15 +85,24 @@ export interface ReviewDetail {
 }
 
 export const NOTE_LIMIT = 200
-export const reviewStatuses: { value: ReviewStatus | null; label: string }[] = [
-  { value: null, label: '전체' },
-  { value: 'APPLIED', label: '접수' },
-  { value: 'UNDER_REVIEW', label: '심사 중' },
-  { value: 'APPROVED', label: '승인' },
-  { value: 'REJECTED', label: '거절' },
+/** Review-stage filters, then the statuses an approved application moves on to (agreement, execution, repayment). */
+export const reviewStatuses: {
+  value: ReviewStatus | null
+  label: string
+  stage: 'review' | 'afterApproval'
+}[] = [
+  { value: null, label: '전체', stage: 'review' },
+  { value: 'APPLIED', label: '접수', stage: 'review' },
+  { value: 'UNDER_REVIEW', label: '심사 중', stage: 'review' },
+  { value: 'APPROVED', label: '승인', stage: 'review' },
+  { value: 'REJECTED', label: '거절', stage: 'review' },
+  { value: 'AGREED', label: '약정 완료', stage: 'afterApproval' },
+  { value: 'EXECUTED', label: '실행 완료', stage: 'afterApproval' },
+  { value: 'REPAYING', label: '상환 중', stage: 'afterApproval' },
+  { value: 'PAID_OFF', label: '완납', stage: 'afterApproval' },
 ]
 
-/** Only the four server statuses are sent as a filter; anything else shows every application. */
+/** Only the server's application statuses are sent as a filter; anything else shows every application. */
 export function statusFilter(value: string | null): ReviewStatus | null {
   return reviewStatuses.some((item) => item.value === value) ? (value as ReviewStatus) : null
 }

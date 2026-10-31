@@ -75,17 +75,28 @@ export default function StaffReviewsPage() {
               있습니다.
             </p>
           </div>
-          <div className="bank-admin-filter" role="group" aria-label="심사 상태로 보기">
-            {reviewStatuses.map((item) => (
-              <button
-                key={item.label}
-                type="button"
-                aria-pressed={status === item.value}
-                disabled={pending}
-                onClick={() => choose(item.value)}
-              >
-                {item.label}
-              </button>
+          <div className="staff-review-filters">
+            {(
+              [
+                ['review', '심사 상태로 보기'],
+                ['afterApproval', '승인 이후 진행 상태로 보기'],
+              ] as const
+            ).map(([stage, label]) => (
+              <div key={stage} className="bank-admin-filter" role="group" aria-label={label}>
+                {reviewStatuses
+                  .filter((item) => item.stage === stage)
+                  .map((item) => (
+                    <button
+                      key={item.label}
+                      type="button"
+                      aria-pressed={status === item.value}
+                      disabled={pending}
+                      onClick={() => choose(item.value)}
+                    >
+                      {item.label}
+                    </button>
+                  ))}
+              </div>
             ))}
           </div>
         </div>
