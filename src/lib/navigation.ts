@@ -11,6 +11,8 @@ export function destinationAfterAuthentication(
   registering = false,
 ) {
   const internal = isInternalPath(redirect) ? redirect : null
+  // Every role owns an account page, so returning there after a session expiry is safe.
+  if (internal === '/account') return internal
   if (role === 'ADMIN') return internal && isAdminPath(internal) ? internal : '/staff'
   if (role !== 'CUSTOMER') return '/staff'
   if (registering)
