@@ -31,6 +31,7 @@ import StrategySavePage from './views/StrategySavePage'
 import StrategyComparePage from './views/StrategyComparePage'
 import SimulationPage from './views/SimulationPage'
 import SimulationAccountPage from './views/SimulationAccountPage'
+import AccountPage from './views/AccountPage'
 import AdminAccessDenied from './components/AdminAccessDenied'
 import { anchorId, destinationAfterAuthentication, isAdminPath } from './lib/navigation'
 import { calculatorInfo, calculatorKinds, isCalculatorKind } from './lib/learning'
@@ -38,10 +39,12 @@ function Protected({
   children,
   staff = false,
   admin = false,
+  anyRole = false,
 }: {
   children: ReactNode
   staff?: boolean
   admin?: boolean
+  anyRole?: boolean
 }) {
   const { user } = useAuth()
   const location = useLocation()
@@ -52,6 +55,7 @@ function Protected({
         replace
       />
     )
+  if (anyRole) return children
   // Other roles see why instead of an empty redirect; the admin API is not called for them.
   if (admin) return user.role === 'ADMIN' ? children : <AdminAccessDenied role={user.role} />
   if (staff && user.role === 'CUSTOMER') return <Navigate to="/my" replace />
@@ -80,6 +84,7 @@ function pageTitle(pathname: string, search: string) {
   if (pathname.startsWith('/applications/')) return '신청 내역'
   if (pathname === '/guide') return '이용안내'
   if (pathname === '/staff') return '직원업무'
+  if (pathname === '/account') return '내 정보'
   if (pathname === '/admin/audit') return '감사 로그'
   if (pathname === '/staff/dashboard') return '운영 현황'
   if (pathname === '/staff/reviews') return '대출 심사'
@@ -178,6 +183,11 @@ export default function App() {
               </>
             )}
             {user && (
+              <Link to="/account" className="utility-guide">
+                내 정보
+              </Link>
+            )}
+            {user && (
               <Link to={staff ? '/staff' : '/my'} className="utility-guide">
                 {staff ? '직원업무' : '신청조회'}
               </Link>
@@ -273,6 +283,7 @@ export default function App() {
             <Link to="/guide#notice">시뮬레이션 안내</Link>
             <Link to="/guide#scope">서비스 제공 범위</Link>
             {!user && <Link to="/login?mode=register">회원가입</Link>}
+            {user && <Link to="/account">내 정보·비밀번호 변경</Link>}
           </section>
         </div>
       </dialog>
@@ -385,6 +396,14 @@ export default function App() {
               element={
                 <Protected staff>
                   <StaffPage />
+                </Protected>
+              }
+            />
+            <Route
+              path="/account"
+              element={
+                <Protected anyRole>
+                  <AccountPage />
                 </Protected>
               }
             />

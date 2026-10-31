@@ -1,6 +1,7 @@
 import { useState, type FormEvent, type KeyboardEvent } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../stores/auth'
+import { ApiError } from '../lib/api'
 import AppIcon from '../components/AppIcon'
 import ErrorNotice from '../components/ErrorNotice'
 import { destinationAfterAuthentication } from '../lib/navigation'
@@ -106,7 +107,14 @@ export default function AuthPage() {
               안내를 받지 못한 변경은 다시 확인해 주세요.
             </div>
           )}
-          <ErrorNotice error={error} />
+          <ErrorNotice
+            error={error}
+            message={
+              error instanceof ApiError && error.code === 'LOGIN_LOCKED'
+                ? `${error.message} 제한 중에는 올바른 비밀번호로도 로그인할 수 없습니다.`
+                : undefined
+            }
+          />
           <form className="stack-form" onSubmit={submit}>
             <fieldset className="form-fieldset" disabled={pending}>
               {registering && (
@@ -156,6 +164,11 @@ export default function AuthPage() {
                   </small>
                 )}
               </label>
+              {!registering && (
+                <small className="form-help">
+                  연속으로 여러 번 실패하면 잠시 로그인이 제한됩니다(교육용 기준).
+                </small>
+              )}
               <button className="button button-primary full auth-submit" disabled={pending}>
                 {pending ? '처리 중입니다…' : registering ? '가입하기' : '로그인'}
               </button>
