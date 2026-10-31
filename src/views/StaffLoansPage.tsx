@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { ApiError, request } from '../lib/api'
 import { rate, won } from '../lib/format'
-import { loanDate, loanStatusLabel } from '../lib/loans'
+import { loanDate, loanBadgeClass, loanStatusLabel } from '../lib/loans'
 import {
   staffLoanFilter,
   staffLoanLoadMessage,
@@ -62,8 +62,8 @@ export default function StaffLoansPage() {
         </Link>
       </section>
       <div className="notice bank-admin-scope">
-        조회 전용 화면입니다. 납부·취소 같은 변경은 제공하지 않으며 모든 금액과 날짜는 교육용
-        시뮬레이션의 가상 데이터입니다.
+        대출 계정을 조회합니다. 운영 관리자는 상세 화면에서 가장 최근 납부를 반대 거래로 취소할 수
+        있습니다. 모든 금액과 날짜는 교육용 시뮬레이션의 가상 데이터입니다.
       </div>
       <section className="bank-record-section" aria-labelledby="staff-loan-list-title">
         <div className="section-heading bank-admin-list-heading">
@@ -159,9 +159,7 @@ export default function StaffLoansPage() {
                       {rate(loan.annualInterestRate)}%
                     </td>
                     <td data-label="상태">
-                      <span
-                        className={`status-badge ${loan.status === 'PAID_OFF' ? 'paid_off' : 'repaying'}`}
-                      >
+                      <span className={`status-badge ${loanBadgeClass(loan.status)}`}>
                         {loanStatusLabel(loan.status)}
                       </span>
                     </td>

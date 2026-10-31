@@ -17,6 +17,7 @@ import AppIcon from '../components/AppIcon'
 import ConfirmDialog from '../components/ConfirmDialog'
 import ErrorNotice from '../components/ErrorNotice'
 import { LoanRecordTabs, LoanStatement } from '../components/LoanRecords'
+import LoanWithdrawalSection from '../components/LoanWithdrawalSection'
 import '../styles/banking-records.css'
 import '../styles/simulation.css'
 import '../styles/loans.css'
@@ -195,46 +196,64 @@ export default function LoanPage() {
             }
           />
 
-          <section className="loan-next" aria-labelledby="loan-next-title">
-            <h2 id="loan-next-title">다음 납부</h2>
-            {next && body ? (
-              <>
-                <dl className="details-list">
-                  <div>
-                    <dt>회차</dt>
-                    <dd>{next.installment}회차</dd>
-                  </div>
-                  <div>
-                    <dt>납부일 (가상)</dt>
-                    <dd>{loanDate(next.dueDate)}</dd>
-                  </div>
-                  <div>
-                    <dt>납입액</dt>
-                    <dd>
-                      {won(next.payment)} (원금 {won(next.principal)} · 이자 {won(next.interest)})
-                    </dd>
-                  </div>
-                </dl>
-                <button
-                  className="button button-primary"
-                  disabled={command.pending}
-                  onClick={() => {
-                    setCheckResult(null)
-                    setConfirming(true)
-                  }}
-                >
-                  {next.installment}회차 납부하기
-                </button>
-              </>
-            ) : (
-              <p>모든 회차를 납부해 대출을 완납했습니다. 남은 원금은 0원입니다.</p>
-            )}
-            <p className="bank-section-help">
-              <AppIcon name="info" size={14} /> 회차 순서대로, 회차 납입액 그대로만 납부할 수
-              있습니다. 납부는 해당 회차 납부일에 낸 것으로 기록되는 가상 시간 진행이며 실제 출금이
-              아닙니다. 부분·조기 상환과 연체는 제공하지 않습니다.
-            </p>
-          </section>
+          {loan.status !== 'WITHDRAWN' && (
+            <section className="loan-next" aria-labelledby="loan-next-title">
+              <h2 id="loan-next-title">다음 납부</h2>
+              {next && body ? (
+                <>
+                  <dl className="details-list">
+                    <div>
+                      <dt>회차</dt>
+                      <dd>{next.installment}회차</dd>
+                    </div>
+                    <div>
+                      <dt>납부일 (가상)</dt>
+                      <dd>{loanDate(next.dueDate)}</dd>
+                    </div>
+                    <div>
+                      <dt>납입액</dt>
+                      <dd>
+                        {won(next.payment)} (원금 {won(next.principal)} · 이자 {won(next.interest)})
+                      </dd>
+                    </div>
+                  </dl>
+                  <button
+                    className="button button-primary"
+                    disabled={command.pending}
+                    onClick={() => {
+                      setCheckResult(null)
+                      setConfirming(true)
+                    }}
+                  >
+                    {next.installment}회차 납부하기
+                  </button>
+                </>
+              ) : (
+                <p>모든 회차를 납부해 대출을 완납했습니다. 남은 원금은 0원입니다.</p>
+              )}
+              <p className="bank-section-help">
+                <AppIcon name="info" size={14} /> 회차 순서대로, 회차 납입액 그대로만 납부할 수
+                있습니다. 납부는 해당 회차 납부일에 낸 것으로 기록되는 가상 시간 진행이며 실제
+                출금이 아닙니다. 부분·조기 상환과 연체는 제공하지 않습니다.
+              </p>
+            </section>
+          )}
+          <LoanWithdrawalSection
+            loan={loan}
+            path={path}
+            onWithdrawn={(latest) => {
+              setLoan(latest)
+              setConflict(null)
+              setNotice(
+                '대출을 철회했습니다. 실행 거래의 반대 거래가 기록되었고 남은 원금은 0원입니다.',
+              )
+            }}
+            onConflict={(message) => {
+              setNotice(null)
+              setConflict(message)
+              refreshAll()
+            }}
+          />
 
           <LoanRecordTabs loan={loan} ledgerPath={`${path}/ledger`} />
 
@@ -286,7 +305,10 @@ export default function LoanPage() {
                 </div>
               </dl>
             )}
-            <p>납부는 취소할 수 없습니다. 가상 결제 자금으로 처리되는 교육용 시뮬레이션입니다.</p>
+            <p>
+              고객은 납부를 취소할 수 없습니다. 착오 납부 정정은 운영자가 최근 회차부터 반대
+              거래로만 처리합니다. 가상 결제 자금으로 처리되는 교육용 시뮬레이션입니다.
+            </p>
             <ErrorNotice
               error={command.error}
               message={loanCommandMessage(command.error, 'repay')}

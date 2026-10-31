@@ -161,6 +161,7 @@ describe('list filter and labels', () => {
     expect(statusFilter('UNDER_REVIEW')).toBe('UNDER_REVIEW')
     expect(statusFilter('AGREED')).toBe('AGREED')
     expect(statusFilter('PAID_OFF')).toBe('PAID_OFF')
+    expect(statusFilter('WITHDRAWN')).toBe('WITHDRAWN')
     expect(statusFilter('CANCELLED')).toBeNull()
     expect(statusFilter(null)).toBeNull()
     expect(ruleResultLabel(null)).toBe('평가 전')

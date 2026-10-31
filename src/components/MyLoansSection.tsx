@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { request } from '../lib/api'
 import { won } from '../lib/format'
-import { loanDate, loanStatusLabel, type LoanSummary } from '../lib/loans'
+import { loanDate, loanBadgeClass, loanStatusLabel, type LoanSummary } from '../lib/loans'
 import AppIcon from './AppIcon'
 import ErrorNotice from './ErrorNotice'
 import '../styles/loans.css'
@@ -90,12 +90,12 @@ export default function MyLoansSection({ reload }: { reload: number }) {
                     {loan.paidInstallments}/{loan.termMonths}회
                   </td>
                   <td className="bank-date-cell" data-label="다음 납부일">
-                    {loan.nextInstallment ? loanDate(loan.nextInstallment.dueDate) : '완납'}
+                    {loan.nextInstallment
+                      ? loanDate(loan.nextInstallment.dueDate)
+                      : loanStatusLabel(loan.status)}
                   </td>
                   <td data-label="상태">
-                    <span
-                      className={`status-badge ${loan.status === 'PAID_OFF' ? 'paid_off' : 'repaying'}`}
-                    >
+                    <span className={`status-badge ${loanBadgeClass(loan.status)}`}>
                       {loanStatusLabel(loan.status)}
                     </span>
                   </td>

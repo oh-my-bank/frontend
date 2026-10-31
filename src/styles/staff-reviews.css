@@ -175,4 +175,10 @@
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  min-width: 0;
+}
+.staff-review-filters .bank-admin-filter {
+  flex-wrap: wrap;
+  flex-shrink: 1;
+  max-width: 100%;
 }
