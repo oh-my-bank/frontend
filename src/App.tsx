@@ -12,20 +12,28 @@ import ProductsPage from './views/ProductsPage'
 import ProductPage from './views/ProductPage'
 import ApplicationPage from './views/ApplicationPage'
 import StaffPage from './views/StaffPage'
+import OpsDashboardPage from './views/OpsDashboardPage'
+import StaffReviewsPage from './views/StaffReviewsPage'
+import StaffReviewPage from './views/StaffReviewPage'
 import AdminProductsPage from './views/AdminProductsPage'
 import AdminProductNewPage from './views/AdminProductNewPage'
 import AdminProductPage from './views/AdminProductPage'
 import AdminPolicyPublishPage from './views/AdminPolicyPublishPage'
+import AdminAuditLogsPage from './views/AdminAuditLogsPage'
 import LearnPage from './views/LearnPage'
 import ConceptPage from './views/ConceptPage'
 import GlossaryPage from './views/GlossaryPage'
 import ToolsPage from './views/ToolsPage'
 import CalculatorPage from './views/tools/CalculatorPage'
 import StrategyPage from './views/StrategyPage'
+import StrategySavesPage from './views/StrategySavesPage'
+import StrategySavePage from './views/StrategySavePage'
+import StrategyComparePage from './views/StrategyComparePage'
 import SimulationPage from './views/SimulationPage'
 import SimulationAccountPage from './views/SimulationAccountPage'
 import SimulationHistoryPage from './views/SimulationHistoryPage'
 import SimulationReportPage from './views/SimulationReportPage'
+import AccountPage from './views/AccountPage'
 import AdminAccessDenied from './components/AdminAccessDenied'
 import { anchorId, destinationAfterAuthentication, isAdminPath } from './lib/navigation'
 import { calculatorInfo, calculatorKinds, isCalculatorKind } from './lib/learning'
@@ -33,10 +41,12 @@ function Protected({
   children,
   staff = false,
   admin = false,
+  anyRole = false,
 }: {
   children: ReactNode
   staff?: boolean
   admin?: boolean
+  anyRole?: boolean
 }) {
   const { user } = useAuth()
   const location = useLocation()
@@ -47,6 +57,7 @@ function Protected({
         replace
       />
     )
+  if (anyRole) return children
   // Other roles see why instead of an empty redirect; the admin API is not called for them.
   if (admin) return user.role === 'ADMIN' ? children : <AdminAccessDenied role={user.role} />
   if (staff && user.role === 'CUSTOMER') return <Navigate to="/my" replace />
@@ -64,6 +75,9 @@ function pageTitle(pathname: string, search: string) {
     return isCalculatorKind(kind) ? calculatorInfo[kind].title : '계산기'
   }
   if (pathname === '/strategy') return '나의 전략'
+  if (pathname === '/strategy/saves') return '내 전략'
+  if (pathname === '/strategy/saves/compare') return '전략 비교'
+  if (pathname.startsWith('/strategy/saves/')) return '저장한 전략'
   if (pathname === '/simulation') return '모의 운용'
   if (pathname.startsWith('/simulation/accounts/')) return '모의 계좌 상세'
   if (pathname === '/simulation/history') return '지난 모의 운용'
@@ -74,6 +88,11 @@ function pageTitle(pathname: string, search: string) {
   if (pathname.startsWith('/applications/')) return '신청 내역'
   if (pathname === '/guide') return '이용안내'
   if (pathname === '/staff') return '직원업무'
+  if (pathname === '/account') return '내 정보'
+  if (pathname === '/admin/audit') return '감사 로그'
+  if (pathname === '/staff/dashboard') return '운영 현황'
+  if (pathname === '/staff/reviews') return '대출 심사'
+  if (pathname.startsWith('/staff/reviews/')) return '심사 상세'
   if (pathname === '/admin/products/new') return '상품 등록'
   if (pathname.startsWith('/admin/products/'))
     return pathname.endsWith('/policies/new') ? '새 정책 발행' : '상품 상세'
@@ -168,6 +187,11 @@ export default function App() {
               </>
             )}
             {user && (
+              <Link to="/account" className="utility-guide">
+                내 정보
+              </Link>
+            )}
+            {user && (
               <Link to={staff ? '/staff' : '/my'} className="utility-guide">
                 {staff ? '직원업무' : '신청조회'}
               </Link>
@@ -247,10 +271,12 @@ export default function App() {
             <h3>은행 업무 체험</h3>
             <Link to="/products">대출상품 조회·신청</Link>
             <Link to={staff ? '/staff' : '/my'}>{staff ? '직원 업무 범위' : '나의 신청 조회'}</Link>
+            {staff && <Link to="/staff/reviews">대출 심사</Link>}
             {admin && (
               <>
                 <Link to="/admin/products">상품 관리</Link>
                 <Link to="/admin/products/new">상품 등록</Link>
+                <Link to="/admin/audit">감사 로그 조회</Link>
               </>
             )}
             <Link to="/guide#application">대출 신청 절차</Link>
@@ -261,6 +287,7 @@ export default function App() {
             <Link to="/guide#notice">시뮬레이션 안내</Link>
             <Link to="/guide#scope">서비스 제공 범위</Link>
             {!user && <Link to="/login?mode=register">회원가입</Link>}
+            {user && <Link to="/account">내 정보·비밀번호 변경</Link>}
           </section>
         </div>
       </dialog>
@@ -293,6 +320,30 @@ export default function App() {
             <Route path="/tools" element={<ToolsPage />} />
             <Route path="/tools/:kind" element={<CalculatorPage key={location.pathname} />} />
             <Route path="/strategy" element={<StrategyPage />} />
+            <Route
+              path="/strategy/saves"
+              element={
+                <Protected>
+                  <StrategySavesPage />
+                </Protected>
+              }
+            />
+            <Route
+              path="/strategy/saves/compare"
+              element={
+                <Protected>
+                  <StrategyComparePage />
+                </Protected>
+              }
+            />
+            <Route
+              path="/strategy/saves/:id"
+              element={
+                <Protected>
+                  <StrategySavePage key={location.pathname} />
+                </Protected>
+              }
+            />
             <Route
               path="/simulation"
               element={
@@ -368,8 +419,41 @@ export default function App() {
                 </Protected>
               }
             />
+            <Route
+              path="/account"
+              element={
+                <Protected anyRole>
+                  <AccountPage />
+                </Protected>
+              }
+            />
+            <Route
+              path="/staff/dashboard"
+              element={
+                <Protected staff>
+                  <OpsDashboardPage />
+                </Protected>
+              }
+            />
+            <Route
+              path="/staff/reviews"
+              element={
+                <Protected staff>
+                  <StaffReviewsPage />
+                </Protected>
+              }
+            />
+            <Route
+              path="/staff/reviews/:id"
+              element={
+                <Protected staff>
+                  <StaffReviewPage key={location.pathname} />
+                </Protected>
+              }
+            />
             <Route path="/admin" element={<Navigate to="/admin/products" replace />} />
             <Route path="/admin/products" element={adminRoute(<AdminProductsPage />)} />
+            <Route path="/admin/audit" element={adminRoute(<AdminAuditLogsPage />)} />
             <Route path="/admin/products/new" element={adminRoute(<AdminProductNewPage />)} />
             <Route
               path="/admin/products/:id"

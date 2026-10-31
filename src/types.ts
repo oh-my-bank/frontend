@@ -27,6 +27,16 @@ export interface LoanApplication {
   annualInterestRate: string
   status: string
   createdAt: string
+  /** Mock review result, present only once a reviewer approved or rejected the application. */
+  decision?: ApplicationDecision | null
+}
+export interface ApplicationDecision {
+  result: 'APPROVED' | 'REJECTED'
+  decidedAt: string
+  approvedTerms: { amount: number; termMonths: number; annualInterestRate: string } | null
+  reasonCode: string | null
+  reasonMessage: string | null
+  notice: string
 }
 export interface ApplicationInput {
   productId: string
@@ -54,6 +64,8 @@ export interface AdminProduct {
   active: boolean
   createdAt: string
   deactivatedAt: string | null
+  /** Current name and description version; edits append a new version. */
+  detailVersion: number
   currentPolicy: PolicyVersion
 }
 export interface ProductInput {
