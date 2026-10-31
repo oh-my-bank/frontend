@@ -8,10 +8,14 @@ import {
   type ConceptSummary,
 } from '../lib/learning'
 import { fetchLearningPath, pathTotals, type LearningPath } from '../lib/learningPath'
+import { progressBadges, type ConceptProgress } from '../lib/learningProgress'
 import { anchorId } from '../lib/navigation'
+import { useLearningProgress } from '../lib/useLearningProgress'
 import AppIcon from '../components/AppIcon'
+import ContinueLearningCard from '../components/ContinueLearningCard'
 import ErrorNotice from '../components/ErrorNotice'
 import '../styles/learning.css'
+import '../styles/learning-progress.css'
 
 export default function LearnPage() {
   const [data, setData] = useState<{ categories: Category[]; items: ConceptSummary[] } | null>(null)
@@ -39,6 +43,10 @@ export default function LearnPage() {
       })
     return () => controller.abort()
   }, [])
+  const record = useLearningProgress()
+  const progressBySlug = new Map<string, ConceptProgress>(
+    record.progress?.items.map((item) => [item.slug, item]) ?? [],
+  )
   const location = useLocation()
   // The list arrives after the router's hash scroll, so a category link is followed here.
   useEffect(() => {
@@ -79,6 +87,30 @@ export default function LearnPage() {
         <div className="empty-state">아직 공개된 개념이 없습니다.</div>
       ) : (
         <>
+          {record.progress ? (
+            <ContinueLearningCard progress={record.progress} />
+          ) : record.error ? (
+            <div className="learn-progress-error">
+              <ErrorNotice error={record.error} message="학습 기록을 불러오지 못했습니다." />
+              <button type="button" className="text-button" onClick={record.reload}>
+                학습 기록 다시 불러오기
+              </button>
+            </div>
+          ) : record.customer ? (
+            <div className="empty-state" role="status">
+              학습 기록을 불러오고 있습니다.
+            </div>
+          ) : !record.signedIn ? (
+            <p className="notice learn-progress-notice">
+              로그인하지 않아도 모든 개념과 확인 문제를 이용할 수 있습니다.{' '}
+              <Link to="/login?redirect=%2Flearn">고객으로 로그인</Link>하면 학습 완료 표시와 채점
+              결과가 저장되고 이어서 학습할 개념을 안내합니다.
+            </p>
+          ) : (
+            <p className="notice learn-progress-notice">
+              학습 기록은 고객 계정에만 저장됩니다. 직원 계정의 채점 결과는 저장하지 않습니다.
+            </p>
+          )}
           <nav className="learn-category-index" aria-label="학습 분류">
             {path && <a href="#learning-path">권장 학습 경로</a>}
             {data.categories.map((category) => (
@@ -97,6 +129,9 @@ export default function LearnPage() {
           {data.categories.map((category) => {
             const items = data.items.filter((item) => item.category === category.code)
             if (!items.length) return null
+            const categoryRecord = record.progress?.categories.find(
+              (entry) => entry.code === category.code,
+            )
             return (
               <section
                 key={category.code}
@@ -107,23 +142,36 @@ export default function LearnPage() {
                 <div className="learn-category-heading">
                   <h2 id={`category-${category.code}-title`}>{category.label}</h2>
                   <p>{category.description}</p>
+                  {categoryRecord && (
+                    <span className="learn-category-progress">
+                      학습 완료 {categoryRecord.completed}/{categoryRecord.total}
+                    </span>
+                  )}
                 </div>
                 <ol className="learn-concept-list">
-                  {items.map((item) => (
-                    <li key={item.slug}>
-                      <Link to={`/learn/${item.slug}`}>
-                        <span className="learn-concept-meta">
-                          <span className={`learn-level ${item.level.toLowerCase()}`}>
-                            {levelLabel(item.level)}
+                  {items.map((item) => {
+                    const badges = progressBadges(progressBySlug.get(item.slug))
+                    return (
+                      <li key={item.slug}>
+                        <Link to={`/learn/${item.slug}`}>
+                          <span className="learn-concept-meta">
+                            <span className={`learn-level ${item.level.toLowerCase()}`}>
+                              {levelLabel(item.level)}
+                            </span>
+                            <span>{item.readMinutes}분 읽기</span>
+                            <span>확인 문제 {item.questionCount}문항</span>
+                            {badges.map((badge) => (
+                              <span key={badge} className="learn-progress-badge">
+                                {badge}
+                              </span>
+                            ))}
                           </span>
-                          <span>{item.readMinutes}분 읽기</span>
-                          <span>확인 문제 {item.questionCount}문항</span>
-                        </span>
-                        <strong>{item.title}</strong>
-                        <span className="learn-concept-summary">{item.summary}</span>
-                      </Link>
-                    </li>
-                  ))}
+                          <strong>{item.title}</strong>
+                          <span className="learn-concept-summary">{item.summary}</span>
+                        </Link>
+                      </li>
+                    )
+                  })}
                 </ol>
               </section>
             )

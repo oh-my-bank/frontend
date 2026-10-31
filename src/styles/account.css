@@ -1,0 +1,46 @@
+.account-card {
+  margin-bottom: 24px;
+  padding: 26px 28px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #fff;
+}
+.account-card h2 {
+  margin: 0 0 12px;
+  font-size: 19px;
+}
+.account-card > p {
+  margin: 0 0 16px;
+  font-size: 14px;
+  line-height: 1.7;
+}
+.account-wrap {
+  overflow-wrap: anywhere;
+}
+.account-hint {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin: 16px 0 0;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.account-hint svg {
+  flex: none;
+  margin-top: 3px;
+}
+.account-form {
+  max-width: 480px;
+}
+.account-success {
+  margin-bottom: 16px;
+}
+@media (max-width: 600px) {
+  .account-card {
+    padding: 20px 16px;
+  }
+  .account-card .details-list > div {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+}
