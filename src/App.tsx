@@ -26,6 +26,7 @@ import GlossaryPage from './views/GlossaryPage'
 import ToolsPage from './views/ToolsPage'
 import CalculatorPage from './views/tools/CalculatorPage'
 import StrategyPage from './views/StrategyPage'
+import BankLabPage from './views/BankLabPage'
 import StrategySavesPage from './views/StrategySavesPage'
 import StrategySavePage from './views/StrategySavePage'
 import StrategyComparePage from './views/StrategyComparePage'
@@ -73,6 +74,7 @@ function pageTitle(pathname: string, search: string) {
     return isCalculatorKind(kind) ? calculatorInfo[kind].title : '계산기'
   }
   if (pathname === '/strategy') return '나의 전략'
+  if (pathname === '/bank-lab') return '은행 경영 시뮬레이터'
   if (pathname === '/strategy/saves') return '내 전략'
   if (pathname === '/strategy/saves/compare') return '전략 비교'
   if (pathname.startsWith('/strategy/saves/')) return '저장한 전략'
@@ -257,6 +259,7 @@ export default function App() {
                 {calculatorInfo[kind].title}
               </Link>
             ))}
+            <Link to="/bank-lab">은행 경영 시뮬레이터</Link>
           </section>
           <section>
             <h3>전략·운용</h3>
@@ -316,6 +319,7 @@ export default function App() {
             <Route path="/tools" element={<ToolsPage />} />
             <Route path="/tools/:kind" element={<CalculatorPage key={location.pathname} />} />
             <Route path="/strategy" element={<StrategyPage />} />
+            <Route path="/bank-lab" element={<BankLabPage />} />
             <Route
               path="/strategy/saves"
               element={
