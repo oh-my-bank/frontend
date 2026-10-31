@@ -7,6 +7,8 @@ import SavingsTool from './SavingsTool'
 import LoanTool from './LoanTool'
 import DsrTool from './DsrTool'
 import GoalTool from './GoalTool'
+import VariableLoanTool from './VariableLoanTool'
+import RateScenarioTool from './RateScenarioTool'
 import '../../styles/banking-products.css'
 import '../../styles/tools.css'
 
@@ -16,6 +18,8 @@ const tools = {
   loan: LoanTool,
   dsr: DsrTool,
   goal: GoalTool,
+  'variable-loan': VariableLoanTool,
+  'rate-scenario': RateScenarioTool,
 }
 
 export default function CalculatorPage() {
