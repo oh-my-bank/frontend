@@ -682,13 +682,19 @@
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   background: #f6f8f6;
   border-top: 1px solid #edf0ec;
   border-bottom: 1px solid #edf0ec;
 }
 .home-tools li + li {
   border-left: 1px solid #dfe6df;
+}
+.home-tools li:nth-child(4n + 1) {
+  border-left: 0;
+}
+.home-tools li:nth-child(n + 5) {
+  border-top: 1px solid #dfe6df;
 }
 .home-tools a {
   display: grid;
