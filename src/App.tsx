@@ -12,6 +12,7 @@ import ProductsPage from './views/ProductsPage'
 import ProductPage from './views/ProductPage'
 import ApplicationPage from './views/ApplicationPage'
 import StaffPage from './views/StaffPage'
+import OpsDashboardPage from './views/OpsDashboardPage'
 import StaffReviewsPage from './views/StaffReviewsPage'
 import StaffReviewPage from './views/StaffReviewPage'
 import AdminProductsPage from './views/AdminProductsPage'
@@ -72,6 +73,7 @@ function pageTitle(pathname: string, search: string) {
   if (pathname.startsWith('/applications/')) return '신청 내역'
   if (pathname === '/guide') return '이용안내'
   if (pathname === '/staff') return '직원업무'
+  if (pathname === '/staff/dashboard') return '운영 현황'
   if (pathname === '/staff/reviews') return '대출 심사'
   if (pathname.startsWith('/staff/reviews/')) return '심사 상세'
   if (pathname === '/admin/products/new') return '상품 등록'
@@ -350,6 +352,14 @@ export default function App() {
               element={
                 <Protected staff>
                   <StaffPage />
+                </Protected>
+              }
+            />
+            <Route
+              path="/staff/dashboard"
+              element={
+                <Protected staff>
+                  <OpsDashboardPage />
                 </Protected>
               }
             />
