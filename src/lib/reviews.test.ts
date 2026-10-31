@@ -177,7 +177,7 @@ describe('customer review stage', () => {
       notice: '교육용',
     })
     expect(approved?.tone).toBe('approved')
-    expect(approved?.description).toContain('대출금이 지급되거나')
+    expect(approved?.description).toContain('약정 전에는 대출금이나 대출 잔액이 생기지 않습니다')
   })
   it('shows the server notice for a rejection and a waiting state before the decision', () => {
     const rejected = customerReviewStage('REJECTED', {

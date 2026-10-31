@@ -6,6 +6,7 @@ import type { LoanApplication } from '../types'
 import AppIcon from '../components/AppIcon'
 import ErrorNotice from '../components/ErrorNotice'
 import ApplicationDecisionPanel from '../components/ApplicationDecisionPanel'
+import LoanLifecyclePanel, { type LifecycleReport } from '../components/LoanLifecyclePanel'
 import ProgressSteps from '../components/ProgressSteps'
 import '../styles/banking-records.css'
 
@@ -15,6 +16,14 @@ export default function ApplicationPage() {
   const [pending, setPending] = useState(true)
   const [error, setError] = useState<unknown>(null)
   const [reload, setReload] = useState(0)
+  // Set by an agreement or execution step; kept across the reload that step triggers.
+  const [lifecycleMessage, setLifecycleMessage] = useState<Parameters<LifecycleReport>[0] | null>(
+    null,
+  )
+  const lifecycleChanged: LifecycleReport = (message) => {
+    setLifecycleMessage(message)
+    setReload((value) => value + 1)
+  }
   useEffect(() => {
     let active = true
     const controller = new AbortController()
@@ -52,6 +61,15 @@ export default function ApplicationPage() {
         </Link>
       </section>
       {application && !pending && <ProgressSteps current={3} />}
+      {lifecycleMessage && (
+        <div
+          className={lifecycleMessage.tone === 'success' ? 'bank-admin-success' : 'notice'}
+          role={lifecycleMessage.tone === 'success' ? 'status' : 'alert'}
+        >
+          {lifecycleMessage.tone === 'success' && <AppIcon name="check" size={19} />}
+          <p>{lifecycleMessage.text}</p>
+        </div>
+      )}
       <ErrorNotice error={error} />
       {error && (
         <div className="bank-record-retry">
@@ -124,13 +142,14 @@ export default function ApplicationPage() {
             </div>
           </section>
           <ApplicationDecisionPanel application={application} />
+          <LoanLifecyclePanel application={application} onChanged={lifecycleChanged} />
           <section className="bank-record-notice" aria-labelledby="bank-application-notice-title">
             <AppIcon name="info" size={21} />
             <div>
               <h2 id="bank-application-notice-title">확인해 주세요</h2>
               <p>
-                현재 신청 접수·내역 조회와 모의 심사 결과 조회를 이용할 수 있습니다.
-                약정·실행·상환은 준비 중이며 실제 자금 이동은 발생하지 않습니다.
+                신청 접수 → 모의 심사 → 약정 → 대출 실행 → 회차 상환까지 이용할 수 있습니다. 모든
+                금액은 가상 자금이고 날짜는 가상 날짜이며 실제 자금 이동은 발생하지 않습니다.
               </p>
             </div>
           </section>
