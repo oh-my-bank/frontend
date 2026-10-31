@@ -6,7 +6,7 @@ import { loanStatusLabel } from '../lib/loans'
 import { staffLoansPath, type StaffLoanSummary } from '../lib/staffLoans'
 import AppIcon from './AppIcon'
 
-const EXECUTED = ['EXECUTED', 'REPAYING', 'PAID_OFF']
+const EXECUTED = ['EXECUTED', 'REPAYING', 'PAID_OFF', 'WITHDRAWN']
 
 /** On a review whose application was executed, links staff to the loan account. Shows nothing before execution or on failure. */
 export default function StaffLoanLink({
@@ -34,8 +34,9 @@ export default function StaffLoanLink({
   if (!item) return null
   return (
     <div className="notice bank-admin-scope" role="status">
-      이 신청은 대출로 실행되었습니다({loanStatusLabel(item.loan.status)}, 남은 원금{' '}
-      {won(item.loan.outstandingPrincipal)}).{' '}
+      {item.loan.status === 'WITHDRAWN'
+        ? '이 신청은 대출로 실행된 뒤 고객이 철회했습니다(반대 거래 기록, 남은 원금 0원). '
+        : `이 신청은 대출로 실행되었습니다(${loanStatusLabel(item.loan.status)}, 남은 원금 ${won(item.loan.outstandingPrincipal)}). `}
       <Link to={`/staff/loans/${item.loan.id}`} className="text-button">
         대출 계정 보기
         <AppIcon name="arrow" size={15} />

@@ -6,6 +6,7 @@ describe('staff loan list', () => {
   it('sends only the server loan statuses as a filter', () => {
     expect(staffLoanFilter('ACTIVE')).toBe('ACTIVE')
     expect(staffLoanFilter('PAID_OFF')).toBe('PAID_OFF')
+    expect(staffLoanFilter('WITHDRAWN')).toBe('WITHDRAWN')
     expect(staffLoanFilter('REPAYING')).toBeNull()
     expect(staffLoanFilter(null)).toBeNull()
   })

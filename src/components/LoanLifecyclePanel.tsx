@@ -494,7 +494,7 @@ function AgreedStep({
                       </span>
                     </div>
                     <Link to={`/loans/${loan.id}`} className="button button-outline small">
-                      대출 상세·상환
+                      {loan.status === 'WITHDRAWN' ? '대출 상세' : '대출 상세·상환'}
                       <AppIcon name="chevron" size={14} />
                     </Link>
                   </li>
@@ -544,7 +544,10 @@ function AgreedStep({
               </dd>
             </div>
           </dl>
-          <p>실행은 취소할 수 없습니다. 실제 입금이 아닌 가상 자금 지급입니다.</p>
+          <p>
+            실제 입금이 아닌 가상 자금 지급입니다. 실행한 뒤 아직 납부하지 않았다면 대출 상세에서
+            철회할 수 있으며, 철회는 원거래를 지우지 않고 반대 거래로 기록됩니다.
+          </p>
           <ErrorNotice
             error={command.error}
             message={loanCommandMessage(command.error, 'execute')}

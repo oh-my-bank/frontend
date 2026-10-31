@@ -5,6 +5,7 @@ import {
   ledgerAccountLabel,
   ledgerKindLabel,
   loanDate,
+  loanBadgeClass,
   loanStatusLabel,
   sideLabel,
   type Ledger,
@@ -38,7 +39,7 @@ export function LoanStatement({
           <span>모의 대출 계정</span>
           <h2 id="loan-title">{loan.productName}</h2>
         </div>
-        <span className={`status-badge ${loan.status === 'PAID_OFF' ? 'paid_off' : 'repaying'}`}>
+        <span className={`status-badge ${loanBadgeClass(loan.status)}`}>
           {loanStatusLabel(loan.status)}
         </span>
       </div>

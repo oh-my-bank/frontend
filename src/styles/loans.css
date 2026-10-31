@@ -163,6 +163,11 @@
   color: #1f6f78;
   background: #e5f3f4;
 }
+.status-badge.withdrawn {
+  color: #5d6763;
+  border-color: #dfe5e2;
+  background: #f3f5f4;
+}
 .bank-loan-table-wrap {
   margin-top: 6px;
 }

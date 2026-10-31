@@ -3,7 +3,15 @@ import { ApiError } from './api'
 import {
   acknowledgementLabel,
   agreementBody,
+  canWithdraw,
   ledgerAccountLabel,
+  ledgerKindLabel,
+  loanBadgeClass,
+  loanStatusLabel,
+  reversalApplied,
+  reversalBody,
+  reversalTarget,
+  withdrawalApplied,
   lifecycleStage,
   loanCommandMessage,
   loanDate,
@@ -176,5 +184,62 @@ describe('loan labels', () => {
     expect(ledgerAccountLabel('LOAN_RECEIVABLE')).toBe('대출채권')
     expect(ledgerAccountLabel('OTHER')).toBe('OTHER')
     expect(acknowledgementLabel('EXPLANATION_READ')).toBe('상품설명서 확인')
+  })
+})
+
+describe('withdrawal and repayment reversal (decision 0008)', () => {
+  it('lets a customer withdraw only an active loan with no repayment', () => {
+    expect(canWithdraw(loan(0))).toBe(true)
+    expect(canWithdraw(loan(1))).toBe(false)
+    expect(canWithdraw(loan(0, 'WITHDRAWN'))).toBe(false)
+    expect(withdrawalApplied(loan(0, 'WITHDRAWN'))).toBe(true)
+    expect(withdrawalApplied(loan(0))).toBe(false)
+    expect(lifecycleStage('WITHDRAWN')).toBe('loan')
+  })
+  it('targets only the latest paid installment of a loan that is not withdrawn', () => {
+    expect(reversalTarget(loan(2))?.installment).toBe(2)
+    expect(reversalTarget(loan(12, 'PAID_OFF'))?.installment).toBe(12)
+    expect(reversalTarget(loan(0))).toBeNull()
+    expect(reversalTarget(loan(2, 'WITHDRAWN'))).toBeNull()
+  })
+  it('sends a reason and the trimmed note, and needs a reason and at most 200 characters', () => {
+    expect(reversalBody(2, '', '메모')).toBeNull()
+    expect(reversalBody(2, 'ERRONEOUS_PAYMENT', '   ')).toEqual({
+      installment: 2,
+      reasonCode: 'ERRONEOUS_PAYMENT',
+    })
+    expect(reversalBody(2, 'CUSTOMER_REQUEST', ' 착오 ')).toEqual({
+      installment: 2,
+      reasonCode: 'CUSTOMER_REQUEST',
+      note: '착오',
+    })
+    expect(reversalBody(2, 'CUSTOMER_REQUEST', '가'.repeat(200))).not.toBeNull()
+    expect(reversalBody(2, 'CUSTOMER_REQUEST', '가'.repeat(201))).toBeNull()
+  })
+  it('judges an uncertain reversal from one fewer paid installment', () => {
+    expect(reversalApplied(2, loan(1))).toBe(true)
+    expect(reversalApplied(2, loan(2))).toBe(false)
+  })
+  it('explains reversal conflicts and labels', () => {
+    expect(loanCommandMessage(new ApiError('LOAN_HAS_REPAYMENTS', 'x', 409), 'withdraw')).toContain(
+      '운영자가 납부를 모두 취소',
+    )
+    expect(loanCommandMessage(new ApiError('REPAYMENT_NOT_LATEST', 'x', 409), 'reverse')).toContain(
+      '가장 최근',
+    )
+    expect(loanCommandMessage(new ApiError('LOAN_WITHDRAWN', 'x', 409), 'reverse')).toContain(
+      '철회',
+    )
+    expect(loanCommandMessage(new ApiError('ACCESS_DENIED', 'x', 403), 'reverse')).toContain(
+      '운영 관리자',
+    )
+    expect(loanCommandMessage(new ApiError('VALIDATION_ERROR', 'x', 400), 'reverse')).toContain(
+      '취소 사유',
+    )
+    expect(loanStatusLabel('WITHDRAWN')).toBe('철회')
+    expect(loanBadgeClass('WITHDRAWN')).toBe('withdrawn')
+    expect(loanBadgeClass('ACTIVE')).toBe('repaying')
+    expect(ledgerKindLabel('REPAYMENT_REVERSAL')).toBe('납부 취소(반대 거래)')
+    expect(ledgerKindLabel('DISBURSEMENT_REVERSAL')).toBe('실행 철회(반대 거래)')
   })
 })

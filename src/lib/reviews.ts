@@ -11,6 +11,7 @@ export type ReviewStatus =
   | 'EXECUTED'
   | 'REPAYING'
   | 'PAID_OFF'
+  | 'WITHDRAWN'
 export type RuleResult = 'MET' | 'NOT_MET'
 export type RejectReasonCode = 'DSR_LIMIT_EXCEEDED' | 'STAFF_DECISION'
 export type ReviewCommand = 'start' | 'approve' | 'reject'
@@ -100,6 +101,7 @@ export const reviewStatuses: {
   { value: 'EXECUTED', label: '실행 완료', stage: 'afterApproval' },
   { value: 'REPAYING', label: '상환 중', stage: 'afterApproval' },
   { value: 'PAID_OFF', label: '완납', stage: 'afterApproval' },
+  { value: 'WITHDRAWN', label: '철회', stage: 'afterApproval' },
 ]
 
 /** Only the server's application statuses are sent as a filter; anything else shows every application. */

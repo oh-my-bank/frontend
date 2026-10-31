@@ -19,9 +19,10 @@ export const staffLoanStatuses: { value: LoanStatus | null; label: string }[] = 
   { value: null, label: '전체' },
   { value: 'ACTIVE', label: '상환 중' },
   { value: 'PAID_OFF', label: '완납' },
+  { value: 'WITHDRAWN', label: '철회' },
 ]
 
-/** Only the server's two loan statuses are sent as a filter; anything else shows every loan. */
+/** Only the server's loan statuses are sent as a filter; anything else shows every loan. */
 export function staffLoanFilter(value: string | null): LoanStatus | null {
   return staffLoanStatuses.some((item) => item.value === value) ? (value as LoanStatus) : null
 }

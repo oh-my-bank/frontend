@@ -20,7 +20,7 @@ describe('amount and rate display', () => {
 
 describe('review approval', () => {
   it('counts approved applications that moved on to agreement and repayment', () => {
-    for (const status of ['APPROVED', 'AGREED', 'EXECUTED', 'REPAYING', 'PAID_OFF'])
+    for (const status of ['APPROVED', 'AGREED', 'EXECUTED', 'REPAYING', 'PAID_OFF', 'WITHDRAWN'])
       expect(isReviewApproved(status)).toBe(true)
     for (const status of ['APPLIED', 'UNDER_REVIEW', 'REJECTED'])
       expect(isReviewApproved(status)).toBe(false)
