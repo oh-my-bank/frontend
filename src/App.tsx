@@ -16,6 +16,8 @@ import StaffPage from './views/StaffPage'
 import OpsDashboardPage from './views/OpsDashboardPage'
 import StaffReviewsPage from './views/StaffReviewsPage'
 import StaffReviewPage from './views/StaffReviewPage'
+import StaffLoansPage from './views/StaffLoansPage'
+import StaffLoanPage from './views/StaffLoanPage'
 import AdminProductsPage from './views/AdminProductsPage'
 import AdminProductNewPage from './views/AdminProductNewPage'
 import AdminProductPage from './views/AdminProductPage'
@@ -97,6 +99,8 @@ function pageTitle(pathname: string, search: string) {
   if (pathname === '/staff/dashboard') return '운영 현황'
   if (pathname === '/staff/reviews') return '대출 심사'
   if (pathname.startsWith('/staff/reviews/')) return '심사 상세'
+  if (pathname === '/staff/loans') return '대출 계정 조회'
+  if (pathname.startsWith('/staff/loans/')) return '대출 계정 상세'
   if (pathname === '/admin/products/new') return '상품 등록'
   if (pathname.startsWith('/admin/products/'))
     return pathname.endsWith('/policies/new') ? '새 정책 발행' : '상품 상세'
@@ -277,6 +281,7 @@ export default function App() {
             <Link to="/products">대출상품 조회·신청</Link>
             <Link to={staff ? '/staff' : '/my'}>{staff ? '직원 업무 범위' : '나의 신청 조회'}</Link>
             {staff && <Link to="/staff/reviews">대출 심사</Link>}
+            {staff && <Link to="/staff/loans">대출 계정 조회</Link>}
             {admin && (
               <>
                 <Link to="/admin/products">상품 관리</Link>
@@ -462,6 +467,22 @@ export default function App() {
               element={
                 <Protected staff>
                   <StaffReviewPage key={location.pathname} />
+                </Protected>
+              }
+            />
+            <Route
+              path="/staff/loans"
+              element={
+                <Protected staff>
+                  <StaffLoansPage />
+                </Protected>
+              }
+            />
+            <Route
+              path="/staff/loans/:id"
+              element={
+                <Protected staff>
+                  <StaffLoanPage key={location.pathname} />
                 </Protected>
               }
             />

@@ -101,17 +101,18 @@ export default function StaffPage() {
               </Link>
             </section>
           )}
-          <section className="bank-staff-scope bank-staff-pending">
-            <span className="bank-scope-state">준비 중</span>
-            <h3>운영 관리</h3>
-            <ul>
-              <li>거래 모니터링</li>
-            </ul>
-            <p className="bank-section-help">
-              업무 기능과 권한 검증을 구현한 후 제공합니다.
+          <section className="bank-staff-scope">
+            <span className="bank-scope-state">이용 가능</span>
+            <h3>대출 계정 조회</h3>
+            <p>
+              실행된 가상 대출의 남은 원금·납부 회차와 상환 일정, 거래원장 대사 결과를 조회합니다.
               {!admin &&
                 ' 상품 등록·정책 관리와 감사 로그 조회는 운영 관리자 계정에서 이용할 수 있습니다.'}
             </p>
+            <Link to="/staff/loans" className="text-button">
+              대출 계정 보기
+              <AppIcon name="arrow" size={16} />
+            </Link>
           </section>
         </div>
       </section>

@@ -24,6 +24,7 @@ import { useAuth } from '../stores/auth'
 import AppIcon from '../components/AppIcon'
 import ConfirmDialog from '../components/ConfirmDialog'
 import ErrorNotice from '../components/ErrorNotice'
+import StaffLoanLink from '../components/StaffLoanLink'
 import '../styles/banking-records.css'
 import '../styles/banking-admin.css'
 import '../styles/staff-reviews.css'
@@ -222,6 +223,7 @@ export default function StaffReviewPage() {
         </>
       ) : (
         <>
+          <StaffLoanLink applicationId={detail.applicationId} status={detail.status} />
           <section
             className="bank-statement"
             aria-labelledby="staff-review-title"
