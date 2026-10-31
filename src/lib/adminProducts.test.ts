@@ -2,13 +2,17 @@ import { describe, expect, it } from 'vitest'
 import { ApiError } from './api'
 import {
   commandMessage,
+  detailsOutcome,
   fieldErrorsFrom,
   findActiveByName,
   isUncertain,
+  listPath,
+  listState,
   orderedErrors,
   policyChanges,
   policyForm,
   publishOutcome,
+  readDetails,
   readPolicy,
   readProduct,
   rebasePolicyForm,
@@ -184,5 +188,67 @@ describe('administrator errors', () => {
     const products = [product('OMB Loan', false), product('omb loan', true)]
     expect(findActiveByName(products, ' OMB LOAN ')?.id).toBe('omb loan')
     expect(findActiveByName([product('OMB Loan', false)], 'OMB Loan')).toBeUndefined()
+  })
+})
+
+describe('product details and reactivation', () => {
+  const current = { name: 'OMB 생활자금 대출', description: '가상 상품 설명입니다.' }
+  const detail = (version: number, name: string, description = current.description) => ({
+    version,
+    name,
+    description,
+    createdAt: '2026-10-31T01:00:00Z',
+  })
+
+  it('trims the edit like the server and reports an unchanged edit before sending', () => {
+    expect(readDetails('  OMB 새 이름  ', ` ${current.description} `, current)).toEqual({
+      errors: {},
+      input: { name: 'OMB 새 이름', description: current.description },
+    })
+    expect(readDetails(` ${current.name}`, current.description, current)).toEqual({
+      errors: {},
+      unchanged: true,
+    })
+    expect(readDetails(' ', 'x'.repeat(1001), current).errors).toEqual({
+      name: '상품명을 입력해 주세요.',
+      description: '상품 설명은 1,000자 이내로 입력해 주세요.',
+    })
+  })
+  it('judges an uncertain details edit from the versions after the one it started from', () => {
+    const input = { name: 'OMB 새 이름', description: current.description }
+    expect(detailsOutcome([detail(1, current.name)], 1, input)).toEqual({ state: 'not-applied' })
+    expect(detailsOutcome([detail(2, 'OMB 새 이름'), detail(1, current.name)], 1, input)).toEqual({
+      state: 'applied',
+      version: 2,
+    })
+    expect(
+      detailsOutcome([detail(2, '다른 관리자 이름'), detail(1, current.name)], 1, input),
+    ).toEqual({ state: 'superseded' })
+  })
+  it('keeps the list status and a bounded search in the URL and searches by name on the server', () => {
+    expect(listState(new URLSearchParams('status=inactive&q=%20청년%20'))).toEqual({
+      status: 'inactive',
+      q: '청년',
+    })
+    expect(listState(new URLSearchParams('status=ACTIVE'))).toEqual({ status: 'all', q: '' })
+    expect(listState(new URLSearchParams(`q=${'가'.repeat(120)}`)).q).toHaveLength(100)
+    expect(listPath('  ')).toBe('/admin/loan-products')
+    expect(listPath(' 100%_대출 ')).toBe('/admin/loan-products?q=100%25_%EB%8C%80%EC%B6%9C')
+  })
+  it('explains reactivation and details conflicts', () => {
+    const apiError = (code: string) => new ApiError(code, 'server message', 409, 'trace')
+    expect(commandMessage(apiError('PRODUCT_NAME_DUPLICATE'), 'reactivate')).toContain(
+      '이름을 먼저 바꿔 주세요',
+    )
+    expect(commandMessage(apiError('PRODUCT_ACTIVE'), 'reactivate')).toContain('이미 판매 중')
+    expect(commandMessage(apiError('PRODUCT_DETAILS_VERSION_CONFLICT'), 'details')).toContain(
+      '다른 관리자가 먼저 상품 정보를 수정',
+    )
+    expect(commandMessage(apiError('PRODUCT_DETAILS_UNCHANGED'), 'details')).toContain(
+      '현재 상품 정보와 같습니다',
+    )
+    expect(commandMessage(new ApiError('NETWORK_ERROR', 'offline'), 'reactivate')).toContain(
+      '판매 재개 결과를 확인하지 못했습니다',
+    )
   })
 })
