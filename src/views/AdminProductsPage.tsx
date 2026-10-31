@@ -1,7 +1,13 @@
-import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, useState, type FormEvent } from 'react'
+import { Link, useSearchParams } from 'react-router-dom'
 import { ApiError, request } from '../lib/api'
-import { loadMessage } from '../lib/adminProducts'
+import {
+  MAX_SEARCH_LENGTH,
+  listPath,
+  listState,
+  loadMessage,
+  type StatusFilter,
+} from '../lib/adminProducts'
 import { koreanWon, rate } from '../lib/format'
 import { useAuth } from '../stores/auth'
 import type { AdminProduct } from '../types'
@@ -10,8 +16,7 @@ import ErrorNotice from '../components/ErrorNotice'
 import '../styles/banking-records.css'
 import '../styles/banking-admin.css'
 
-type Filter = 'all' | 'active' | 'inactive'
-const filters: { value: Filter; label: string }[] = [
+const filters: { value: StatusFilter; label: string }[] = [
   { value: 'all', label: '전체' },
   { value: 'active', label: '판매 중' },
   { value: 'inactive', label: '판매 중지' },
@@ -23,12 +28,28 @@ export default function AdminProductsPage() {
   const [pending, setPending] = useState(true)
   const [error, setError] = useState<unknown>(null)
   const [reload, setReload] = useState(0)
-  const [filter, setFilter] = useState<Filter>('all')
+  // Status and search live in the URL; the server searches names and the status buttons count the result.
+  const [params, setParams] = useSearchParams()
+  const { status: filter, q } = listState(params)
+  const [search, setSearch] = useState(q)
+  useEffect(() => setSearch(q), [q])
+  function update(next: { status?: StatusFilter; q?: string }) {
+    const state = { status: filter, q, ...next }
+    const query = new URLSearchParams()
+    if (state.status !== 'all') query.set('status', state.status)
+    if (state.q.trim()) query.set('q', state.q.trim())
+    setParams(query, { replace: true })
+  }
+  const setFilter = (status: StatusFilter) => update({ status })
+  function submitSearch(event: FormEvent) {
+    event.preventDefault()
+    update({ q: search })
+  }
   useEffect(() => {
     const controller = new AbortController()
     setPending(true)
     setError(null)
-    void request<{ items: AdminProduct[] }>('/admin/loan-products', { signal: controller.signal })
+    void request<{ items: AdminProduct[] }>(listPath(q), { signal: controller.signal })
       .then((result) => {
         if (!controller.signal.aborted) setProducts(result.items)
       })
@@ -41,7 +62,7 @@ export default function AdminProductsPage() {
         if (!controller.signal.aborted) setPending(false)
       })
     return () => controller.abort()
-  }, [reload])
+  }, [reload, q])
   const counts = {
     all: products.length,
     active: products.filter((product) => product.active).length,
@@ -64,7 +85,8 @@ export default function AdminProductsPage() {
       </section>
       <div className="notice bank-admin-scope">
         등록·정책 발행·판매 중지는 즉시 고객 화면에 반영됩니다. 정책은 버전으로 보존되며 이미 접수된
-        신청의 조건은 바뀌지 않습니다. 상품명·설명 수정과 재활성화는 제공하지 않습니다.
+        신청의 조건은 바뀌지 않습니다. 상품명·설명 수정은 정보 이력으로 남고, 판매 중지한 상품은
+        현재 정책 그대로 판매를 재개할 수 있습니다.
       </div>
       <section className="bank-record-section" aria-labelledby="bank-admin-list-title">
         <div className="section-heading bank-admin-list-heading">
@@ -90,6 +112,40 @@ export default function AdminProductsPage() {
             ))}
           </div>
         </div>
+        <form className="bank-admin-search" role="search" onSubmit={submitSearch}>
+          <label htmlFor="admin-product-search">상품명 검색</label>
+          <div>
+            <input
+              id="admin-product-search"
+              type="search"
+              value={search}
+              maxLength={MAX_SEARCH_LENGTH}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="상품명 일부를 입력하세요"
+              autoComplete="off"
+            />
+            <button type="submit" className="button button-primary small">
+              검색
+            </button>
+            {q && (
+              <button
+                type="button"
+                className="text-button"
+                onClick={() => {
+                  setSearch('')
+                  update({ q: '' })
+                }}
+              >
+                검색 초기화
+              </button>
+            )}
+          </div>
+          {q && !pending && !error && (
+            <p className="bank-application-help" role="status">
+              ‘{q}’ 검색 결과 {counts.all}개
+            </p>
+          )}
+        </form>
         <ErrorNotice error={error} message={loadMessage(error)} />
         {pending ? (
           <div className="empty-state" role="status">
@@ -104,6 +160,19 @@ export default function AdminProductsPage() {
               onClick={() => setReload((value) => value + 1)}
             >
               다시 불러오기
+            </button>
+          </div>
+        ) : !products.length && q ? (
+          <div className="empty-state">
+            <h3>‘{q}’ 이름의 상품이 없습니다.</h3>
+            <button
+              className="text-button"
+              onClick={() => {
+                setSearch('')
+                update({ q: '' })
+              }}
+            >
+              전체 상품 보기
             </button>
           </div>
         ) : !products.length ? (

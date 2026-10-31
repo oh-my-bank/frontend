@@ -191,7 +191,7 @@ export default function AdminProductNewPage() {
                   />
                 </div>
                 <p className="bank-application-help" id={`${fieldId('name')}-help`}>
-                  판매 중인 상품과 겹치지 않는 100자 이내의 이름 · 등록 후 수정할 수 없습니다.
+                  판매 중인 상품과 겹치지 않는 100자 이내의 이름 · 등록 후 수정하면 이력이 남습니다.
                 </p>
                 {errors.name && (
                   <p className="bank-application-error" id={`${fieldId('name')}-error`}>
@@ -219,7 +219,7 @@ export default function AdminProductNewPage() {
                 />
                 <p className="bank-application-help" id={`${fieldId('description')}-help`}>
                   고객 상품 화면에 표시됩니다 ({description.length.toLocaleString('ko-KR')}
-                  /1,000자) · 등록 후 수정할 수 없습니다.
+                  /1,000자) · 등록 후 수정하면 이력이 남습니다.
                 </p>
                 {errors.description && (
                   <p className="bank-application-error" id={`${fieldId('description')}-error`}>
@@ -246,9 +246,9 @@ export default function AdminProductNewPage() {
           </h2>
           <ul>
             <li>등록하면 판매 중 상태로 고객 상품 목록과 신청 화면에 바로 공개됩니다.</li>
-            <li>상품명과 설명은 등록 후 수정할 수 없습니다.</li>
+            <li>상품명과 설명은 등록 후 수정할 수 있으며 이전 정보는 이력으로 보존됩니다.</li>
             <li>조건을 바꾸려면 새 정책 버전을 발행합니다. 이미 접수된 신청은 바뀌지 않습니다.</li>
-            <li>판매 중지는 되돌릴 수 없습니다.</li>
+            <li>판매를 중지한 상품은 현재 정책 그대로 판매를 재개할 수 있습니다.</li>
             <li>가상 상품입니다. 실제 금융상품이나 실제 자금을 사용하지 않습니다.</li>
           </ul>
         </aside>
