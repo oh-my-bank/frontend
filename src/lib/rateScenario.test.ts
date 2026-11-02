@@ -72,6 +72,8 @@ describe('calculator list', () => {
       'goal',
       'variable-loan',
       'rate-scenario',
+      'account-plan',
+      'real-rate',
     ])
     expect(isCalculatorKind('rate-scenario')).toBe(true)
     expect(isCalculatorKind('rate')).toBe(false)
