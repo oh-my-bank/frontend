@@ -810,7 +810,7 @@
   outline: 2px solid var(--brand);
   outline-offset: 1px;
 }
-/* Outranks the global `input:not([type='checkbox'])` text-field rule, which loads later. */
+/* Outranks the global radio base rule and keeps this screen's own size. */
 .sim-product input[type='radio'] {
   grid-row: span 3;
   width: 17px;

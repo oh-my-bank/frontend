@@ -429,7 +429,7 @@
   outline: 3px solid #8dbbb2;
   outline-offset: 2px;
 }
-/* Outranks the global `input:not([type='checkbox'])` text-field rule, which loads later. */
+/* Outranks the global radio base rule and keeps this screen's own size. */
 .learn-options input[type='radio'] {
   width: 18px;
   height: 18px;
