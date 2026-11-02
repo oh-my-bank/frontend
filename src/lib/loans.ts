@@ -263,6 +263,8 @@ export function loanCommandMessage(error: unknown, command: LoanCommand) {
       NO_REPAYMENT_TO_REVERSE: '취소할 납부가 없습니다. 최신 대출 정보를 다시 불러왔습니다.',
       LOAN_HAS_PREPAYMENT:
         '조기상환한 대출은 철회할 수 없습니다. 최신 대출 정보를 다시 불러왔습니다.',
+      CUSTOMER_WITHDRAWN:
+        '탈퇴한 회원의 대출은 납부를 취소할 수 없습니다. 탈퇴 회원의 기록은 그대로 보존합니다.',
       REPAYMENT_BEFORE_PREPAYMENT:
         '조기상환 이전에 납부한 회차는 취소할 수 없습니다. 최신 대출 정보를 다시 불러왔습니다.',
       PREPAYMENT_STATE_CHANGED:

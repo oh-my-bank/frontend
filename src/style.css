@@ -446,6 +446,9 @@ summary:focus-visible {
   line-height: 1.8;
   color: #5c7063;
 }
+.home-notice {
+  margin-bottom: 20px;
+}
 .notice a,
 .info-banner a {
   color: var(--brand);

@@ -83,6 +83,7 @@ describe('audit log display', () => {
   it('labels known codes and keeps unknown codes readable', () => {
     expect(actionLabel('PRODUCT_POLICY_PUBLISHED')).toBe('정책 버전 발행')
     expect(actionLabel('LOAN_EXECUTED')).toBe('LOAN_EXECUTED')
+    expect(actionLabel('ACCOUNT_WITHDRAWN')).toBe('회원 탈퇴')
     expect(roleLabel('REVIEWER')).toBe('심사 담당자')
     expect(roleLabel(null)).toBe('알 수 없음')
   })
