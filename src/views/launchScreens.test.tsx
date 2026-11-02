@@ -88,13 +88,24 @@ describe('render error boundary', () => {
     boundary.componentDidUpdate({ children: null, resetKey: '/a' })
     expect(setState).toHaveBeenCalledWith({ error: null })
   })
+  it('also clears the error when only the query changes on the same path', () => {
+    const boundary = new RouteErrorBoundary({ children: null, resetKey: '/glossary?q=b' })
+    const setState = vi.spyOn(boundary, 'setState').mockImplementation(() => {})
+    boundary.state = { error: new Error('boom') }
+    boundary.componentDidUpdate({ children: null, resetKey: '/glossary?q=a' })
+    expect(setState).toHaveBeenCalledWith({ error: null })
+  })
   it('explains a missing route chunk after a new deployment', () => {
     const chunk = new TypeError('Failed to fetch dynamically imported module: /assets/LearnPage.js')
     expect(isChunkLoadError(chunk)).toBe(true)
     expect(isChunkLoadError(new Error('boom'))).toBe(false)
     expect(isChunkLoadError('Failed to fetch dynamically imported module')).toBe(false)
-    expect(renderToStaticMarkup(<RenderErrorFallback error={chunk} />)).toContain(
-      '새 버전이 배포되어',
-    )
+    const html = renderToStaticMarkup(<RenderErrorFallback error={chunk} />)
+    expect(html).toContain('새 버전이 배포되어')
+    // Reloading is the first, primary action: React keeps the failed import until a reload.
+    const reload = html.indexOf('button button-primary')
+    expect(reload).toBeGreaterThan(-1)
+    expect(html.indexOf('>새로고침<')).toBeGreaterThan(reload)
+    expect(reload).toBeLessThan(html.indexOf('href="/"'))
   })
 })

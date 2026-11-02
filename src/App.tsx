@@ -291,7 +291,7 @@ export default function App() {
             {loggingOut ? '로그아웃 중입니다.' : '이용 정보를 확인하고 있습니다.'}
           </div>
         ) : (
-          <RouteErrorBoundary resetKey={location.pathname}>
+          <RouteErrorBoundary resetKey={location.pathname + location.search}>
             <Suspense
               fallback={
                 <div className="empty-state route-loading" role="status">

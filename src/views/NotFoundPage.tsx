@@ -1,10 +1,14 @@
+import { useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import AppIcon from '../components/AppIcon'
+import { addNoIndex } from '../lib/robotsMeta'
 import '../styles/launch.css'
 
 /** Rendered for any path the app does not declare, instead of silently redirecting home. */
 export default function NotFoundPage() {
   const { pathname } = useLocation()
+  // Unknown paths still get HTTP 200 from the SPA server, so keep crawlers from indexing them.
+  useEffect(() => addNoIndex(), [])
   return (
     <>
       <header className="page-title">

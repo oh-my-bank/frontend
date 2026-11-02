@@ -50,7 +50,11 @@ export function RenderErrorFallback({ error }: { error: unknown }) {
 type Props = { children: ReactNode; resetKey?: string }
 type State = { error: unknown }
 
-/** Catches render errors below it. A new `resetKey` (the current path) clears the error. */
+/**
+ * Catches render errors below it. A new `resetKey` (path and query) clears the error. A failed lazy
+ * chunk stays failed until a reload because React caches the rejected import, hence the fallback
+ * offers reloading first.
+ */
 export default class RouteErrorBoundary extends Component<Props, State> {
   state: State = { error: null }
 
