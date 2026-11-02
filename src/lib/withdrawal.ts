@@ -56,7 +56,7 @@ export function withdrawalErrorMessage(error: unknown): string | null {
   if (!(error instanceof ApiError)) return null
   switch (error.code) {
     case 'WITHDRAWAL_BLOCKED_ACTIVE_LOAN':
-      return `${error.message} 대출을 모두 상환하거나 납부 전에 철회하면 탈퇴할 수 있습니다.`
+      return `${error.message} 납부 기록이 없는 대출은 대출 상세 화면에서 철회할 수 있습니다.`
     case 'LOGIN_LOCKED':
       return `${error.message} 제한이 끝날 때까지 탈퇴할 수 없습니다.`
     case 'NETWORK_ERROR':

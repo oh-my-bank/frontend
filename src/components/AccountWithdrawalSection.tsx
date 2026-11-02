@@ -1,4 +1,4 @@
-import { useRef, useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { ApiError } from '../lib/api'
 import {
@@ -38,6 +38,17 @@ export default function AccountWithdrawalSection({ role }: { role: Role }) {
   const [pending, setPending] = useState(false)
   // A synchronous guard: a double click must not send two withdrawals.
   const sending = useRef(false)
+  // Set once the server ended the session. The signed-in state is cleared when this page unmounts after leaving for the home page:
+  // clearing it while /account is still shown would let the route guard send the user to the login page instead.
+  const withdrawn = useRef(false)
+  const endSessionRef = useRef(endSession)
+  endSessionRef.current = endSession
+  useEffect(
+    () => () => {
+      if (withdrawn.current) endSessionRef.current()
+    },
+    [],
+  )
 
   if (role !== 'CUSTOMER') {
     return (
@@ -77,8 +88,7 @@ export default function AccountWithdrawalSection({ role }: { role: Role }) {
     setPending(true)
     try {
       const result = await withdrawAccount(form)
-      // The server ended the session; forget it here and leave the signed-in pages.
-      endSession()
+      withdrawn.current = true
       void navigate('/', { replace: true, state: { notice: withdrawalNotice(result) } })
     } catch (cause) {
       const fromServer = cause instanceof ApiError ? serverWithdrawalErrors(cause.fieldErrors) : {}
