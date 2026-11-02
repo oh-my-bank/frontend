@@ -38,6 +38,8 @@ import SimulationAccountPage from './views/SimulationAccountPage'
 import SimulationHistoryPage from './views/SimulationHistoryPage'
 import SimulationReportPage from './views/SimulationReportPage'
 import AccountPage from './views/AccountPage'
+import LegalDocumentPage from './views/LegalDocumentPage'
+import './styles/legal.css'
 import AdminAccessDenied from './components/AdminAccessDenied'
 import { anchorId, destinationAfterAuthentication, isAdminPath } from './lib/navigation'
 import { calculatorInfo, calculatorKinds, isCalculatorKind } from './lib/learning'
@@ -93,6 +95,9 @@ function pageTitle(pathname: string, search: string) {
   if (pathname.startsWith('/applications/')) return '신청 내역'
   if (pathname.startsWith('/loans/')) return '대출 상세'
   if (pathname === '/guide') return '이용안내'
+  if (pathname === '/terms') return '이용약관'
+  if (pathname === '/privacy') return '개인정보 처리방침'
+  if (pathname === '/notice') return '서비스 고지'
   if (pathname === '/staff') return '직원업무'
   if (pathname === '/account') return '내 정보'
   if (pathname === '/admin/audit') return '감사 로그'
@@ -296,6 +301,9 @@ export default function App() {
             <Link to="/guide#service">서비스 구성</Link>
             <Link to="/guide#notice">시뮬레이션 안내</Link>
             <Link to="/guide#scope">서비스 제공 범위</Link>
+            <Link to="/notice">서비스 고지</Link>
+            <Link to="/terms">이용약관</Link>
+            <Link to="/privacy">개인정보 처리방침</Link>
             {!user && <Link to="/login?mode=register">회원가입</Link>}
             {user && <Link to="/account">내 정보·비밀번호 변경</Link>}
           </section>
@@ -324,6 +332,9 @@ export default function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/guide" element={<GuidePage />} />
+            <Route path="/terms" element={<LegalDocumentPage code="TERMS" />} />
+            <Route path="/privacy" element={<LegalDocumentPage code="PRIVACY" />} />
+            <Route path="/notice" element={<LegalDocumentPage code="NOTICE" />} />
             <Route path="/learn" element={<LearnPage />} />
             <Route path="/learn/:slug" element={<ConceptPage key={location.pathname} />} />
             <Route path="/glossary" element={<GlossaryPage />} />
@@ -513,6 +524,13 @@ export default function App() {
             <Link to="/simulation">모의 운용</Link>
             <Link to="/products">대출 업무 체험</Link>
             <Link to={staff ? '/staff' : '/my'}>{staff ? '직원업무' : '신청조회'}</Link>
+          </nav>
+          <nav className="footer-links footer-legal" aria-label="약관 및 정책">
+            <Link to="/terms">이용약관</Link>
+            <Link to="/privacy">
+              <strong>개인정보 처리방침</strong>
+            </Link>
+            <Link to="/notice">서비스 고지</Link>
           </nav>
           <div className="footer-bottom">
             <div>
