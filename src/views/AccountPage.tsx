@@ -14,6 +14,7 @@ import {
 import { dateTime } from '../lib/format'
 import AppIcon from '../components/AppIcon'
 import ErrorNotice from '../components/ErrorNotice'
+import AccountWithdrawalSection from '../components/AccountWithdrawalSection'
 import '../styles/banking-products.css'
 import '../styles/account.css'
 
@@ -85,7 +86,7 @@ export default function AccountPage() {
     <>
       <header className="page-title">
         <h1>내 정보</h1>
-        <p>로그인 기록을 확인하고 비밀번호를 변경합니다.</p>
+        <p>로그인 기록을 확인하고 비밀번호를 변경하거나 회원 탈퇴를 신청합니다.</p>
       </header>
 
       <section
@@ -226,6 +227,8 @@ export default function AccountPage() {
           </fieldset>
         </form>
       </section>
+
+      {account && <AccountWithdrawalSection role={account.role} />}
     </>
   )
 }

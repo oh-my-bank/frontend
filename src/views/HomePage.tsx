@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../stores/auth'
 import { request } from '../lib/api'
 import {
@@ -140,6 +140,14 @@ function BankingIllustration() {
 }
 export default function HomePage() {
   const { user } = useAuth()
+  const location = useLocation()
+  const navigate = useNavigate()
+  // A one-time notice from the page that led here, such as a completed account withdrawal.
+  const [notice] = useState(() => (location.state as { notice?: string } | null)?.notice ?? null)
+  useEffect(() => {
+    if ((location.state as { notice?: string } | null)?.notice)
+      void navigate(location.pathname, { replace: true, state: null })
+  }, [location.state, location.pathname, navigate])
   const [products, setProducts] = useState<Product[]>([])
   const [pending, setPending] = useState(true)
   const [failed, setFailed] = useState(false)
@@ -158,6 +166,11 @@ export default function HomePage() {
   const staff = !!user && user.role !== 'CUSTOMER'
   return (
     <>
+      {notice && (
+        <div className="notice home-notice" role="status">
+          {notice}
+        </div>
+      )}
       <section className="bank-home-top">
         <div className="bank-welcome-banner">
           <div className="welcome-copy">

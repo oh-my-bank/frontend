@@ -9,6 +9,8 @@ interface AuthState {
   login: (input: { email: string; password: string }) => Promise<User>
   register: (input: { email: string; password: string; name: string }) => Promise<User>
   logout: () => Promise<void>
+  /** Forgets a session the server already ended (account withdrawal) without another request. */
+  endSession: () => void
   refresh: () => Promise<User | null>
 }
 const AuthContext = createContext<AuthState | null>(null)
@@ -74,6 +76,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null)
     setSessionExpired(false)
   }
+  function endSession() {
+    resetCsrf()
+    setUser(null)
+    setSessionExpired(false)
+  }
   /** Rechecks the server session, e.g. after a 403 that may be an expired session or a stale CSRF token. */
   async function refresh() {
     try {
@@ -88,7 +95,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
   return (
     <AuthContext.Provider
-      value={{ user, ready, error, sessionExpired, login, register, logout, refresh }}
+      value={{ user, ready, error, sessionExpired, login, register, logout, endSession, refresh }}
     >
       {children}
     </AuthContext.Provider>
