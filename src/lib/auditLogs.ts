@@ -47,6 +47,8 @@ export const emptyFilter: AuditFilter = {
 /** Actions recorded by the current modules. Codes added later still show as their raw code. */
 export const actionLabels: Record<string, string> = {
   CUSTOMER_REGISTERED: '고객 가입',
+  ACCOUNT_WITHDRAWN: '회원 탈퇴',
+  ACCOUNT_WITHDRAWAL_REAPPLIED: '회원 탈퇴 재적용(복구 후)',
   APPLICATION_CREATED: '대출 신청 접수',
   REVIEW_STARTED: '심사 시작',
   REVIEW_APPROVED: '심사 승인',

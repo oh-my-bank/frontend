@@ -169,6 +169,10 @@ describe('loan command messages', () => {
       '0원',
     )
     expect(needsLoanReload(new ApiError('VALIDATION_ERROR', 'x', 400))).toBe(false)
+    // L08: an administrator cannot reopen a withdrawn customer's loan.
+    const withdrawn = new ApiError('CUSTOMER_WITHDRAWN', 'x', 409)
+    expect(loanCommandMessage(withdrawn, 'reverse')).toContain('탈퇴한 회원')
+    expect(needsLoanReload(withdrawn)).toBe(true)
   })
   it('shows nothing without an error', () => {
     expect(loanCommandMessage(null, 'agree')).toBeUndefined()
