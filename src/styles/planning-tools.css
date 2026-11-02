@@ -1,0 +1,55 @@
+/* Account plan and real rate calculators (L02, docs/api/banking-learning.md 2장). Same palette as tools.css and the strategy warnings. */
+.tool-warnings {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0 0 20px;
+  padding: 0;
+  list-style: none;
+}
+.tool-warnings li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  padding: 14px 16px;
+  border: 1px solid #efd4cb;
+  border-left: 4px solid #b04a3c;
+  border-radius: 5px;
+  background: #fff7f4;
+  color: #7d3f33;
+  font-size: 14px;
+  line-height: 1.7;
+}
+.tool-warnings strong {
+  color: #9b3f31;
+}
+.account-plan-table tbody th small {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--muted);
+  word-break: keep-all;
+}
+.account-plan-table td {
+  white-space: nowrap;
+  text-align: right;
+}
+.real-rate-message {
+  margin: 0 0 18px;
+  padding: 12px 14px;
+  border: 1px solid #d7e9de;
+  border-left: 4px solid var(--brand);
+  border-radius: 5px;
+  background: #f4faf6;
+  font-size: 14px;
+  line-height: 1.7;
+  word-break: keep-all;
+}
+.real-rate-message.negative {
+  border-color: #efd4cb;
+  border-left-color: #b04a3c;
+  background: #fff7f4;
+  color: #7d3f33;
+}

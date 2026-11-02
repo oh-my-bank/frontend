@@ -12,11 +12,14 @@ import {
   type PasswordField,
 } from '../lib/account'
 import { dateTime } from '../lib/format'
+import { fetchMyAgreements, legalPath, type AgreementRecord } from '../lib/legal'
+import { Link } from 'react-router-dom'
 import AppIcon from '../components/AppIcon'
 import ErrorNotice from '../components/ErrorNotice'
 import AccountWithdrawalSection from '../components/AccountWithdrawalSection'
 import '../styles/banking-products.css'
 import '../styles/account.css'
+import '../styles/legal.css'
 
 const roleLabels = { CUSTOMER: '고객', REVIEWER: '심사 담당자', ADMIN: '운영 관리자' }
 const fields: PasswordField[] = ['currentPassword', 'newPassword', 'confirmPassword']
@@ -31,6 +34,8 @@ export default function AccountPage() {
   const [submitError, setSubmitError] = useState<unknown>(null)
   const [changed, setChanged] = useState(false)
   const [pending, setPending] = useState(false)
+  const [agreements, setAgreements] = useState<AgreementRecord[] | null>(null)
+  const [agreementsError, setAgreementsError] = useState<unknown>(null)
   // A synchronous guard: a double click must not send two password changes.
   const submitting = useRef(false)
 
@@ -41,6 +46,17 @@ export default function AccountPage() {
       .then(setAccount)
       .catch((cause) => {
         if (!controller.signal.aborted) setLoadError(cause)
+      })
+    return () => controller.abort()
+  }, [reload])
+
+  useEffect(() => {
+    const controller = new AbortController()
+    setAgreementsError(null)
+    fetchMyAgreements(controller.signal)
+      .then((result) => setAgreements(result.items))
+      .catch((cause) => {
+        if (!controller.signal.aborted) setAgreementsError(cause)
       })
     return () => controller.abort()
   }, [reload])
@@ -86,7 +102,7 @@ export default function AccountPage() {
     <>
       <header className="page-title">
         <h1>내 정보</h1>
-        <p>로그인 기록을 확인하고 비밀번호를 변경하거나 회원 탈퇴를 신청합니다.</p>
+        <p>로그인 기록과 약관 동의 이력을 확인하고 비밀번호를 변경하거나 회원 탈퇴를 신청합니다.</p>
       </header>
 
       <section
@@ -152,6 +168,46 @@ export default function AccountPage() {
               바로 변경해 주세요.
             </p>
           </>
+        )}
+      </section>
+
+      <section
+        className="account-card"
+        aria-labelledby="account-agreements-title"
+        aria-busy={!agreements && !agreementsError}
+      >
+        <h2 id="account-agreements-title">약관 동의 이력</h2>
+        {agreementsError ? (
+          <>
+            <ErrorNotice error={agreementsError} message="동의 이력을 불러오지 못했습니다." />
+            <button className="button button-outline small" onClick={() => setReload((n) => n + 1)}>
+              다시 불러오기
+            </button>
+          </>
+        ) : !agreements ? (
+          <div className="empty-state" role="status">
+            동의 이력을 불러오고 있습니다.
+          </div>
+        ) : agreements.length === 0 ? (
+          <p>
+            저장된 동의 기록이 없습니다. 약관 동의 기록을 도입하기 전에 만든 학습용 계정이거나 직원
+            계정입니다. 현재 문서는 <Link to="/terms">이용약관</Link>과{' '}
+            <Link to="/privacy">개인정보 처리방침</Link>에서 볼 수 있습니다.
+          </p>
+        ) : (
+          <ul className="agreement-history">
+            {agreements.map((item) => (
+              <li key={`${item.code}-${item.version}`}>
+                <span>
+                  <Link to={`${legalPath(item.code)}?version=${encodeURIComponent(item.version)}`}>
+                    {item.title}
+                  </Link>{' '}
+                  <small className="form-help">{item.version}</small>
+                </span>
+                <span>{dateTime(item.agreedAt)} 동의</span>
+              </li>
+            ))}
+          </ul>
         )}
       </section>
 

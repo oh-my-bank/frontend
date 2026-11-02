@@ -1,13 +1,20 @@
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
 import { ApiError, request, resetCsrf } from '../lib/api'
 import type { User } from '../types'
+import type { Agreement } from '../lib/legal'
 interface AuthState {
   user: User | null
   ready: boolean
   error: string
   sessionExpired: boolean
   login: (input: { email: string; password: string }) => Promise<User>
-  register: (input: { email: string; password: string; name: string }) => Promise<User>
+  register: (input: {
+    email: string
+    password: string
+    name: string
+    ageConfirmed: boolean
+    agreements: Agreement[]
+  }) => Promise<User>
   logout: () => Promise<void>
   /** Forgets a session the server already ended (account withdrawal) without another request. */
   endSession: () => void
@@ -62,7 +69,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setSessionExpired(false)
     return result
   }
-  async function register(input: { email: string; password: string; name: string }) {
+  async function register(input: {
+    email: string
+    password: string
+    name: string
+    ageConfirmed: boolean
+    agreements: Agreement[]
+  }) {
     const result = await request<User>('/auth/register', { method: 'POST', body: input })
     resetCsrf()
     setUser(result)

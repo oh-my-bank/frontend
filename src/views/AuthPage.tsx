@@ -1,10 +1,20 @@
-import { useState, type FormEvent, type KeyboardEvent } from 'react'
+import { useEffect, useState, type FormEvent, type KeyboardEvent } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../stores/auth'
 import { ApiError } from '../lib/api'
 import AppIcon from '../components/AppIcon'
 import ErrorNotice from '../components/ErrorNotice'
 import { destinationAfterAuthentication } from '../lib/navigation'
+import SignupAgreements from '../components/SignupAgreements'
+import {
+  agreementErrorCodes,
+  agreementPayload,
+  fetchLegalDocuments,
+  requiredDocuments,
+  signupConsentProblem,
+  type LegalDocumentList,
+} from '../lib/legal'
+import '../styles/legal.css'
 
 export default function AuthPage() {
   const { login, register, error: connectionError, sessionExpired } = useAuth()
@@ -16,6 +26,37 @@ export default function AuthPage() {
   const [name, setName] = useState('')
   const [pending, setPending] = useState(false)
   const [error, setError] = useState<unknown>(null)
+  const [legal, setLegal] = useState<LegalDocumentList | null>(null)
+  const [legalError, setLegalError] = useState<unknown>(null)
+  const [legalReload, setLegalReload] = useState(0)
+  const [agreed, setAgreed] = useState<Record<string, boolean>>({})
+  const [ageConfirmed, setAgeConfirmed] = useState(false)
+  const [agreementError, setAgreementError] = useState('')
+  const required = requiredDocuments(legal)
+
+  // The form asks for the versions the server publishes now; a stale version is refused with 400.
+  useEffect(() => {
+    if (!registering) return
+    const controller = new AbortController()
+    // Cleared while loading so the form cannot be sent with the versions that were just refused.
+    setLegal(null)
+    setLegalError(null)
+    fetchLegalDocuments(controller.signal)
+      .then(setLegal)
+      .catch((cause) => {
+        if (!controller.signal.aborted) setLegalError(cause)
+      })
+    return () => controller.abort()
+  }, [registering, legalReload])
+
+  function changeAgreements(next: Record<string, boolean>) {
+    setAgreed(next)
+    if (!signupConsentProblem(required, next, ageConfirmed)) setAgreementError('')
+  }
+  function changeAge(value: boolean) {
+    setAgeConfirmed(value)
+    if (!signupConsentProblem(required, agreed, value)) setAgreementError('')
+  }
   function changeMode(value: boolean) {
     setError(null)
     setParams(
@@ -38,17 +79,44 @@ export default function AuthPage() {
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (pending) return
+    if (registering) {
+      if (!legal) return
+      const problem = signupConsentProblem(required, agreed, ageConfirmed)
+      if (problem) {
+        setAgreementError(problem.message)
+        document.getElementById(problem.focusId)?.focus()
+        return
+      }
+    }
     setPending(true)
     setError(null)
+    setAgreementError('')
     try {
       const user = registering
-        ? await register({ email: email.trim(), password, name: name.trim() })
+        ? await register({
+            email: email.trim(),
+            password,
+            name: name.trim(),
+            ageConfirmed,
+            agreements: agreementPayload(required, agreed),
+          })
         : await login({ email: email.trim(), password })
       navigate(destinationAfterAuthentication(params.get('redirect'), user.role, registering), {
         replace: true,
       })
     } catch (cause) {
-      setError(cause)
+      if (cause instanceof ApiError && cause.code === 'AGE_CONFIRMATION_REQUIRED') {
+        setAgreementError(cause.message)
+        setAgeConfirmed(false)
+      } else if (
+        cause instanceof ApiError &&
+        (agreementErrorCodes as readonly string[]).includes(cause.code)
+      ) {
+        // The documents changed or the list was refused: show the current versions again, unchecked.
+        setAgreementError(cause.message)
+        setAgreed({})
+        setLegalReload((n) => n + 1)
+      } else setError(cause)
     } finally {
       setPending(false)
     }
@@ -164,12 +232,44 @@ export default function AuthPage() {
                   </small>
                 )}
               </label>
+              {registering &&
+                (legalError ? (
+                  <div>
+                    <ErrorNotice
+                      error={legalError}
+                      message="약관을 불러오지 못해 가입할 수 없습니다. 다시 불러와 주세요."
+                    />
+                    <button
+                      type="button"
+                      className="button button-outline small"
+                      onClick={() => setLegalReload((n) => n + 1)}
+                    >
+                      약관 다시 불러오기
+                    </button>
+                  </div>
+                ) : !legal ? (
+                  <div className="empty-state" role="status">
+                    약관을 불러오고 있습니다.
+                  </div>
+                ) : (
+                  <SignupAgreements
+                    required={required}
+                    checked={agreed}
+                    onChange={changeAgreements}
+                    ageConfirmed={ageConfirmed}
+                    onAgeChange={changeAge}
+                    error={agreementError}
+                  />
+                ))}
               {!registering && (
                 <small className="form-help">
                   연속으로 여러 번 실패하면 잠시 로그인이 제한됩니다(교육용 기준).
                 </small>
               )}
-              <button className="button button-primary full auth-submit" disabled={pending}>
+              <button
+                className="button button-primary full auth-submit"
+                disabled={pending || (registering && !legal)}
+              >
                 {pending ? '처리 중입니다…' : registering ? '가입하기' : '로그인'}
               </button>
             </fieldset>

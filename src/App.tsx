@@ -1,46 +1,54 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link, NavLink, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from './stores/auth'
 import BrandLogo from './components/BrandLogo'
 import AppIcon from './components/AppIcon'
 import ErrorNotice from './components/ErrorNotice'
 import HomePage from './views/HomePage'
-import GuidePage from './views/GuidePage'
-import AuthPage from './views/AuthPage'
-import DashboardPage from './views/DashboardPage'
-import ProductsPage from './views/ProductsPage'
-import ProductPage from './views/ProductPage'
-import ApplicationPage from './views/ApplicationPage'
-import LoanPage from './views/LoanPage'
-import StaffPage from './views/StaffPage'
-import OpsDashboardPage from './views/OpsDashboardPage'
-import StaffReviewsPage from './views/StaffReviewsPage'
-import StaffReviewPage from './views/StaffReviewPage'
-import StaffLoansPage from './views/StaffLoansPage'
-import StaffLoanPage from './views/StaffLoanPage'
-import AdminProductsPage from './views/AdminProductsPage'
-import AdminProductNewPage from './views/AdminProductNewPage'
-import AdminProductPage from './views/AdminProductPage'
-import AdminPolicyPublishPage from './views/AdminPolicyPublishPage'
-import AdminAuditLogsPage from './views/AdminAuditLogsPage'
-import LearnPage from './views/LearnPage'
-import ConceptPage from './views/ConceptPage'
-import GlossaryPage from './views/GlossaryPage'
-import ToolsPage from './views/ToolsPage'
-import CalculatorPage from './views/tools/CalculatorPage'
-import StrategyPage from './views/StrategyPage'
-import BankLabPage from './views/BankLabPage'
-import StrategySavesPage from './views/StrategySavesPage'
-import StrategySavePage from './views/StrategySavePage'
-import StrategyComparePage from './views/StrategyComparePage'
-import SimulationPage from './views/SimulationPage'
-import SimulationAccountPage from './views/SimulationAccountPage'
-import SimulationHistoryPage from './views/SimulationHistoryPage'
-import SimulationReportPage from './views/SimulationReportPage'
-import AccountPage from './views/AccountPage'
+import './styles/legal.css'
 import AdminAccessDenied from './components/AdminAccessDenied'
 import { anchorId, destinationAfterAuthentication, isAdminPath } from './lib/navigation'
-import { calculatorInfo, calculatorKinds, isCalculatorKind } from './lib/learning'
+import { calculatorInfo, calculatorKinds } from './lib/learning'
+import { documentTitle, notFoundTitle, routeTitle } from './lib/pageTitle'
+import { scrollToElementWhenReady } from './lib/scroll'
+import RouteErrorBoundary from './components/RouteErrorBoundary'
+// The home screen stays in the entry chunk; every other screen loads with its route.
+const GuidePage = lazy(() => import('./views/GuidePage'))
+const AuthPage = lazy(() => import('./views/AuthPage'))
+const DashboardPage = lazy(() => import('./views/DashboardPage'))
+const ProductsPage = lazy(() => import('./views/ProductsPage'))
+const ProductPage = lazy(() => import('./views/ProductPage'))
+const ApplicationPage = lazy(() => import('./views/ApplicationPage'))
+const LoanPage = lazy(() => import('./views/LoanPage'))
+const StaffPage = lazy(() => import('./views/StaffPage'))
+const OpsDashboardPage = lazy(() => import('./views/OpsDashboardPage'))
+const StaffReviewsPage = lazy(() => import('./views/StaffReviewsPage'))
+const StaffReviewPage = lazy(() => import('./views/StaffReviewPage'))
+const StaffLoansPage = lazy(() => import('./views/StaffLoansPage'))
+const StaffLoanPage = lazy(() => import('./views/StaffLoanPage'))
+const AdminProductsPage = lazy(() => import('./views/AdminProductsPage'))
+const AdminProductNewPage = lazy(() => import('./views/AdminProductNewPage'))
+const AdminProductPage = lazy(() => import('./views/AdminProductPage'))
+const AdminPolicyPublishPage = lazy(() => import('./views/AdminPolicyPublishPage'))
+const AdminAuditLogsPage = lazy(() => import('./views/AdminAuditLogsPage'))
+const LearnPage = lazy(() => import('./views/LearnPage'))
+const ConceptPage = lazy(() => import('./views/ConceptPage'))
+const GlossaryPage = lazy(() => import('./views/GlossaryPage'))
+const ToolsPage = lazy(() => import('./views/ToolsPage'))
+const CalculatorPage = lazy(() => import('./views/tools/CalculatorPage'))
+const StrategyPage = lazy(() => import('./views/StrategyPage'))
+const BankLabPage = lazy(() => import('./views/BankLabPage'))
+const StrategySavesPage = lazy(() => import('./views/StrategySavesPage'))
+const StrategySavePage = lazy(() => import('./views/StrategySavePage'))
+const StrategyComparePage = lazy(() => import('./views/StrategyComparePage'))
+const SimulationPage = lazy(() => import('./views/SimulationPage'))
+const SimulationAccountPage = lazy(() => import('./views/SimulationAccountPage'))
+const SimulationHistoryPage = lazy(() => import('./views/SimulationHistoryPage'))
+const SimulationReportPage = lazy(() => import('./views/SimulationReportPage'))
+const AccountPage = lazy(() => import('./views/AccountPage'))
+const LegalDocumentPage = lazy(() => import('./views/LegalDocumentPage'))
+const AboutPage = lazy(() => import('./views/AboutPage'))
+const NotFoundPage = lazy(() => import('./views/NotFoundPage'))
 function Protected({
   children,
   staff = false,
@@ -68,45 +76,6 @@ function Protected({
   if (!staff && user.role !== 'CUSTOMER') return <Navigate to="/staff" replace />
   return children
 }
-function pageTitle(pathname: string, search: string) {
-  if (pathname === '/') return '홈'
-  if (pathname === '/learn') return '은행업 학습'
-  if (pathname.startsWith('/learn/')) return '개념 학습'
-  if (pathname === '/glossary') return '용어 사전'
-  if (pathname === '/tools') return '계산기'
-  if (pathname.startsWith('/tools/')) {
-    const kind = pathname.slice('/tools/'.length)
-    return isCalculatorKind(kind) ? calculatorInfo[kind].title : '계산기'
-  }
-  if (pathname === '/strategy') return '나의 전략'
-  if (pathname === '/bank-lab') return '은행 경영 시뮬레이터'
-  if (pathname === '/strategy/saves') return '내 전략'
-  if (pathname === '/strategy/saves/compare') return '전략 비교'
-  if (pathname.startsWith('/strategy/saves/')) return '저장한 전략'
-  if (pathname === '/simulation') return '모의 운용'
-  if (pathname.startsWith('/simulation/accounts/')) return '모의 계좌 상세'
-  if (pathname === '/simulation/history') return '지난 모의 운용'
-  if (pathname.startsWith('/simulation/history/')) return '모의 운용 리포트'
-  if (pathname === '/my') return '나의 대출'
-  if (pathname === '/products') return '대출상품'
-  if (pathname.startsWith('/products/')) return '대출 신청'
-  if (pathname.startsWith('/applications/')) return '신청 내역'
-  if (pathname.startsWith('/loans/')) return '대출 상세'
-  if (pathname === '/guide') return '이용안내'
-  if (pathname === '/staff') return '직원업무'
-  if (pathname === '/account') return '내 정보'
-  if (pathname === '/admin/audit') return '감사 로그'
-  if (pathname === '/staff/dashboard') return '운영 현황'
-  if (pathname === '/staff/reviews') return '대출 심사'
-  if (pathname.startsWith('/staff/reviews/')) return '심사 상세'
-  if (pathname === '/staff/loans') return '대출 계정 조회'
-  if (pathname.startsWith('/staff/loans/')) return '대출 계정 상세'
-  if (pathname === '/admin/products/new') return '상품 등록'
-  if (pathname.startsWith('/admin/products/'))
-    return pathname.endsWith('/policies/new') ? '새 정책 발행' : '상품 상세'
-  if (isAdminPath(pathname)) return '상품관리'
-  return new URLSearchParams(search).get('mode') === 'register' ? '회원가입' : '로그인'
-}
 const adminRoute = (page: ReactNode) => <Protected admin>{page}</Protected>
 export default function App() {
   const { user, ready, logout } = useAuth()
@@ -122,22 +91,24 @@ export default function App() {
   const role = user
     ? { CUSTOMER: '고객', REVIEWER: '심사 담당자', ADMIN: '운영 관리자' }[user.role]
     : ''
+  const knownTitle = routeTitle(location.pathname, location.search)
   // Other roles only see the access notice on an administrator path, so the title stays generic.
-  const title =
-    user && !admin && isAdminPath(location.pathname)
+  const title = !knownTitle
+    ? notFoundTitle
+    : user && !admin && isAdminPath(location.pathname)
       ? '상품관리'
-      : pageTitle(location.pathname, location.search)
+      : knownTitle
   // Search filters that rewrite the query string in place keep the reader's scroll position.
   const keepScroll = !!(location.state as { keepScroll?: boolean } | null)?.keepScroll
   useEffect(() => {
-    document.title = `${title} | Oh My Bank`
+    document.title = documentTitle(title)
     setMenuOpen(false)
     if (!ready || keepScroll) return
     if (!location.hash) window.scrollTo(0, 0)
     else {
+      // The screen may still be loading its chunk or data, so wait for the anchor to appear.
       const id = anchorId(location.hash)
-      const target = id ? document.getElementById(id) : null
-      target?.scrollIntoView()
+      if (id) return scrollToElementWhenReady(id)
     }
   }, [location.pathname, location.hash, location.key, title, ready, keepScroll])
   useEffect(() => {
@@ -293,9 +264,13 @@ export default function App() {
           </section>
           <section>
             <h3>이용안내</h3>
+            <Link to="/about">서비스 소개</Link>
             <Link to="/guide#service">서비스 구성</Link>
             <Link to="/guide#notice">시뮬레이션 안내</Link>
             <Link to="/guide#scope">서비스 제공 범위</Link>
+            <Link to="/notice">서비스 고지</Link>
+            <Link to="/terms">이용약관</Link>
+            <Link to="/privacy">개인정보 처리방침</Link>
             {!user && <Link to="/login?mode=register">회원가입</Link>}
             {user && <Link to="/account">내 정보·비밀번호 변경</Link>}
           </section>
@@ -307,13 +282,13 @@ export default function App() {
         tabIndex={-1}
       >
         {location.pathname !== '/' && (
-          <div className="bank-breadcrumb" aria-label="현재 위치">
+          <nav className="bank-breadcrumb" aria-label="현재 위치">
             <Link to="/" aria-label="홈">
               <AppIcon name="home" size={14} />
             </Link>
             <AppIcon name="chevron" size={12} />
-            <span>{title}</span>
-          </div>
+            <span aria-current="page">{title}</span>
+          </nav>
         )}
         <ErrorNotice error={logoutError} />
         {!ready || loggingOut ? (
@@ -321,190 +296,205 @@ export default function App() {
             {loggingOut ? '로그아웃 중입니다.' : '이용 정보를 확인하고 있습니다.'}
           </div>
         ) : (
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/guide" element={<GuidePage />} />
-            <Route path="/learn" element={<LearnPage />} />
-            <Route path="/learn/:slug" element={<ConceptPage key={location.pathname} />} />
-            <Route path="/glossary" element={<GlossaryPage />} />
-            <Route path="/tools" element={<ToolsPage />} />
-            <Route path="/tools/:kind" element={<CalculatorPage key={location.pathname} />} />
-            <Route path="/strategy" element={<StrategyPage />} />
-            <Route path="/bank-lab" element={<BankLabPage />} />
-            <Route
-              path="/strategy/saves"
-              element={
-                <Protected>
-                  <StrategySavesPage />
-                </Protected>
+          <RouteErrorBoundary resetKey={location.pathname + location.search}>
+            <Suspense
+              fallback={
+                <div className="empty-state route-loading" role="status">
+                  화면을 불러오고 있습니다.
+                </div>
               }
-            />
-            <Route
-              path="/strategy/saves/compare"
-              element={
-                <Protected>
-                  <StrategyComparePage />
-                </Protected>
-              }
-            />
-            <Route
-              path="/strategy/saves/:id"
-              element={
-                <Protected>
-                  <StrategySavePage key={location.pathname} />
-                </Protected>
-              }
-            />
-            <Route
-              path="/simulation"
-              element={
-                <Protected>
-                  <SimulationPage />
-                </Protected>
-              }
-            />
-            <Route
-              path="/simulation/accounts/:id"
-              element={
-                <Protected>
-                  <SimulationAccountPage key={location.pathname} />
-                </Protected>
-              }
-            />
-            <Route
-              path="/simulation/history"
-              element={
-                <Protected>
-                  <SimulationHistoryPage />
-                </Protected>
-              }
-            />
-            <Route
-              path="/simulation/history/:id"
-              element={
-                <Protected>
-                  <SimulationReportPage key={location.pathname} />
-                </Protected>
-              }
-            />
-            <Route
-              path="/login"
-              element={
-                user ? (
-                  <Navigate
-                    to={destinationAfterAuthentication(
-                      new URLSearchParams(location.search).get('redirect'),
-                      user.role,
-                      new URLSearchParams(location.search).get('mode') === 'register',
-                    )}
-                    replace
-                  />
-                ) : (
-                  <AuthPage />
-                )
-              }
-            />
-            <Route
-              path="/my"
-              element={
-                <Protected>
-                  <DashboardPage />
-                </Protected>
-              }
-            />
-            <Route path="/products" element={<ProductsPage />} />
-            <Route path="/products/:id" element={<ProductPage key={location.pathname} />} />
-            <Route
-              path="/applications/:id"
-              element={
-                <Protected>
-                  <ApplicationPage key={location.pathname} />
-                </Protected>
-              }
-            />
-            <Route
-              path="/loans/:id"
-              element={
-                <Protected>
-                  <LoanPage key={location.pathname} />
-                </Protected>
-              }
-            />
-            <Route
-              path="/staff"
-              element={
-                <Protected staff>
-                  <StaffPage />
-                </Protected>
-              }
-            />
-            <Route
-              path="/account"
-              element={
-                <Protected anyRole>
-                  <AccountPage />
-                </Protected>
-              }
-            />
-            <Route
-              path="/staff/dashboard"
-              element={
-                <Protected staff>
-                  <OpsDashboardPage />
-                </Protected>
-              }
-            />
-            <Route
-              path="/staff/reviews"
-              element={
-                <Protected staff>
-                  <StaffReviewsPage />
-                </Protected>
-              }
-            />
-            <Route
-              path="/staff/reviews/:id"
-              element={
-                <Protected staff>
-                  <StaffReviewPage key={location.pathname} />
-                </Protected>
-              }
-            />
-            <Route
-              path="/staff/loans"
-              element={
-                <Protected staff>
-                  <StaffLoansPage />
-                </Protected>
-              }
-            />
-            <Route
-              path="/staff/loans/:id"
-              element={
-                <Protected staff>
-                  <StaffLoanPage key={location.pathname} />
-                </Protected>
-              }
-            />
-            <Route path="/admin" element={<Navigate to="/admin/products" replace />} />
-            <Route path="/admin/products" element={adminRoute(<AdminProductsPage />)} />
-            <Route path="/admin/audit" element={adminRoute(<AdminAuditLogsPage />)} />
-            <Route path="/admin/products/new" element={adminRoute(<AdminProductNewPage />)} />
-            <Route
-              path="/admin/products/:id"
-              element={adminRoute(<AdminProductPage key={location.pathname} />)}
-            />
-            <Route
-              path="/admin/products/:id/policies/new"
-              element={adminRoute(<AdminPolicyPublishPage key={location.pathname} />)}
-            />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
+            >
+              <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/about" element={<AboutPage />} />
+                <Route path="/guide" element={<GuidePage />} />
+                <Route path="/terms" element={<LegalDocumentPage code="TERMS" />} />
+                <Route path="/privacy" element={<LegalDocumentPage code="PRIVACY" />} />
+                <Route path="/notice" element={<LegalDocumentPage code="NOTICE" />} />
+                <Route path="/learn" element={<LearnPage />} />
+                <Route path="/learn/:slug" element={<ConceptPage key={location.pathname} />} />
+                <Route path="/glossary" element={<GlossaryPage />} />
+                <Route path="/tools" element={<ToolsPage />} />
+                <Route path="/tools/:kind" element={<CalculatorPage key={location.pathname} />} />
+                <Route path="/strategy" element={<StrategyPage />} />
+                <Route path="/bank-lab" element={<BankLabPage />} />
+                <Route
+                  path="/strategy/saves"
+                  element={
+                    <Protected>
+                      <StrategySavesPage />
+                    </Protected>
+                  }
+                />
+                <Route
+                  path="/strategy/saves/compare"
+                  element={
+                    <Protected>
+                      <StrategyComparePage />
+                    </Protected>
+                  }
+                />
+                <Route
+                  path="/strategy/saves/:id"
+                  element={
+                    <Protected>
+                      <StrategySavePage key={location.pathname} />
+                    </Protected>
+                  }
+                />
+                <Route
+                  path="/simulation"
+                  element={
+                    <Protected>
+                      <SimulationPage />
+                    </Protected>
+                  }
+                />
+                <Route
+                  path="/simulation/accounts/:id"
+                  element={
+                    <Protected>
+                      <SimulationAccountPage key={location.pathname} />
+                    </Protected>
+                  }
+                />
+                <Route
+                  path="/simulation/history"
+                  element={
+                    <Protected>
+                      <SimulationHistoryPage />
+                    </Protected>
+                  }
+                />
+                <Route
+                  path="/simulation/history/:id"
+                  element={
+                    <Protected>
+                      <SimulationReportPage key={location.pathname} />
+                    </Protected>
+                  }
+                />
+                <Route
+                  path="/login"
+                  element={
+                    user ? (
+                      <Navigate
+                        to={destinationAfterAuthentication(
+                          new URLSearchParams(location.search).get('redirect'),
+                          user.role,
+                          new URLSearchParams(location.search).get('mode') === 'register',
+                        )}
+                        replace
+                      />
+                    ) : (
+                      <AuthPage />
+                    )
+                  }
+                />
+                <Route
+                  path="/my"
+                  element={
+                    <Protected>
+                      <DashboardPage />
+                    </Protected>
+                  }
+                />
+                <Route path="/products" element={<ProductsPage />} />
+                <Route path="/products/:id" element={<ProductPage key={location.pathname} />} />
+                <Route
+                  path="/applications/:id"
+                  element={
+                    <Protected>
+                      <ApplicationPage key={location.pathname} />
+                    </Protected>
+                  }
+                />
+                <Route
+                  path="/loans/:id"
+                  element={
+                    <Protected>
+                      <LoanPage key={location.pathname} />
+                    </Protected>
+                  }
+                />
+                <Route
+                  path="/staff"
+                  element={
+                    <Protected staff>
+                      <StaffPage />
+                    </Protected>
+                  }
+                />
+                <Route
+                  path="/account"
+                  element={
+                    <Protected anyRole>
+                      <AccountPage />
+                    </Protected>
+                  }
+                />
+                <Route
+                  path="/staff/dashboard"
+                  element={
+                    <Protected staff>
+                      <OpsDashboardPage />
+                    </Protected>
+                  }
+                />
+                <Route
+                  path="/staff/reviews"
+                  element={
+                    <Protected staff>
+                      <StaffReviewsPage />
+                    </Protected>
+                  }
+                />
+                <Route
+                  path="/staff/reviews/:id"
+                  element={
+                    <Protected staff>
+                      <StaffReviewPage key={location.pathname} />
+                    </Protected>
+                  }
+                />
+                <Route
+                  path="/staff/loans"
+                  element={
+                    <Protected staff>
+                      <StaffLoansPage />
+                    </Protected>
+                  }
+                />
+                <Route
+                  path="/staff/loans/:id"
+                  element={
+                    <Protected staff>
+                      <StaffLoanPage key={location.pathname} />
+                    </Protected>
+                  }
+                />
+                <Route path="/admin" element={<Navigate to="/admin/products" replace />} />
+                <Route path="/admin/products" element={adminRoute(<AdminProductsPage />)} />
+                <Route path="/admin/audit" element={adminRoute(<AdminAuditLogsPage />)} />
+                <Route path="/admin/products/new" element={adminRoute(<AdminProductNewPage />)} />
+                <Route
+                  path="/admin/products/:id"
+                  element={adminRoute(<AdminProductPage key={location.pathname} />)}
+                />
+                <Route
+                  path="/admin/products/:id/policies/new"
+                  element={adminRoute(<AdminPolicyPublishPage key={location.pathname} />)}
+                />
+                <Route path="*" element={<NotFoundPage />} />
+              </Routes>
+            </Suspense>
+          </RouteErrorBoundary>
         )}
       </main>
       <footer className="bank-footer">
         <div className="content-width">
           <nav className="footer-links" aria-label="하단 메뉴">
+            <Link to="/about">서비스 소개</Link>
             <Link to="/guide#notice">시뮬레이션 안내</Link>
             <Link to="/learn">은행업 학습</Link>
             <Link to="/glossary">용어 사전</Link>
@@ -513,6 +503,13 @@ export default function App() {
             <Link to="/simulation">모의 운용</Link>
             <Link to="/products">대출 업무 체험</Link>
             <Link to={staff ? '/staff' : '/my'}>{staff ? '직원업무' : '신청조회'}</Link>
+          </nav>
+          <nav className="footer-links footer-legal" aria-label="약관 및 정책">
+            <Link to="/terms">이용약관</Link>
+            <Link to="/privacy">
+              <strong>개인정보 처리방침</strong>
+            </Link>
+            <Link to="/notice">서비스 고지</Link>
           </nav>
           <div className="footer-bottom">
             <div>

@@ -1,0 +1,271 @@
+/* L04: terms, privacy policy and service notice pages, sign-up agreements, agreement history. */
+.legal-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 24px;
+}
+.legal-tabs a {
+  padding: 9px 16px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text);
+  font-size: 14px;
+  text-decoration: none;
+}
+.legal-tabs a[aria-current='page'] {
+  border-color: var(--brand);
+  background: var(--surface-soft);
+  color: var(--brand-dark);
+  font-weight: 700;
+}
+.legal-document {
+  padding: 28px 32px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #fff;
+}
+.legal-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 28px;
+  margin: 0 0 18px;
+  font-size: 14px;
+}
+.legal-meta > div {
+  display: flex;
+  gap: 8px;
+}
+.legal-meta dt {
+  color: var(--muted);
+}
+.legal-meta dd {
+  margin: 0;
+  font-weight: 600;
+}
+.legal-document > .notice {
+  margin: 0 0 18px;
+}
+.legal-body {
+  font-size: 15px;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+.legal-body h2 {
+  margin: 30px 0 10px;
+  font-size: 18px;
+  scroll-margin-top: 16px;
+}
+.legal-body h3 {
+  margin: 22px 0 8px;
+  font-size: 16px;
+}
+.legal-body p {
+  margin: 0 0 12px;
+}
+.legal-body ul,
+.legal-body ol {
+  margin: 0 0 14px;
+  padding-left: 22px;
+}
+.legal-toc {
+  margin: 0 0 8px;
+  padding: 16px 20px;
+  border-radius: 8px;
+  background: var(--surface-soft);
+  font-size: 14px;
+}
+.legal-toc ul {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  columns: 2;
+  column-gap: 28px;
+}
+.legal-toc a {
+  color: var(--brand-dark);
+}
+.legal-table-wrap {
+  margin: 0 0 16px;
+  overflow-x: auto;
+}
+.legal-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.legal-table th,
+.legal-table td {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+}
+.legal-table th {
+  background: var(--surface-soft);
+  white-space: nowrap;
+}
+.legal-versions,
+.legal-operator {
+  margin-top: 32px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+.legal-versions h2,
+.legal-operator h2 {
+  margin: 0 0 12px;
+  font-size: 17px;
+}
+.legal-pending {
+  margin: 0;
+  padding: 14px 18px;
+  border: 1px dashed #c9b26a;
+  border-radius: 6px;
+  background: #fffaf0;
+  font-size: 14px;
+  line-height: 1.7;
+}
+.legal-wrap {
+  overflow-wrap: anywhere;
+}
+
+/* Sign-up agreements */
+.signup-agreements {
+  margin: 4px 0 0;
+  padding: 16px 18px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fbfcfb;
+}
+.signup-agreements legend {
+  padding: 0 4px;
+  font-size: 14px;
+  font-weight: 700;
+}
+.signup-agreements input[aria-invalid='true'] {
+  outline: 2px solid #c4473a;
+  outline-offset: 2px;
+}
+.signup-agreement {
+  padding: 8px 0;
+}
+.signup-agreement + .signup-agreement {
+  border-top: 1px solid var(--border);
+}
+.signup-agreement-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 4px 12px;
+}
+.signup-agreement-row a {
+  color: var(--brand);
+  font-size: 13px;
+  white-space: nowrap;
+}
+.signup-agreement-summary {
+  margin: 6px 0 0 28px;
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+.signup-agreement-summary div {
+  display: grid;
+  grid-template-columns: 7em 1fr;
+  gap: 8px;
+}
+.signup-agreement-summary dt {
+  font-weight: 600;
+}
+.signup-agreement-summary dd {
+  margin: 0;
+}
+.signup-agreements-all {
+  font-weight: 700 !important;
+}
+.signup-agreements .bank-application-error {
+  margin: 8px 0 0;
+}
+.signup-notice-link {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+.signup-notice-link a {
+  color: var(--brand);
+}
+
+/* Account: agreement history */
+.agreement-history {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+}
+.agreement-history li {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 16px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.agreement-history a {
+  color: var(--brand);
+}
+
+@media (max-width: 600px) {
+  .legal-document {
+    padding: 20px 16px;
+  }
+  .legal-toc ul {
+    columns: 1;
+  }
+  .legal-table thead {
+    display: none;
+  }
+  .legal-table,
+  .legal-table tbody,
+  .legal-table tr,
+  .legal-table td {
+    display: block;
+    width: 100%;
+  }
+  .legal-table tr {
+    margin-bottom: 10px;
+    border: 1px solid var(--border);
+  }
+  .legal-table td {
+    border: 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .legal-table td::before {
+    content: attr(data-label);
+    display: block;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .signup-agreement-summary {
+    margin-left: 0;
+  }
+  .signup-agreement-summary div {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}
+
+/* Footer: policy links on every page; the privacy policy is set apart as the guideline recommends. */
+.footer-links.footer-legal {
+  min-height: 46px;
+  gap: 18px;
+}
+.footer-links.footer-legal a:first-child {
+  font-weight: 400;
+  color: inherit;
+}
+.footer-links.footer-legal strong {
+  color: #3d5548;
+  font-weight: 700;
+}
