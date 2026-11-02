@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import { calculatorInfo, isCalculatorKind, relatedToolLinks } from './learning'
-import { normalizeSignedRate, pairedAmount, signedPercent } from './planningTools'
+import {
+  allocationChartNote,
+  monthsToTargetText,
+  normalizeSignedRate,
+  pairedAmount,
+  signedPercent,
+} from './planningTools'
 
 describe('signed rate input', () => {
   it('sends inflation, including deflation, as the decimal string the API accepts', () => {
@@ -30,6 +36,19 @@ describe('optional principal and term', () => {
     expect(pairedAmount(10_000_000, 12)).toEqual({ principal: 10_000_000, termMonths: 12 })
     expect(pairedAmount(10_000_000, null)).toEqual({ error: 'termMonths' })
     expect(pairedAmount(null, 12)).toEqual({ error: 'principal' })
+  })
+})
+
+describe('account plan text', () => {
+  it('reads months to the target, including counts beyond 32-bit integers', () => {
+    expect(monthsToTargetText(null)).toBe('여유자금이 없어 도달할 수 없음')
+    expect(monthsToTargetText(0)).toBe('이미 도달')
+    expect(monthsToTargetText(12)).toBe('12개월')
+    expect(monthsToTargetText(11_999_999_988)).toBe('11,999,999,988개월')
+  })
+  it('says what the full bar is when spending exceeds income', () => {
+    expect(allocationChartNote(0)).toContain('막대 전체가 월 소득')
+    expect(allocationChartNote(200_000)).toContain('막대 전체가 월 지출 합계')
   })
 })
 

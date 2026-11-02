@@ -1,7 +1,13 @@
 import { useState } from 'react'
 import { wonText } from '../../lib/format'
 import { parseWholeNumber } from '../../lib/learning'
-import { accountPlanWarningLabels, accountRoleTones, signedPercent } from '../../lib/planningTools'
+import {
+  accountPlanWarningLabels,
+  accountRoleTones,
+  allocationChartNote,
+  monthsToTargetText,
+  signedPercent,
+} from '../../lib/planningTools'
 import { signedWon } from '../../lib/rateScenario'
 import {
   CalculationError,
@@ -180,7 +186,7 @@ export default function AccountPlanTool() {
                     ][])
                   : []),
                 ['12개월 안에 채우는 데 필요한 월 적립', wonText(result.emergencyMonthlyNeed)],
-                ['목표 도달까지', monthsText(result.monthsToTarget), true],
+                ['목표 도달까지', monthsToTargetText(result.monthsToTarget), true],
                 ...(result.finalMonthTopup !== null
                   ? ([['마지막 달 적립액', wonText(result.finalMonthTopup)]] as [string, string][])
                   : []),
@@ -226,7 +232,7 @@ export default function AccountPlanTool() {
                   })),
                 },
               ]}
-              note="막대 전체가 월 소득입니다. 비상금 목표에 도달하면 파킹통장 적립분이 저축 계좌로 옮겨 갑니다."
+              note={allocationChartNote(result.monthlyShortfall)}
             />
             <div className="tool-explain">
               <h3>이 배분을 읽는 법</h3>
@@ -247,10 +253,4 @@ export default function AccountPlanTool() {
       </ResultPanel>
     </div>
   )
-}
-
-function monthsText(months: number | null) {
-  if (months === null) return '여유자금이 없어 도달할 수 없음'
-  if (months === 0) return '이미 도달'
-  return `${months}개월`
 }

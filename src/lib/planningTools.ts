@@ -35,7 +35,10 @@ export interface AccountPlanResult {
   emergencyGap: number
   emergencyExcess: number
   emergencyMonthlyNeed: number
-  /** 0 when the target is already met, null when there is no surplus to reach it. */
+  /**
+   * 0 when the target is already met, null when there is no surplus to reach it. An int64 on the
+   * server: a few won of surplus against a gap of billions takes billions of months, still exact here.
+   */
   monthsToTarget: number | null
   finalMonthTopup: number | null
   accounts: PlannedAccount[]
@@ -128,4 +131,18 @@ export function pairedAmount(principal: number | null, months: number | null) {
   if (principal === null) return { error: 'principal' as const }
   if (months === null) return { error: 'termMonths' as const }
   return { principal, termMonths: months }
+}
+
+/** Months to the emergency fund target, e.g. "12개월", "11,999,999,988개월". */
+export function monthsToTargetText(months: number | null) {
+  if (months === null) return '여유자금이 없어 도달할 수 없음'
+  if (months === 0) return '이미 도달'
+  return `${new Intl.NumberFormat('ko-KR').format(months)}개월`
+}
+
+/** The bars span the income only when spending fits in it; otherwise they span the spending. */
+export function allocationChartNote(monthlyShortfall: number) {
+  return monthlyShortfall > 0
+    ? '지출이 소득보다 많아 막대 전체가 월 지출 합계입니다. 소득으로 채우지 못하는 부족액만큼 비상금·저축 배분이 없습니다.'
+    : '막대 전체가 월 소득입니다. 비상금 목표에 도달하면 파킹통장 적립분이 저축 계좌로 옮겨 갑니다.'
 }
