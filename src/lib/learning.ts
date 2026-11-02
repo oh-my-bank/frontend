@@ -371,6 +371,7 @@ export const calculatorInfo: Record<
     summary:
       '월 소득을 급여·고정지출, 생활비, 비상금, 저축 계좌로 나누는 교육용 배분과 비상금 목표 도달 시점을 계산합니다.',
     concepts: [
+      { slug: 'choosing-accounts', label: '목적에 맞는 계좌 고르기' },
       { slug: 'saving-strategy', label: '나에게 맞는 은행 활용 전략' },
       { slug: 'demand-deposits', label: '입출금 통장과 파킹통장' },
     ],
@@ -380,6 +381,7 @@ export const calculatorInfo: Record<
     summary:
       '명목 금리에서 이자소득세와 예상 물가상승률을 빼면 실제로 늘어나는 구매력이 얼마인지 계산합니다.',
     concepts: [
+      { slug: 'real-interest-rate', label: '실질금리: 물가와 세금을 빼고 남는 수익' },
       { slug: 'interest-tax', label: '이자에 붙는 세금' },
       { slug: 'time-deposits', label: '정기예금' },
     ],
