@@ -265,6 +265,8 @@ export function loanCommandMessage(error: unknown, command: LoanCommand) {
         '조기상환한 대출은 철회할 수 없습니다. 최신 대출 정보를 다시 불러왔습니다.',
       REPAYMENT_BEFORE_PREPAYMENT:
         '조기상환 이전에 납부한 회차는 취소할 수 없습니다. 최신 대출 정보를 다시 불러왔습니다.',
+      PREPAYMENT_STATE_CHANGED:
+        '미리보기 이후 대출 상태가 바뀌었습니다. 최신 정보로 미리보기를 다시 계산했으니 확인해 주세요.',
       PREPAYMENT_EXCEEDS_BALANCE:
         '부분상환 금액은 남은 원금보다 적어야 합니다. 남은 원금을 모두 갚으려면 전액상환을 선택해 주세요.',
       PREPAYMENT_TERMS_UNSUPPORTED:
@@ -302,6 +304,18 @@ export const ledgerAccountLabel = (code: string) =>
     INTEREST_INCOME: '이자수익',
     FEE_INCOME: '수수료수익',
   })[code] ?? code
+
+/** When a ledger transaction was actually recorded (Asia/Seoul, to the second). The journal is ordered by virtual date first. */
+export const ledgerRecordedAt = (value: string) => {
+  const date = new Date(value)
+  return Number.isNaN(date.getTime())
+    ? value
+    : new Intl.DateTimeFormat('ko-KR', {
+        dateStyle: 'short',
+        timeStyle: 'medium',
+        timeZone: 'Asia/Seoul',
+      }).format(date)
+}
 
 /** `2026-01-31` → `2026.01.31`; lifecycle dates are virtual calendar dates without a time zone. */
 export const loanDate = (value: string | null | undefined) => {

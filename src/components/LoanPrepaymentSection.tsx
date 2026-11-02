@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { ApiError, request } from '../lib/api'
 import { won } from '../lib/format'
 import { loanCommandMessage, loanDate, needsLoanReload, type LoanDetail } from '../lib/loans'
@@ -7,11 +7,14 @@ import {
   canPrepay,
   feeRateLabel,
   isAmountConflict,
+  isStateChanged,
   prepaymentApplied,
   prepaymentNotice,
   prepaymentPreviewPath,
   prepaymentRequest,
   prepaymentTypeLabel,
+  withPreviewState,
+  type PrepaymentBody,
   type PrepaymentPreview,
   type PrepaymentResult,
   type PrepaymentType,
@@ -52,7 +55,8 @@ export default function LoanPrepaymentSection({
   const [unresolved, setUnresolved] = useState<number | null>(null)
   const [checking, setChecking] = useState(false)
   const [checkResult, setCheckResult] = useState<{ message: string; failed?: unknown } | null>(null)
-  if (!canPrepay(loan)) return null
+  // After 409 PREPAYMENT_STATE_CHANGED the page reloads the loan; this holds the stale loan until the new one arrives.
+  const staleLoan = useRef<LoanDetail | null>(null)
 
   const parsed = prepaymentRequest(type, amount, loan.outstandingPrincipal)
   const body = 'body' in parsed ? parsed.body : null
@@ -60,9 +64,20 @@ export default function LoanPrepaymentSection({
   const key = JSON.stringify([body, loan.outstandingPrincipal, loan.paidInstallments])
   const current = body && preview?.key === key ? preview.value : null
 
+  useEffect(() => {
+    if (!staleLoan.current || staleLoan.current === loan) return
+    staleLoan.current = null
+    if (canPrepay(loan) && body) void fetchPreview(body, key)
+    // Runs once the reloaded loan replaces the stale one; body and key belong to that render.
+  }, [loan])
+  if (!canPrepay(loan)) return null
+
   function edited() {
     setFormError(null)
     setPreviewError(null)
+    // A different request is no longer the one whose result was uncertain.
+    setUnresolved(null)
+    setCheckResult(null)
   }
   async function loadPreview(event: FormEvent) {
     event.preventDefault()
@@ -71,13 +86,16 @@ export default function LoanPrepaymentSection({
       setFormError('error' in parsed ? parsed.error : null)
       return
     }
+    await fetchPreview(body, key)
+  }
+  async function fetchPreview(previewBody: PrepaymentBody, previewKey: string) {
     setFormError(null)
     setPreviewError(null)
     setPreviewing(true)
     try {
       setPreview({
-        key,
-        value: await request<PrepaymentPreview>(prepaymentPreviewPath(path, body)),
+        key: previewKey,
+        value: await request<PrepaymentPreview>(prepaymentPreviewPath(path, previewBody)),
       })
     } catch (cause) {
       setPreview(null)
@@ -92,6 +110,7 @@ export default function LoanPrepaymentSection({
   }
   function finished(latest: LoanDetail, notice: string) {
     command.setError(null)
+    command.clear()
     setConfirming(false)
     setUnresolved(null)
     setAcknowledged(false)
@@ -103,12 +122,16 @@ export default function LoanPrepaymentSection({
     if (!body || !current) return
     setCheckResult(null)
     const before = loan.prepayments?.length ?? 0
-    const outcome = await command.run({ loanId: loan.id, command: 'prepay', body }, (requestKey) =>
-      request<PrepaymentResult>(`${path}/prepayments`, {
-        method: 'POST',
-        idempotencyKey: requestKey,
-        body,
-      }),
+    // The previewed state goes with the request, so a second identical prepayment is a new request with a new key.
+    const sent = withPreviewState(body, current)
+    const outcome = await command.run(
+      { loanId: loan.id, command: 'prepay', body: sent },
+      (requestKey) =>
+        request<PrepaymentResult>(`${path}/prepayments`, {
+          method: 'POST',
+          idempotencyKey: requestKey,
+          body: sent,
+        }),
     )
     if (!outcome) return
     if (outcome.ok) {
@@ -124,7 +147,10 @@ export default function LoanPrepaymentSection({
     if (!isAmountConflict(cause) && needsLoanReload(cause)) {
       setConfirming(false)
       setPreview(null)
+      setAcknowledged(false)
       command.setError(null)
+      // The loan moved on since the preview: reload it, then preview the same request again.
+      if (isStateChanged(cause)) staleLoan.current = loan
       onConflict(loanCommandMessage(cause, 'prepay') ?? cause.message)
     }
   }

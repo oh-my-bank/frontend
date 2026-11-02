@@ -4,6 +4,7 @@ import { rate, repaymentLabel, won } from '../lib/format'
 import {
   ledgerAccountLabel,
   ledgerKindLabel,
+  ledgerRecordedAt,
   loanDate,
   loanBadgeClass,
   loanStatusLabel,
@@ -283,6 +284,7 @@ function LedgerView({ ledger }: { ledger: Ledger }) {
             <tr>
               <th scope="col">거래일 (가상)</th>
               <th scope="col">거래</th>
+              <th scope="col">기록 시각</th>
               <th scope="col">계정</th>
               <th scope="col">구분</th>
               <th scope="col" className="sim-number">
@@ -303,6 +305,7 @@ function LedgerView({ ledger }: { ledger: Ledger }) {
                       ? `${ledgerKindLabel(transaction.kind)}${transaction.installment ? ` ${transaction.installment}회차` : ''}`
                       : ''}
                   </td>
+                  <td>{index === 0 ? ledgerRecordedAt(transaction.createdAt) : ''}</td>
                   <td>{ledgerAccountLabel(entry.account)}</td>
                   <td>{sideLabel(entry.side)}</td>
                   <td className="sim-number">{won(entry.amount)}</td>
@@ -314,7 +317,9 @@ function LedgerView({ ledger }: { ledger: Ledger }) {
       </div>
       <p className="bank-section-help">
         <AppIcon name="info" size={14} /> {ledger.notice} 원장은 추가 전용이며 기존 거래를
-        수정·삭제하지 않습니다.
+        수정·삭제하지 않습니다. 거래는 가상 거래일 순서로 표시하므로, 같은 거래일에 나중에 기록된
+        거래(예: 납부 취소 뒤 다시 한 조기상환)가 앞에 놓일 수 있습니다. 실제 처리 순서는 기록
+        시각으로 확인합니다.
       </p>
     </>
   )

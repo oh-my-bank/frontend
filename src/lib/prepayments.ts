@@ -103,6 +103,20 @@ export function prepaymentPreviewPath(loanPath: string, body: PrepaymentBody) {
   return `${loanPath}/prepayments/preview?${query.toString()}`
 }
 
+/** The previewed loan state the server checks before it prepays (409 PREPAYMENT_STATE_CHANGED when the loan moved on). */
+export const withPreviewState = (
+  body: PrepaymentBody,
+  preview: Pick<PrepaymentPreview, 'paidInstallments' | 'outstandingBefore'>,
+) => ({
+  ...body,
+  expectedPaidInstallments: preview.paidInstallments,
+  expectedOutstandingPrincipal: preview.outstandingBefore,
+})
+
+/** The loan changed after the preview; the screen previews the same request again. */
+export const isStateChanged = (error: unknown) =>
+  error instanceof ApiError && error.code === 'PREPAYMENT_STATE_CHANGED'
+
 /** Only an active loan can be prepaid. */
 export const canPrepay = (loan: Pick<LoanDetail, 'status'>) => loan.status === 'ACTIVE'
 

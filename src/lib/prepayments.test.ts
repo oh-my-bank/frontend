@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import { ApiError } from './api'
+import { createRequestIdentity } from './idempotency'
 import {
   canWithdraw,
   ledgerAccountLabel,
   ledgerKindLabel,
+  ledgerRecordedAt,
   loanCommandMessage,
   prepaymentPoint,
   reversalTarget,
@@ -15,12 +17,14 @@ import {
   canPrepay,
   feeRateLabel,
   isAmountConflict,
+  isStateChanged,
   parseWon,
   prepaymentApplied,
   prepaymentNotice,
   prepaymentPreviewPath,
   prepaymentRequest,
   prepaymentTypeLabel,
+  withPreviewState,
   type Prepayment,
 } from './prepayments'
 
@@ -181,5 +185,58 @@ describe('loan commands after a prepayment', () => {
       '10,000원 이상',
     )
     expect(loanCommandMessage(new TypeError('network'), 'prepay')).toContain('조기상환 결과를')
+  })
+})
+
+describe('previewed state in the request', () => {
+  it('sends the previewed paid count and balance with the body', () => {
+    expect(
+      withPreviewState(
+        { type: 'PARTIAL', amount: 3000000 },
+        { paidInstallments: 3, outstandingBefore: 7610802 },
+      ),
+    ).toEqual({
+      type: 'PARTIAL',
+      amount: 3000000,
+      expectedPaidInstallments: 3,
+      expectedOutstandingPrincipal: 7610802,
+    })
+    expect(
+      withPreviewState({ type: 'FULL' }, { paidInstallments: 6, outstandingBefore: 5149209 }),
+    ).toEqual({
+      type: 'FULL',
+      expectedPaidInstallments: 6,
+      expectedOutstandingPrincipal: 5149209,
+    })
+  })
+  it('gives a second identical prepayment a new key because the previewed balance moved', () => {
+    const identity = createRequestIdentity(
+      (() => {
+        let n = 0
+        return () => `key-${++n}`
+      })(),
+    )
+    const body = { type: 'PARTIAL' as const, amount: 1000000 }
+    const first = identity.keyFor(
+      withPreviewState(body, { paidInstallments: 0, outstandingBefore: 10000000 }),
+    )
+    // An uncertain retry of the same preview reuses the key.
+    expect(
+      identity.keyFor(withPreviewState(body, { paidInstallments: 0, outstandingBefore: 10000000 })),
+    ).toBe(first)
+    expect(
+      identity.keyFor(withPreviewState(body, { paidInstallments: 0, outstandingBefore: 9000000 })),
+    ).not.toBe(first)
+  })
+  it('recognizes a changed loan and explains it', () => {
+    const changed = new ApiError('PREPAYMENT_STATE_CHANGED', 'x', 409)
+    expect(isStateChanged(changed)).toBe(true)
+    expect(isAmountConflict(changed)).toBe(false)
+    expect(isStateChanged(new ApiError('LOAN_PAID_OFF', 'x', 409))).toBe(false)
+    expect(loanCommandMessage(changed, 'prepay')).toContain('미리보기를 다시 계산')
+  })
+  it('shows when a ledger transaction was recorded, to the second in Seoul time', () => {
+    expect(ledgerRecordedAt('2026-11-02T05:30:15Z')).toMatch(/2:30:15/)
+    expect(ledgerRecordedAt('not-a-date')).toBe('not-a-date')
   })
 })

@@ -38,5 +38,9 @@ export function useAdminCommand() {
       setPending(false)
     }
   }
-  return { run, pending, error, setError }
+  /** Forgets the key once a result was settled another way (for example by checking whether it took effect), so the next command gets a new key. */
+  function clear() {
+    identity.current.clear()
+  }
+  return { run, pending, error, setError, clear }
 }

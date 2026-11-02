@@ -65,6 +65,7 @@ export default function StaffReversalSection({
   }
   function finished(latest: LoanDetail, installment: number) {
     command.setError(null)
+    command.clear()
     setConfirming(false)
     setUnresolved(null)
     setReasonCode('')
