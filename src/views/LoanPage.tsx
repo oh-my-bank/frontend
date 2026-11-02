@@ -18,6 +18,8 @@ import ConfirmDialog from '../components/ConfirmDialog'
 import ErrorNotice from '../components/ErrorNotice'
 import { LoanRecordTabs, LoanStatement } from '../components/LoanRecords'
 import LoanWithdrawalSection from '../components/LoanWithdrawalSection'
+import LoanPrepaymentHistory from '../components/LoanPrepaymentHistory'
+import LoanPrepaymentSection from '../components/LoanPrepaymentSection'
 import '../styles/banking-records.css'
 import '../styles/simulation.css'
 import '../styles/loans.css'
@@ -228,13 +230,15 @@ export default function LoanPage() {
                     {next.installment}회차 납부하기
                   </button>
                 </>
+              ) : loan.prepayments?.some((item) => item.type === 'FULL') ? (
+                <p>전액상환으로 대출을 완납했습니다. 남은 원금은 0원입니다.</p>
               ) : (
                 <p>모든 회차를 납부해 대출을 완납했습니다. 남은 원금은 0원입니다.</p>
               )}
               <p className="bank-section-help">
                 <AppIcon name="info" size={14} /> 회차 순서대로, 회차 납입액 그대로만 납부할 수
                 있습니다. 납부는 해당 회차 납부일에 낸 것으로 기록되는 가상 시간 진행이며 실제
-                출금이 아닙니다. 부분·조기 상환과 연체는 제공하지 않습니다.
+                출금이 아닙니다. 연체는 제공하지 않으며, 원금을 미리 갚으려면 조기상환을 이용합니다.
               </p>
             </section>
           )}
@@ -254,6 +258,22 @@ export default function LoanPage() {
               refreshAll()
             }}
           />
+
+          <LoanPrepaymentSection
+            loan={loan}
+            path={path}
+            onPrepaid={(latest, message) => {
+              setLoan(latest)
+              setConflict(null)
+              setNotice(message)
+            }}
+            onConflict={(message) => {
+              setNotice(null)
+              setConflict(message)
+              refreshAll()
+            }}
+          />
+          <LoanPrepaymentHistory loan={loan} />
 
           <LoanRecordTabs loan={loan} ledgerPath={`${path}/ledger`} />
 

@@ -65,6 +65,7 @@ export default function StaffReversalSection({
   }
   function finished(latest: LoanDetail, installment: number) {
     command.setError(null)
+    command.clear()
     setConfirming(false)
     setUnresolved(null)
     setReasonCode('')
@@ -157,7 +158,11 @@ export default function StaffReversalSection({
           </button>
         </>
       ) : (
-        <p>취소할 납부가 없습니다.</p>
+        <p>
+          {loan.paidInstallments > 0 && loan.prepayments?.length
+            ? '조기상환 이전에 납부한 회차는 취소할 수 없습니다. 조기상환 이후 납부만 취소할 수 있습니다.'
+            : '취소할 납부가 없습니다.'}
+        </p>
       )}
       <p className="bank-section-help">
         <AppIcon name="info" size={14} /> 가장 최근에 납부한 회차부터 하나씩만 취소할 수 있습니다.
