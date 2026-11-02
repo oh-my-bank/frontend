@@ -58,8 +58,16 @@ describe('calculator registration', () => {
     expect(isCalculatorKind('real-rate')).toBe(true)
     expect(calculatorInfo['account-plan'].title).toBe('계좌 설계 계산기')
     expect(calculatorInfo['real-rate'].title).toBe('실질금리 계산기')
-    expect(calculatorInfo['account-plan'].concepts.map((c) => c.slug)).toContain('saving-strategy')
-    expect(calculatorInfo['real-rate'].concepts.map((c) => c.slug)).toContain('interest-tax')
+    expect(calculatorInfo['account-plan'].concepts.map((c) => c.slug)).toEqual([
+      'choosing-accounts',
+      'saving-strategy',
+      'demand-deposits',
+    ])
+    expect(calculatorInfo['real-rate'].concepts.map((c) => c.slug)).toEqual([
+      'real-interest-rate',
+      'interest-tax',
+      'time-deposits',
+    ])
   })
   it('lets learning content point at both calculators', () => {
     expect(relatedToolLinks['account-plan'].to).toBe('/tools/account-plan')
