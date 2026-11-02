@@ -1,39 +1,57 @@
 import { Link } from 'react-router-dom'
-import { legalPath, type LegalDocumentSummary } from '../lib/legal'
+import { ageCheckboxId, legalPath, type LegalDocumentSummary } from '../lib/legal'
+
+const errorId = 'signup-agreements-error'
 
 /**
- * Required sign-up agreements (L04). Each box names the exact document version the request will
- * carry; full texts open in a new tab so the half-filled form is kept.
+ * Required sign-up confirmations (L04): 14 or older, then each required document. Each document
+ * box names the exact version the request will carry; full texts open in a new tab so the
+ * half-filled form is kept. After a refused submit only the boxes still empty are marked invalid.
  */
 export default function SignupAgreements({
   required,
   checked,
   onChange,
+  ageConfirmed,
+  onAgeChange,
   error,
 }: {
   required: LegalDocumentSummary[]
   checked: Record<string, boolean>
   onChange: (next: Record<string, boolean>) => void
+  ageConfirmed: boolean
+  onAgeChange: (value: boolean) => void
   error: string
 }) {
-  const all = required.length > 0 && required.every((doc) => checked[doc.code])
+  const all = ageConfirmed && required.length > 0 && required.every((doc) => checked[doc.code])
+  const invalid = (isChecked: boolean) =>
+    error && !isChecked ? { 'aria-invalid': true, 'aria-describedby': errorId } : {}
   return (
-    <fieldset
-      className="signup-agreements"
-      aria-invalid={!!error}
-      aria-describedby={error ? 'signup-agreements-error' : undefined}
-    >
-      <legend>약관 동의</legend>
+    <fieldset className="signup-agreements">
+      <legend>가입 확인과 약관 동의</legend>
       <label className="checkbox-label signup-agreements-all">
         <input
           type="checkbox"
           checked={all}
-          onChange={(event) =>
+          onChange={(event) => {
+            onAgeChange(event.target.checked)
             onChange(Object.fromEntries(required.map((doc) => [doc.code, event.target.checked])))
-          }
+          }}
         />
         필수 항목에 모두 동의합니다.
       </label>
+      <div className="signup-agreement">
+        <label className="checkbox-label" htmlFor={ageCheckboxId}>
+          <input
+            id={ageCheckboxId}
+            type="checkbox"
+            checked={ageConfirmed}
+            onChange={(event) => onAgeChange(event.target.checked)}
+            {...invalid(ageConfirmed)}
+          />
+          <span>[필수] 만 14세 이상입니다.</span>
+        </label>
+      </div>
       {required.map((doc) => (
         <div className="signup-agreement" key={doc.code}>
           <div className="signup-agreement-row">
@@ -43,7 +61,11 @@ export default function SignupAgreements({
                 type="checkbox"
                 checked={!!checked[doc.code]}
                 onChange={(event) => onChange({ ...checked, [doc.code]: event.target.checked })}
-                aria-describedby={doc.summary.length ? `agreement-${doc.code}-summary` : undefined}
+                {...(error && !checked[doc.code]
+                  ? invalid(false)
+                  : doc.summary.length
+                    ? { 'aria-describedby': `agreement-${doc.code}-summary` }
+                    : {})}
               />
               <span>
                 {doc.consentLabel ?? `[필수] ${doc.title}에 동의합니다.`}{' '}
@@ -72,7 +94,7 @@ export default function SignupAgreements({
         </div>
       ))}
       {error && (
-        <p className="bank-application-error" id="signup-agreements-error" role="alert">
+        <p className="bank-application-error" id={errorId} role="alert">
           {error}
         </p>
       )}

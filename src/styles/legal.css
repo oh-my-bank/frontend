@@ -142,8 +142,9 @@
   font-size: 14px;
   font-weight: 700;
 }
-.signup-agreements[aria-invalid='true'] {
-  border-color: #c4473a;
+.signup-agreements input[aria-invalid='true'] {
+  outline: 2px solid #c4473a;
+  outline-offset: 2px;
 }
 .signup-agreement {
   padding: 8px 0;

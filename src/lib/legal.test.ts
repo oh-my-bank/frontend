@@ -6,8 +6,11 @@ import {
   missingAgreements,
   parseMarkdown,
   requiredDocuments,
+  signupConsentProblem,
   type LegalDocumentList,
 } from './legal'
+import { routeTitle } from './pageTitle'
+import { sitemapPaths } from './seo'
 
 const list: LegalDocumentList = {
   items: [
@@ -72,6 +75,28 @@ describe('sign-up agreements', () => {
       ['PRIVACY'],
     )
     expect(missingAgreements(required, { TERMS: true, PRIVACY: true })).toEqual([])
+  })
+  it('requires the 14-or-older confirmation and every required document before sending', () => {
+    expect(signupConsentProblem(required, { TERMS: true, PRIVACY: true }, true)).toBeNull()
+    expect(signupConsentProblem(required, { TERMS: true, PRIVACY: true }, false)).toEqual({
+      message: '만 14세 이상만 가입할 수 있습니다. 만 14세 이상임을 확인해 주세요.',
+      focusId: 'agreement-AGE',
+    })
+    expect(signupConsentProblem(required, { TERMS: true }, true)).toEqual({
+      message: '개인정보 처리방침에 동의해야 가입할 수 있습니다.',
+      focusId: 'agreement-PRIVACY',
+    })
+    expect(signupConsentProblem(required, {}, false)).toEqual({
+      message:
+        '만 14세 이상임을 확인하고 이용약관·개인정보 처리방침에 동의해야 가입할 수 있습니다.',
+      focusId: 'agreement-AGE',
+    })
+  })
+  it('titles the legal pages and lists them in the sitemap', () => {
+    expect(routeTitle('/terms')).toBe('이용약관')
+    expect(routeTitle('/privacy')).toBe('개인정보 처리방침')
+    expect(routeTitle('/notice')).toBe('서비스 고지')
+    expect(sitemapPaths).toEqual(expect.arrayContaining(['/terms', '/privacy', '/notice']))
   })
   it('maps document codes to their public pages', () => {
     expect(legalPath('TERMS')).toBe('/terms')

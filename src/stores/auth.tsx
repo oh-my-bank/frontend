@@ -12,6 +12,7 @@ interface AuthState {
     email: string
     password: string
     name: string
+    ageConfirmed: boolean
     agreements: Agreement[]
   }) => Promise<User>
   logout: () => Promise<void>
@@ -70,6 +71,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     email: string
     password: string
     name: string
+    ageConfirmed: boolean
     agreements: Agreement[]
   }) {
     const result = await request<User>('/auth/register', { method: 'POST', body: input })

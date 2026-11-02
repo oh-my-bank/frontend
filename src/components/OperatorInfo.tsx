@@ -25,7 +25,7 @@ export default function OperatorInfo({ operator }: { operator: LegalOperator }) 
           </div>
         </dl>
       ) : (
-        <p className="legal-pending" role="status">
+        <p className="legal-pending">
           운영자 정보 준비 중입니다. 운영자·연락처·개인정보 보호책임자는 서비스 공개 전에 확정해
           이곳에 표시합니다.
         </p>

@@ -84,6 +84,38 @@ export const missingAgreements = (
   checked: Record<string, boolean>,
 ) => required.filter((doc) => !checked[doc.code])
 
+/** Id of the "14 or older" checkbox; the request field is `ageConfirmed`. */
+export const ageCheckboxId = 'agreement-AGE'
+
+/**
+ * Why the sign-up cannot be sent yet, with the checkbox to focus, or null when the age is confirmed
+ * and every required document is checked. The server applies the same rules (400).
+ */
+export function signupConsentProblem(
+  required: LegalDocumentSummary[],
+  checked: Record<string, boolean>,
+  ageConfirmed: boolean,
+): { message: string; focusId: string } | null {
+  const missing = missingAgreements(required, checked)
+  const titles = missing.map((doc) => doc.title).join('·')
+  if (!ageConfirmed && missing.length > 0)
+    return {
+      message: `만 14세 이상임을 확인하고 ${titles}에 동의해야 가입할 수 있습니다.`,
+      focusId: ageCheckboxId,
+    }
+  if (!ageConfirmed)
+    return {
+      message: '만 14세 이상만 가입할 수 있습니다. 만 14세 이상임을 확인해 주세요.',
+      focusId: ageCheckboxId,
+    }
+  if (missing.length > 0)
+    return {
+      message: `${titles}에 동의해야 가입할 수 있습니다.`,
+      focusId: `agreement-${missing[0].code}`,
+    }
+  return null
+}
+
 /** Sign-up errors that mean the agreement list must be shown again rather than the user fields. */
 export const agreementErrorCodes = [
   'AGREEMENT_REQUIRED',

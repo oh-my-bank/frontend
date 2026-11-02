@@ -10,8 +10,8 @@ import {
   agreementErrorCodes,
   agreementPayload,
   fetchLegalDocuments,
-  missingAgreements,
   requiredDocuments,
+  signupConsentProblem,
   type LegalDocumentList,
 } from '../lib/legal'
 import '../styles/legal.css'
@@ -30,6 +30,7 @@ export default function AuthPage() {
   const [legalError, setLegalError] = useState<unknown>(null)
   const [legalReload, setLegalReload] = useState(0)
   const [agreed, setAgreed] = useState<Record<string, boolean>>({})
+  const [ageConfirmed, setAgeConfirmed] = useState(false)
   const [agreementError, setAgreementError] = useState('')
   const required = requiredDocuments(legal)
 
@@ -37,6 +38,8 @@ export default function AuthPage() {
   useEffect(() => {
     if (!registering) return
     const controller = new AbortController()
+    // Cleared while loading so the form cannot be sent with the versions that were just refused.
+    setLegal(null)
     setLegalError(null)
     fetchLegalDocuments(controller.signal)
       .then(setLegal)
@@ -48,7 +51,11 @@ export default function AuthPage() {
 
   function changeAgreements(next: Record<string, boolean>) {
     setAgreed(next)
-    if (missingAgreements(required, next).length === 0) setAgreementError('')
+    if (!signupConsentProblem(required, next, ageConfirmed)) setAgreementError('')
+  }
+  function changeAge(value: boolean) {
+    setAgeConfirmed(value)
+    if (!signupConsentProblem(required, agreed, value)) setAgreementError('')
   }
   function changeMode(value: boolean) {
     setError(null)
@@ -74,12 +81,10 @@ export default function AuthPage() {
     if (pending) return
     if (registering) {
       if (!legal) return
-      const missing = missingAgreements(required, agreed)
-      if (missing.length > 0) {
-        setAgreementError(
-          `${missing.map((doc) => doc.title).join('·')}에 동의해야 가입할 수 있습니다.`,
-        )
-        document.getElementById(`agreement-${missing[0].code}`)?.focus()
+      const problem = signupConsentProblem(required, agreed, ageConfirmed)
+      if (problem) {
+        setAgreementError(problem.message)
+        document.getElementById(problem.focusId)?.focus()
         return
       }
     }
@@ -92,6 +97,7 @@ export default function AuthPage() {
             email: email.trim(),
             password,
             name: name.trim(),
+            ageConfirmed,
             agreements: agreementPayload(required, agreed),
           })
         : await login({ email: email.trim(), password })
@@ -99,7 +105,10 @@ export default function AuthPage() {
         replace: true,
       })
     } catch (cause) {
-      if (
+      if (cause instanceof ApiError && cause.code === 'AGE_CONFIRMATION_REQUIRED') {
+        setAgreementError(cause.message)
+        setAgeConfirmed(false)
+      } else if (
         cause instanceof ApiError &&
         (agreementErrorCodes as readonly string[]).includes(cause.code)
       ) {
@@ -247,6 +256,8 @@ export default function AuthPage() {
                     required={required}
                     checked={agreed}
                     onChange={changeAgreements}
+                    ageConfirmed={ageConfirmed}
+                    onAgeChange={changeAge}
                     error={agreementError}
                   />
                 ))}
