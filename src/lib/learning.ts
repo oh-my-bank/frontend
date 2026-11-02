@@ -5,13 +5,28 @@ import type {
   VariableLoanInput,
   VariableLoanResult,
 } from './rateScenario'
+import type {
+  AccountPlanInput,
+  AccountPlanResult,
+  RealRateInput,
+  RealRateResult,
+} from './planningTools'
 
 /** Contract: docs/api/banking-learning.md 1장(학습)·2장(계산기). */
 export type CategoryCode =
   'BANKING_BASICS' | 'DEPOSITS' | 'LOANS' | 'RATES_REGULATION' | 'PROTECTION' | 'PLANNING'
 export type Level = 'BASIC' | 'INTERMEDIATE'
 export type RelatedTool =
-  'deposit' | 'savings' | 'loan' | 'dsr' | 'goal' | 'strategy' | 'simulation' | 'products'
+  | 'deposit'
+  | 'savings'
+  | 'loan'
+  | 'dsr'
+  | 'goal'
+  | 'account-plan'
+  | 'real-rate'
+  | 'strategy'
+  | 'simulation'
+  | 'products'
 
 export interface Category {
   code: CategoryCode
@@ -86,7 +101,15 @@ export interface Term {
 }
 
 export type CalculatorKind =
-  'deposit' | 'savings' | 'loan' | 'dsr' | 'goal' | 'variable-loan' | 'rate-scenario'
+  | 'deposit'
+  | 'savings'
+  | 'loan'
+  | 'dsr'
+  | 'goal'
+  | 'variable-loan'
+  | 'rate-scenario'
+  | 'account-plan'
+  | 'real-rate'
 export type InterestType = 'SIMPLE' | 'MONTHLY_COMPOUND'
 export type TaxType = 'GENERAL' | 'TAX_FREE'
 export type RepaymentMethod = 'EQUAL_PAYMENT' | 'EQUAL_PRINCIPAL' | 'BULLET'
@@ -229,6 +252,8 @@ interface Calculation {
   goal: [GoalInput, GoalResult]
   'variable-loan': [VariableLoanInput, VariableLoanResult]
   'rate-scenario': [RateScenarioInput, RateScenarioResult]
+  'account-plan': [AccountPlanInput, AccountPlanResult]
+  'real-rate': [RealRateInput, RealRateResult]
 }
 export type CalculationInput<K extends CalculatorKind> = Calculation[K][0]
 export type CalculationResult<K extends CalculatorKind> = Calculation[K][1]
@@ -274,6 +299,8 @@ export const calculatorKinds: CalculatorKind[] = [
   'goal',
   'variable-loan',
   'rate-scenario',
+  'account-plan',
+  'real-rate',
 ]
 export const isCalculatorKind = (value: string | undefined): value is CalculatorKind =>
   calculatorKinds.includes(value as CalculatorKind)
@@ -339,6 +366,24 @@ export const calculatorInfo: Record<
       { slug: 'fixed-vs-variable', label: '고정금리와 변동금리' },
     ],
   },
+  'account-plan': {
+    title: '계좌 설계 계산기',
+    summary:
+      '월 소득을 급여·고정지출, 생활비, 비상금, 저축 계좌로 나누는 교육용 배분과 비상금 목표 도달 시점을 계산합니다.',
+    concepts: [
+      { slug: 'saving-strategy', label: '나에게 맞는 은행 활용 전략' },
+      { slug: 'demand-deposits', label: '입출금 통장과 파킹통장' },
+    ],
+  },
+  'real-rate': {
+    title: '실질금리 계산기',
+    summary:
+      '명목 금리에서 이자소득세와 예상 물가상승률을 빼면 실제로 늘어나는 구매력이 얼마인지 계산합니다.',
+    concepts: [
+      { slug: 'interest-tax', label: '이자에 붙는 세금' },
+      { slug: 'time-deposits', label: '정기예금' },
+    ],
+  },
 }
 
 /** Where each related tool of a concept lives, with the label shown on its link. */
@@ -348,6 +393,8 @@ export const relatedToolLinks: Record<RelatedTool, { to: string; label: string }
   loan: { to: '/tools/loan', label: '대출 상환 계산기' },
   dsr: { to: '/tools/dsr', label: 'DSR 계산기' },
   goal: { to: '/tools/goal', label: '목표 저축 계산기' },
+  'account-plan': { to: '/tools/account-plan', label: '계좌 설계 계산기' },
+  'real-rate': { to: '/tools/real-rate', label: '실질금리 계산기' },
   strategy: { to: '/strategy', label: '나의 전략 세우기' },
   simulation: { to: '/simulation', label: '모의 운용' },
   products: { to: '/products', label: '대출 업무 체험' },
