@@ -91,6 +91,14 @@ export function LoanStatement({
               {won(loan.totals.paidInterest)})
             </dd>
           </div>
+          {!!loan.prepaidPrincipal && (
+            <div>
+              <dt>조기상환</dt>
+              <dd>
+                원금 {won(loan.prepaidPrincipal)} · 중도상환수수료 {won(loan.prepaymentFees ?? 0)}
+              </dd>
+            </div>
+          )}
           {extra}
         </dl>
       </div>
@@ -108,9 +116,11 @@ export function LoanRecordTabs({ loan, ledgerPath }: { loan: LoanDetail; ledgerP
   const [ledgerError, setLedgerError] = useState<unknown>(null)
   const [ledgerReload, setLedgerReload] = useState(0)
   const paid = loan.paidInstallments
+  // A prepayment keeps the paid count, so the balance also tells the ledger to reload.
+  const outstanding = loan.outstandingPrincipal
   useEffect(() => {
     setLedger(null)
-  }, [ledgerPath, paid])
+  }, [ledgerPath, paid, outstanding])
   useEffect(() => {
     if (tab !== 'ledger' || ledger) return
     const controller = new AbortController()

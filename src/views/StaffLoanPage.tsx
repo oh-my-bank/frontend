@@ -7,6 +7,7 @@ import AppIcon from '../components/AppIcon'
 import ErrorNotice from '../components/ErrorNotice'
 import { LoanRecordTabs, LoanStatement } from '../components/LoanRecords'
 import StaffReversalSection from '../components/StaffReversalSection'
+import LoanPrepaymentHistory from '../components/LoanPrepaymentHistory'
 import { won } from '../lib/format'
 import '../styles/banking-records.css'
 import '../styles/banking-admin.css'
@@ -123,6 +124,7 @@ export default function StaffLoanPage() {
               setReload((value) => value + 1)
             }}
           />
+          <LoanPrepaymentHistory loan={loan} />
           <LoanRecordTabs loan={loan} ledgerPath={`${path}/ledger`} />
           <section className="bank-record-notice" aria-labelledby="staff-loan-notice-title">
             <AppIcon name="info" size={21} />

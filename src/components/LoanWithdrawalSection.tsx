@@ -126,6 +126,8 @@ export default function LoanWithdrawalSection({
             대출 철회
           </button>
         </>
+      ) : loan.prepayments?.length ? (
+        <p>조기상환한 대출은 철회할 수 없습니다. 조기상환 거래는 취소(반대 거래)하지 않습니다.</p>
       ) : (
         <p>
           납부가 있는 대출은 철회할 수 없습니다. 운영자가 납부를 모두 취소한 뒤에 철회할 수

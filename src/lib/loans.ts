@@ -1,4 +1,5 @@
 import { ApiError } from './api'
+import type { Prepayment } from './prepayments'
 import { isUncertain } from './reviews'
 
 /** Customer loan lifecycle after a mock approval: agreement, execution, ledger and repayment (R02~R04). */
@@ -75,6 +76,10 @@ export interface LoanDetail extends LoanSummary {
   }
   schedule: Installment[]
   notice: string
+  /** L03 prepayments: principal repaid early, the fees and each prepayment record (absent from older servers). */
+  prepaidPrincipal?: number
+  prepaymentFees?: number
+  prepayments?: Prepayment[]
 }
 export interface RepaymentResult {
   repayment: {
@@ -121,7 +126,7 @@ export interface Ledger {
   notice: string
 }
 
-export type LoanCommand = 'agree' | 'execute' | 'repay' | 'withdraw' | 'reverse'
+export type LoanCommand = 'agree' | 'execute' | 'repay' | 'withdraw' | 'reverse' | 'prepay'
 
 /** Which lifecycle panel the application page shows for a status; null before approval or after rejection. */
 export function lifecycleStage(status: string): 'agree' | 'execute' | 'loan' | null {
@@ -150,9 +155,10 @@ export function repaymentApplied(installment: number, latest: LoanDetail) {
   return latest.schedule.some((item) => item.installment === installment && item.paid)
 }
 
-/** A customer may withdraw an active loan only while it has no repayment left (decision 0008). */
-export const canWithdraw = (loan: Pick<LoanSummary, 'status' | 'paidInstallments'>) =>
-  loan.status === 'ACTIVE' && loan.paidInstallments === 0
+/** A customer may withdraw an active loan only while it has no repayment left (decision 0008) and no prepayment (L03). */
+export const canWithdraw = (
+  loan: Pick<LoanSummary, 'status' | 'paidInstallments'> & { prepayments?: unknown[] },
+) => loan.status === 'ACTIVE' && loan.paidInstallments === 0 && !loan.prepayments?.length
 
 /** Whether an uncertain withdrawal already took effect, judged from a fresh loan detail. */
 export const withdrawalApplied = (latest: Pick<LoanSummary, 'status'>) =>
@@ -182,9 +188,16 @@ export interface RepaymentReversalResult {
   loan: LoanDetail
 }
 
-/** Only the latest paid installment of a loan that is not withdrawn can be reversed (LIFO). */
-export function reversalTarget(loan: Pick<LoanDetail, 'status' | 'paidInstallments' | 'schedule'>) {
+/** The paid installment count at the latest prepayment; repayments up to it cannot be reversed (L03). */
+export const prepaymentPoint = (loan: Pick<LoanDetail, 'prepayments'>) =>
+  Math.max(-1, ...(loan.prepayments ?? []).map((item) => item.paidInstallmentsBefore))
+
+/** Only the latest paid installment of a loan that is not withdrawn can be reversed (LIFO), and only after the latest prepayment. */
+export function reversalTarget(
+  loan: Pick<LoanDetail, 'status' | 'paidInstallments' | 'schedule' | 'prepayments'>,
+) {
   if (loan.status === 'WITHDRAWN' || loan.paidInstallments < 1) return null
+  if (loan.paidInstallments <= prepaymentPoint(loan)) return null
   return (
     loan.schedule.find((item) => item.installment === loan.paidInstallments && item.paid) ?? null
   )
@@ -209,12 +222,15 @@ const commandNames: Record<LoanCommand, string> = {
   repay: '상환',
   withdraw: '대출 철회',
   reverse: '납부 취소',
+  prepay: '조기상환',
 }
 
 export function loanCommandMessage(error: unknown, command: LoanCommand) {
   if (!error) return undefined
   if (command === 'reverse' && error instanceof ApiError && error.code === 'VALIDATION_ERROR')
     return '취소 사유와 메모(200자 이하)를 확인해 주세요.'
+  if (command === 'prepay' && error instanceof ApiError && error.code === 'VALIDATION_ERROR')
+    return '상환 유형과 금액(10,000원 이상, 남은 원금 미만)을 확인해 주세요.'
   if (command === 'reverse' && error instanceof ApiError && error.status === 403)
     return '납부 취소는 운영 관리자만 할 수 있습니다.'
   if (isUncertain(error))
@@ -245,6 +261,14 @@ export function loanCommandMessage(error: unknown, command: LoanCommand) {
       REPAYMENT_NOT_LATEST:
         '가장 최근에 납부한 회차만 취소할 수 있습니다. 최신 상환 일정을 다시 불러왔습니다.',
       NO_REPAYMENT_TO_REVERSE: '취소할 납부가 없습니다. 최신 대출 정보를 다시 불러왔습니다.',
+      LOAN_HAS_PREPAYMENT:
+        '조기상환한 대출은 철회할 수 없습니다. 최신 대출 정보를 다시 불러왔습니다.',
+      REPAYMENT_BEFORE_PREPAYMENT:
+        '조기상환 이전에 납부한 회차는 취소할 수 없습니다. 최신 대출 정보를 다시 불러왔습니다.',
+      PREPAYMENT_EXCEEDS_BALANCE:
+        '부분상환 금액은 남은 원금보다 적어야 합니다. 남은 원금을 모두 갚으려면 전액상환을 선택해 주세요.',
+      PREPAYMENT_TERMS_UNSUPPORTED:
+        '부분상환 뒤 남은 회차 납입액이 0원이 되는 금액입니다. 금액을 줄이거나 전액상환을 선택해 주세요.',
       VALIDATION_ERROR: '필수 확인 항목을 모두 확인해 주세요.',
     } as Record<string, string>
   )[error.code]
@@ -266,6 +290,8 @@ export const ledgerKindLabel = (kind: string) =>
       REPAYMENT: '회차 상환',
       DISBURSEMENT_REVERSAL: '실행 철회(반대 거래)',
       REPAYMENT_REVERSAL: '납부 취소(반대 거래)',
+      PREPAYMENT: '조기상환 원금',
+      PREPAYMENT_FEE: '중도상환수수료',
     }) as Record<string, string>
   )[kind] ?? kind
 export const sideLabel = (side: string) => ({ DEBIT: '차변', CREDIT: '대변' })[side] ?? side
@@ -274,6 +300,7 @@ export const ledgerAccountLabel = (code: string) =>
     LOAN_RECEIVABLE: '대출채권',
     VIRTUAL_CASH: '가상 결제 자금',
     INTEREST_INCOME: '이자수익',
+    FEE_INCOME: '수수료수익',
   })[code] ?? code
 
 /** `2026-01-31` → `2026.01.31`; lifecycle dates are virtual calendar dates without a time zone. */
