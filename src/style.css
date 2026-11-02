@@ -543,7 +543,7 @@ summary:focus-visible {
   font-size: 14px;
   font-weight: 600;
 }
-input:not([type='checkbox']),
+input:not([type='checkbox'], [type='radio']),
 select,
 textarea {
   width: 100%;
@@ -567,6 +567,14 @@ textarea:focus {
   box-shadow: 0 0 0 2px #00857712;
 }
 input[type='checkbox'] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--brand);
+  margin: 2px 0 0;
+  flex-shrink: 0;
+}
+/* Zero-specificity base so screen rules such as `.tool-choice input` still win. */
+input:where([type='radio']) {
   width: 18px;
   height: 18px;
   accent-color: var(--brand);
