@@ -22,6 +22,8 @@ export const sitemapPaths = [
   '/tools/goal',
   '/tools/variable-loan',
   '/tools/rate-scenario',
+  '/tools/account-plan',
+  '/tools/real-rate',
   '/strategy',
   '/bank-lab',
   '/products',
